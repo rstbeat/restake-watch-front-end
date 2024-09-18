@@ -61,7 +61,7 @@ const weeklyOperatorData = [
 ];
 
 const OperatorOverview: React.FC = () => {
-  const mockData = generateMockData(50);
+  // const mockData = generateMockData(50);
 
   // Operator Data
   const [operatorData, setOperatorData] = useState<OperatorData[]>(null);
@@ -79,7 +79,6 @@ const OperatorOverview: React.FC = () => {
         numberOfStrategies: operator['Number of Strategies'],
         mostUsedStrategies: operator['Most Used Strategy'],
       }));
-      console.log(operatorDataResponse);
       setOperatorData(operatorDataResponse);
     } catch (error) {
       console.error('Ha ocurrido un error');
@@ -144,7 +143,7 @@ const OperatorOverview: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Operator Address</TableHead>
-                <TableHead>Operator Name</TableHead>
+                {/* <TableHead>Operator Name</TableHead> */}
                 <TableHead>Market Shared</TableHead>
                 <TableHead>ETH Restaked</TableHead>
                 <TableHead>Number of Strategies</TableHead>
@@ -158,7 +157,7 @@ const OperatorOverview: React.FC = () => {
                     <TableCell className="font-mono">
                       {row.operatorAddress}
                     </TableCell>
-                    <TableCell>{row.operatorName}</TableCell>
+                    {/* <TableCell>{row.operatorName}</TableCell> */}
                     <TableCell>{row.marketShared}</TableCell>
                     <TableCell>{row.ethRestaked}</TableCell>
                     <TableCell>{row.numberOfStrategies}</TableCell>

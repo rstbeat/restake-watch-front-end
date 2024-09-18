@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -26,12 +26,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { fetchStakerData } from '../app/api/restake/restake';
+import { Skeleton } from './ui/skeleton';
 
 interface RestakerData {
   restakerAddress: string;
-  restakerName: string;
+  // restakerName: string;
   amountRestaked: string;
-  percentageOfTotal: string;
+  // percentageOfTotal: string;
   numberOfStrategies: number;
   mostUsedStrategies: string;
 }
@@ -60,6 +62,35 @@ const weeklyRestakerData = [
 
 const RestakerOverview: React.FC = () => {
   const mockData = generateMockData(50);
+  const [stakerData, setStakerData] = useState<any>(null);
+  const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
+
+  const fetchStakerDataCallback = useCallback(async () => {
+    try {
+      setIsLoadingStakerData(true);
+      const data = await fetchStakerData({ limit: 15 });
+      const stakerDataResponse = data.stakerData.map((data) => ({
+        restakerAddress: data['Staker Address'].substr(2, 25),
+        // restakerName: data['Staker Name'],
+        amountRestaked: data['Market Share'].toFixed(2),
+        // percentageOfTotal: data['Percentage of Total'],
+        numberOfStrategies: data['Number of Strategies'],
+        mostUsedStrategies: data['Most Used Strategy'],
+      }));
+      console.log(stakerDataResponse);
+      setStakerData(stakerDataResponse);
+    } catch (error) {
+      console.error('Ha ocurrido un error');
+    } finally {
+      setIsLoadingStakerData(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!stakerData) {
+      fetchStakerDataCallback();
+    }
+  }, [stakerData, fetchStakerDataCallback]);
 
   return (
     <div className="space-y-6">
@@ -111,26 +142,34 @@ const RestakerOverview: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Restaker Address</TableHead>
-                <TableHead>Restaker Name</TableHead>
+                {/* <TableHead>Restaker Name</TableHead> */}
                 <TableHead>Amount Restaked (ETH)</TableHead>
-                <TableHead>Percentage of Total</TableHead>
+                {/* <TableHead>Percentage of Total</TableHead> */}
                 <TableHead>Number of Strategies</TableHead>
                 <TableHead>Most Used Strategies</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockData.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-mono">
-                    {row.restakerAddress}
+              {stakerData ? (
+                stakerData.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-mono">
+                      {row.restakerAddress}
+                    </TableCell>
+                    {/* <TableCell>{row.restakerName}</TableCell> */}
+                    <TableCell>{row.amountRestaked}</TableCell>
+                    {/* <TableCell>{row.percentageOfTotal}</TableCell> */}
+                    <TableCell>{row.numberOfStrategies}</TableCell>
+                    <TableCell>{row.mostUsedStrategies}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    <Skeleton className="w-full h-[20px] rounded-full" />
                   </TableCell>
-                  <TableCell>{row.restakerName}</TableCell>
-                  <TableCell>{row.amountRestaked}</TableCell>
-                  <TableCell>{row.percentageOfTotal}</TableCell>
-                  <TableCell>{row.numberOfStrategies}</TableCell>
-                  <TableCell>{row.mostUsedStrategies}</TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </div>
