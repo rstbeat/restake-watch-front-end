@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   BarChart,
   Bar,
@@ -26,6 +26,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { fetchOperatorData } from '../app/api/restake/restake';
 
 interface OperatorData {
   operatorAddress: string;
@@ -60,6 +62,37 @@ const weeklyOperatorData = [
 
 const OperatorOverview: React.FC = () => {
   const mockData = generateMockData(50);
+
+  // Operator Data
+  const [operatorData, setOperatorData] = useState<OperatorData[]>(null);
+  const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
+
+  const fetchOperatorDataCallback = useCallback(async () => {
+    try {
+      setIsLoadingOperatorData(true);
+      const data = await fetchOperatorData({ limit: 15 });
+      const operatorDataResponse = data.operatorData.map((operator) => ({
+        operatorAddress: operator['Operator Address'].substr(2, 25),
+        operatorName: operator['Operator Name'],
+        marketShared: operator['Market Share'].toFixed(6),
+        ethRestaked: operator['ETH Restaked'].toFixed(6),
+        numberOfStrategies: operator['Number of Strategies'],
+        mostUsedStrategies: operator['Most Used Strategy'],
+      }));
+      console.log(operatorDataResponse);
+      setOperatorData(operatorDataResponse);
+    } catch (error) {
+      console.error('Ha ocurrido un error');
+    } finally {
+      setIsLoadingOperatorData(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!operatorData) {
+      fetchOperatorDataCallback();
+    }
+  }, [operatorData, fetchOperatorDataCallback]);
 
   return (
     <div className="space-y-6">
@@ -119,18 +152,26 @@ const OperatorOverview: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockData.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-mono">
-                    {row.operatorAddress}
+              {operatorData ? (
+                operatorData.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-mono">
+                      {row.operatorAddress}
+                    </TableCell>
+                    <TableCell>{row.operatorName}</TableCell>
+                    <TableCell>{row.marketShared}</TableCell>
+                    <TableCell>{row.ethRestaked}</TableCell>
+                    <TableCell>{row.numberOfStrategies}</TableCell>
+                    <TableCell>{row.mostUsedStrategies}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    <Skeleton  className="w-full h-[20px] rounded-full" />
                   </TableCell>
-                  <TableCell>{row.operatorName}</TableCell>
-                  <TableCell>{row.marketShared}</TableCell>
-                  <TableCell>{row.ethRestaked}</TableCell>
-                  <TableCell>{row.numberOfStrategies}</TableCell>
-                  <TableCell>{row.mostUsedStrategies}</TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </div>
