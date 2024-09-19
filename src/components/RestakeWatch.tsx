@@ -117,12 +117,12 @@ const RestakeWatch: React.FC = () => {
         totalRestaked: 1300000,
         activeOperators: 680,
         totalRestakers: 93674,
-        operatorHerfindahl: 0.10,
-        stakerHerfindahl: 0.048113,
+        operatorHerfindahl: 0.329807,
+        stakerHerfindahl: 4,
         top33PercentOperators: 2,
       },
       criticalAlert:
-        'P2P.org controls over 50% of restaked ETH, posing significant centralization risks.',
+        'P2P.org controls over 30% of restaked ETH, posing significant centralization risks.',
     },
     symbiotic: {
       // Placeholder data
