@@ -117,7 +117,7 @@ const RestakeWatch: React.FC = () => {
         totalRestaked: 1300000,
         activeOperators: 680,
         totalRestakers: 93674,
-        operatorHerfindahl: 0.14595,
+        operatorHerfindahl: 0.10,
         stakerHerfindahl: 0.048113,
         top33PercentOperators: 2,
       },
