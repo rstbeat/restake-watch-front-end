@@ -3,6 +3,19 @@ const nextConfig = {
     experimental: {
         missingSuspenseWithCSRBailout: false,
     },
+    async headers() {
+        return [
+          {
+            source: '/favicon.ico',
+            headers: [
+              {
+                key: 'Content-Type',
+                value: 'image/x-icon',
+              },
+            ],
+          },
+        ];
+      },
     async rewrites() {
         return {
             beforeFiles: [
