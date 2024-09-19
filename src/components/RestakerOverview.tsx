@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/table';
 import { fetchStakerData } from '../app/api/restake/restake';
 import { Skeleton } from './ui/skeleton';
+import { StakerData } from '../app/interface/operatorData.interface';
 
 interface RestakerData {
   restakerAddress: string;
@@ -37,19 +38,6 @@ interface RestakerData {
   numberOfStrategies: number;
   mostUsedStrategies: string;
 }
-
-const generateMockData = (rows: number): RestakerData[] => {
-  return Array.from({ length: rows }, (_, i) => ({
-    restakerAddress: `0x${Math.random().toString(16).substr(2, 40)}`,
-    restakerName: `Restaker ${i + 1}`,
-    amountRestaked: (Math.random() * 1000).toFixed(2),
-    percentageOfTotal: (Math.random() * 5).toFixed(2) + '%',
-    numberOfStrategies: Math.floor(Math.random() * 3) + 1,
-    mostUsedStrategies: ['Swell', 'Rocket_Pool', 'Lido', 'Binance', 'UNKNOWN'][
-      Math.floor(Math.random() * 5)
-    ],
-  }));
-};
 
 const weeklyRestakerData = [
   { week: 'Week 1', restakers: 1000 },
@@ -61,15 +49,14 @@ const weeklyRestakerData = [
 ];
 
 const RestakerOverview: React.FC = () => {
-  const mockData = generateMockData(50);
-  const [stakerData, setStakerData] = useState<any>(null);
-  const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
+  const [stakerData, setStakerData] = useState<RestakerData[] | null>(null);
+  const [, setIsLoadingStakerData] = useState(false);
 
   const fetchStakerDataCallback = useCallback(async () => {
     try {
       setIsLoadingStakerData(true);
-      const data = await fetchStakerData({ limit: 15 });
-      const stakerDataResponse = data.stakerData.map((data) => ({
+      const data = await fetchStakerData();
+      const stakerDataResponse = data.stakerData.map((data: StakerData) => ({
         restakerAddress: data['Staker Address'].substr(2, 25),
         // restakerName: data['Staker Name'],
         amountRestaked: data['Market Share'].toFixed(2),

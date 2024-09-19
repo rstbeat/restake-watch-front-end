@@ -1,4 +1,5 @@
-import axios, { AxiosResponse } from "axios";
+// import axios, { AxiosResponse } from "axios";
+import axios from 'axios';
 
 /**
  * Fetches operator data from the "/restake/operator-data" endpoint.
@@ -6,20 +7,26 @@ import axios, { AxiosResponse } from "axios";
  * @param params - The parameters for the fetch request.
  * @return A Promise that resolves to the fetched data as an object. If an error occurs, an empty object is returned.
  */
-const fetchOperatorData = async (params: any): Promise<any> => {
-    try {
-        const response: AxiosResponse<any> = await axios.get<any>("/restake/operator-data", {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        const data = response.data;
+const fetchOperatorData = async () => {
+  try {
+    const response = await axios.get('/restake/operator-data', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = response.data;
 
-        return data;
-    } catch (err) {
-        console.error(err.response ? err.response.data : err.message);
-        return {};
-    }
+    return data;
+  } catch (err: unknown) {
+    // if (err instanceof Error) {
+    //     const errorResponse = (err as { response?: { data?: any } }).response?.data;
+    //     console.error(errorResponse || err.message);
+    // } else {
+    //     console.error(err);
+    // }
+    console.error('Error operator data');
+    return {};
+  }
 };
 
 /**
@@ -28,20 +35,26 @@ const fetchOperatorData = async (params: any): Promise<any> => {
  * @param params - The parameters for the fetch request.
  * @return  A Promise that resolves to the fetched data as an object. If an error occurs, an empty object is returned.
  */
-const fetchStakerData = async (params: any) => {
-    try {
-        const response: AxiosResponse<any> = await axios.get<any>("/restake/staker-data", {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        const data = response.data;
+const fetchStakerData = async () => {
+  try {
+    const response = await axios.get('/restake/staker-data', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = response.data;
 
-        return data;
-    } catch (err) {
-        console.error(err.response ? err.response.data : err.message);
-        return {};
-    }
+    return data;
+  } catch (err: unknown) {
+    // if (err instanceof Error) {
+    //     const errorResponse = (err as { response?: { data?: any } }).response?.data;
+    //     console.error(errorResponse || err.message);
+    // } else {
+    //     console.error(err);
+    // }
+    console.error('Error staker data');
+    return {};
+  }
 };
 
 export { fetchOperatorData, fetchStakerData };

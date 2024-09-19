@@ -28,28 +28,16 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchOperatorData } from '../app/api/restake/restake';
+import { OperatorData } from '../app/interface/operatorData.interface';
 
-interface OperatorData {
+interface OperatorDataFormated {
   operatorAddress: string;
-  operatorName: string;
+  // operatorName: string;
   marketShared: string;
   ethRestaked: string;
   numberOfStrategies: number;
   mostUsedStrategies: string;
 }
-
-const generateMockData = (rows: number): OperatorData[] => {
-  return Array.from({ length: rows }, (_, i) => ({
-    operatorAddress: `0x${Math.random().toString(16).substr(2, 40)}`,
-    operatorName: `Operator ${i + 1}`,
-    marketShared: (Math.random() * 0.5).toFixed(6),
-    ethRestaked: (Math.random() * 200 - 100).toFixed(6),
-    numberOfStrategies: Math.floor(Math.random() * 5) + 1,
-    mostUsedStrategies: ['Swell', 'Rocket_Pool', 'Lido', 'Binance', 'UNKNOWN'][
-      Math.floor(Math.random() * 5)
-    ],
-  }));
-};
 
 const weeklyOperatorData = [
   { week: 'Week 1', operators: 5 },
@@ -64,21 +52,25 @@ const OperatorOverview: React.FC = () => {
   // const mockData = generateMockData(50);
 
   // Operator Data
-  const [operatorData, setOperatorData] = useState<OperatorData[]>(null);
-  const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
+  const [operatorData, setOperatorData] = useState<
+    OperatorDataFormated[] | null
+  >(null);
+  const [, setIsLoadingOperatorData] = useState(false);
 
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
       setIsLoadingOperatorData(true);
-      const data = await fetchOperatorData({ limit: 15 });
-      const operatorDataResponse = data.operatorData.map((operator) => ({
-        operatorAddress: operator['Operator Address'].substr(2, 25),
-        operatorName: operator['Operator Name'],
-        marketShared: operator['Market Share'].toFixed(6),
-        ethRestaked: operator['ETH Restaked'].toFixed(6),
-        numberOfStrategies: operator['Number of Strategies'],
-        mostUsedStrategies: operator['Most Used Strategy'],
-      }));
+      const data = await fetchOperatorData();
+      const operatorDataResponse = data.operatorData.map(
+        (operator: OperatorData) => ({
+          operatorAddress: operator['Operator Address'].substr(2, 25),
+          // operatorName: operator['Operator Name'],
+          marketShared: operator['Market Share'].toFixed(6),
+          ethRestaked: operator['ETH Restaked'].toFixed(6),
+          numberOfStrategies: operator['Number of Strategies'],
+          mostUsedStrategies: operator['Most Used Strategy'],
+        }),
+      );
       setOperatorData(operatorDataResponse);
     } catch (error) {
       console.error('Ha ocurrido un error');
@@ -167,7 +159,7 @@ const OperatorOverview: React.FC = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center">
-                    <Skeleton  className="w-full h-[20px] rounded-full" />
+                    <Skeleton className="w-full h-[20px] rounded-full" />
                   </TableCell>
                 </TableRow>
               )}

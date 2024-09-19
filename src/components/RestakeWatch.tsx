@@ -17,8 +17,8 @@ import RestakerOverview from './RestakerOverview';
 import Overview from './Overview';
 import Footer from './Footer';
 
-const COLORS = ['#4A90E2', '#50C878', '#9B59B6', '#F39C12'];
-const CHART_COLORS = ['#4A90E2', '#E8F4FD'];
+// const COLORS = ['#4A90E2', '#50C878', '#9B59B6', '#F39C12'];
+// const CHART_COLORS = ['#4A90E2', '#E8F4FD'];
 
 interface Thresholds {
   min: number;
@@ -27,39 +27,39 @@ interface Thresholds {
   yellow: number;
 }
 
-const getStatusColor = (value: number, thresholds: Thresholds): string => {
-  if (value <= thresholds.green) return 'bg-green-500';
-  if (value <= thresholds.yellow) return 'bg-yellow-500';
-  return 'bg-red-500';
-};
+// const getStatusColor = (value: number, thresholds: Thresholds): string => {
+//   if (value <= thresholds.green) return 'bg-green-500';
+//   if (value <= thresholds.yellow) return 'bg-yellow-500';
+//   return 'bg-red-500';
+// };
 
-interface MetricCardProps {
-  title: string;
-  value: number | null;
-  thresholds: Thresholds;
-  format?: (v: number | null) => string;
-}
+// interface MetricCardProps {
+//   title: string;
+//   value: number | null;
+//   thresholds: Thresholds;
+//   format?: (v: number | null) => string;
+// }
 
-const MetricCard: React.FC<MetricCardProps> = ({
-  title,
-  value,
-  thresholds,
-  format = (v) => v?.toString() ?? 'N/A',
-}) => {
-  const statusColor =
-    value !== null ? getStatusColor(value, thresholds) : 'bg-gray-300';
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 transition-all duration-300 hover:shadow-lg">
-      <h3 className="text-lg font-semibold mb-3 text-gray-800">{title}</h3>
-      <div className="flex items-center justify-between">
-        <span className="text-3xl font-bold text-gray-900">
-          {format(value)}
-        </span>
-        <div className={`w-4 h-4 rounded-full ${statusColor}`}></div>
-      </div>
-    </div>
-  );
-};
+// const MetricCard: React.FC<MetricCardProps> = ({
+//   title,
+//   value,
+//   thresholds,
+//   format = (v) => v?.toString() ?? 'N/A',
+// }) => {
+//   const statusColor =
+//     value !== null ? getStatusColor(value, thresholds) : 'bg-gray-300';
+//   return (
+//     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 transition-all duration-300 hover:shadow-lg">
+//       <h3 className="text-lg font-semibold mb-3 text-gray-800">{title}</h3>
+//       <div className="flex items-center justify-between">
+//         <span className="text-3xl font-bold text-gray-900">
+//           {format(value)}
+//         </span>
+//         <div className={`w-4 h-4 rounded-full ${statusColor}`}></div>
+//       </div>
+//     </div>
+//   );
+// };
 
 interface PlatformData {
   operatorData: { name: string; value: number }[];
@@ -161,23 +161,6 @@ const RestakeWatch: React.FC = () => {
   };
 
   const currentPlatformData = platformData[activePlatform];
-
-  const getRiskAssessment = (
-    operatorHerfindahl: number | null,
-    thresholds: Thresholds,
-  ): string => {
-    if (operatorHerfindahl === null) {
-      return 'Insufficient data to assess risk.';
-    }
-    if (operatorHerfindahl > thresholds.yellow) {
-      return 'High operator concentration risk. Immediate diversification recommended.';
-    }
-    if (operatorHerfindahl > thresholds.green) {
-      return 'Moderate operator concentration. Monitor closely and consider diversification strategies.';
-    }
-    return 'Healthy operator distribution. Continue monitoring for changes.';
-  };
-
   const lastUpdateDate = 'September 15, 2024'; // Add this line for the last update date
 
   return (
@@ -211,7 +194,7 @@ const RestakeWatch: React.FC = () => {
                   href="https://hackmd.io/@espejelomar/BkgcuG4MR"
                   className="underline font-medium"
                 >
-                  A Hitchhiker's Guide to Restaking and Its Risks
+                  A Hitchhikers Guide to Restaking and Its Risks
                 </Link>
               </div>
               <Button
