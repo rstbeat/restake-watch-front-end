@@ -81,7 +81,7 @@ const RestakerOverview: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>
             Restakers Needed to Control 1/3 of Total Restaked ETH
@@ -117,7 +117,7 @@ const RestakerOverview: React.FC = () => {
             Showing weekly data for the last 6 weeks
           </div>
         </CardFooter>
-      </Card>
+      </Card> */}
 
       <div className="bg-white p-6 rounded-lg mt-8 shadow-md">
         <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
