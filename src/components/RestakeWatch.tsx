@@ -68,7 +68,7 @@ interface PlatformData {
     totalRestaked: number | null;
     activeOperators: number | null;
     totalRestakers: number | null;
-    operatorHerfindahl: number | null;
+    p2pMarketShare: number | null;
     stakerHerfindahl: number | null;
     top33PercentOperators: number | null;
   };
@@ -117,7 +117,7 @@ const RestakeWatch: React.FC = () => {
         totalRestaked: 1300000,
         activeOperators: 680,
         totalRestakers: 93674,
-        operatorHerfindahl: 0.329807,
+        p2pMarketShare: 0.329807,
         stakerHerfindahl: 4,
         top33PercentOperators: 2,
       },
@@ -132,7 +132,7 @@ const RestakeWatch: React.FC = () => {
         totalRestaked: null,
         activeOperators: null,
         totalRestakers: null,
-        operatorHerfindahl: null,
+        p2pMarketShare: null,
         stakerHerfindahl: null,
         top33PercentOperators: null,
       },
@@ -146,7 +146,7 @@ const RestakeWatch: React.FC = () => {
         totalRestaked: null,
         activeOperators: null,
         totalRestakers: null,
-        operatorHerfindahl: null,
+        p2pMarketShare: null,
         stakerHerfindahl: null,
         top33PercentOperators: null,
       },
@@ -155,7 +155,7 @@ const RestakeWatch: React.FC = () => {
   };
 
   const metricThresholds: Record<string, Thresholds> = {
-    operatorHerfindahl: { min: 0, max: 1, green: 0.1, yellow: 0.18 },
+    p2pMarketShare: { min: 0, max: 1, green: 0.1, yellow: 0.18 },
     stakerHerfindahl: { min: 0, max: 1, green: 0.1, yellow: 0.18 },
     top33PercentOperators: { min: 1, max: 20, green: 10, yellow: 5 },
   };

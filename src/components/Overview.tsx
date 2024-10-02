@@ -29,7 +29,7 @@ interface PlatformData {
     totalRestaked: number | null;
     activeOperators: number | null;
     totalRestakers: number | null;
-    operatorHerfindahl: number | null;
+    p2pMarketShare: number | null;
     stakerHerfindahl: number | null;
     top33PercentOperators: number | null;
   };
@@ -45,16 +45,16 @@ const Overview: React.FC<OverviewProps> = ({
   metricThresholds,
 }) => {
   const getRiskAssessment = (
-    operatorHerfindahl: number | null,
+    p2pMarketShare: number | null,
     thresholds: Thresholds,
   ): string => {
-    if (operatorHerfindahl === null) {
+    if (p2pMarketShare === null) {
       return 'Insufficient data to assess risk.';
     }
-    if (operatorHerfindahl > thresholds.yellow) {
+    if (p2pMarketShare > thresholds.yellow) {
       return 'High operator concentration risk. Immediate diversification recommended.';
     }
-    if (operatorHerfindahl > thresholds.green) {
+    if (p2pMarketShare > thresholds.green) {
       return 'Moderate operator concentration. Monitor closely and consider diversification strategies.';
     }
     return 'Healthy operator distribution. Continue monitoring for changes.';
@@ -65,8 +65,8 @@ const Overview: React.FC<OverviewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <MetricCard
           title="Share of total restaked ETH operated by P2P.org"
-          value={currentPlatformData.keyMetrics.operatorHerfindahl}
-          thresholds={metricThresholds.operatorHerfindahl}
+          value={currentPlatformData.keyMetrics.p2pMarketShare}
+          thresholds={metricThresholds.p2pMarketShare}
           format={(v) => (v ? `${(v * 100).toFixed(2)}%` : 'N/A')}
         />
         <MetricCard
@@ -110,8 +110,8 @@ const Overview: React.FC<OverviewProps> = ({
           </h3>
           <p className="text-gray-700">
             {getRiskAssessment(
-              currentPlatformData.keyMetrics.operatorHerfindahl,
-              metricThresholds.operatorHerfindahl,
+              currentPlatformData.keyMetrics.p2pMarketShare,
+              metricThresholds.p2pMarketShare,
             )}
           </p>
         </div>
@@ -149,7 +149,7 @@ const Overview: React.FC<OverviewProps> = ({
             <p className="text-center mt-10 text-gray-500">No data available</p>
           )}
         </div>
-        <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+        {/* <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
           <h2 className="text-xl font-semibold mb-4 text-gray-800">
             Monthly TVL (Last 5 Months)
           </h2>
@@ -176,7 +176,7 @@ const Overview: React.FC<OverviewProps> = ({
           ) : (
             <p className="text-center mt-10 text-gray-500">No data available</p>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
