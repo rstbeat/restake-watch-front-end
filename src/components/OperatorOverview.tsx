@@ -136,7 +136,7 @@ const OperatorOverview: React.FC = () => {
               <TableRow>
                 <TableHead>Operator Address</TableHead>
                 {/* <TableHead>Operator Name</TableHead> */}
-                <TableHead>Market Shared</TableHead>
+                <TableHead>Market Share</TableHead>
                 <TableHead>ETH Restaked</TableHead>
                 <TableHead>Number of Strategies</TableHead>
                 <TableHead>Most Used Strategies</TableHead>
