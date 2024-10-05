@@ -76,3 +76,13 @@ export interface StakerDataResponse {
     lastUpdated: string;
     stakerData: StakerData[];
   }
+
+  export interface OperatorDataFormated {
+    operatorAddress: string;
+    // operatorName: string;
+    marketShared: string;
+    ethRestaked: string;
+    numberOfStrategies: number;
+    mostUsedStrategies: string;
+  }
+  

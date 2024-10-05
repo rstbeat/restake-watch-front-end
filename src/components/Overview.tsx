@@ -30,6 +30,8 @@ interface PlatformData {
 
 interface OverviewProps {
   currentPlatformData: PlatformData;
+  test?: any;
+  restakeData?: any;
 }
 
 const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
@@ -48,7 +50,12 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
   </Tooltip.Provider>
 );
 
-const Overview: React.FC<OverviewProps> = ({ currentPlatformData }) => {
+const Overview: React.FC<OverviewProps> = ({
+  currentPlatformData,
+  test,
+  restakeData,
+}) => {
+  // TODO: colocar la data de test y eliminar esto
   const operatorData = [
     { name: 'P2P.org', value: 32.98 },
     { name: 'Luganodes', value: 15.5 },
@@ -77,27 +84,20 @@ const Overview: React.FC<OverviewProps> = ({ currentPlatformData }) => {
             Key Metrics
           </h3>
           <p className="mb-2">
-            Total Restaked:{' '}
-            {currentPlatformData.keyMetrics.totalRestaked?.toLocaleString() ??
-              'N/A'}{' '}
-            ETH
+            Total Restaked: {test?.totalETHRestaked ?? 'N/A'} ETH
             <InfoTooltip content="The total amount of ETH that has been restaked across all operators and strategies." />
           </p>
           <p className="mb-2">
-            Active Operators:{' '}
-            {currentPlatformData.keyMetrics.activeOperators?.toLocaleString() ??
-              'N/A'}
+            Active Operators: {test?.activeEntities ?? 'N/A'}
             <InfoTooltip content="The number of operators currently active in the restaking ecosystem." />
           </p>
           <p className="mb-2">
-            Active Restakers:{' '}
-            {currentPlatformData.keyMetrics.totalRestakers?.toLocaleString() ??
-              'N/A'}
+            Active Restakers: {restakeData?.activeRestakers ?? 'N/A'}
             <InfoTooltip content="The total number of unique addresses that have restaked ETH." />
           </p>
           <p className="mb-2">
             Staker Herfindahl Index:{' '}
-            {currentPlatformData.keyMetrics.stakerHerfindahl?.toFixed(4) ??
+            {restakeData?.concentrationMetrics.herfindahlIndex?.toFixed(4) ??
               'N/A'}
             <InfoTooltip
               content="The Herfindahl Index measures market concentration. It's calculated as the sum of squared market shares. Values range from 0 to 1, where 0 indicates perfect competition and 1 indicates a monopoly. For restaking:
@@ -110,8 +110,7 @@ const Overview: React.FC<OverviewProps> = ({ currentPlatformData }) => {
           </p>
           <p className="mb-2">
             Operator Herfindahl Index:{' '}
-            {currentPlatformData.keyMetrics.operatorHerfindahl?.toFixed(4) ??
-              'N/A'}
+            {test?.concentrationMetrics.herfindahlIndex?.toFixed(4) ?? 'N/A'}
             <InfoTooltip content="Similar to the Staker Herfindahl Index, but for operators. It measures the concentration of restaked ETH among operators. Interpretation is the same as the Staker Herfindahl Index." />
           </p>
         </div>
@@ -121,14 +120,12 @@ const Overview: React.FC<OverviewProps> = ({ currentPlatformData }) => {
           </h3>
           <p className="mb-2">
             Restakers needed for 1/3 control:{' '}
-            {currentPlatformData.keyMetrics.top33PercentOperators ?? 'N/A'}
+            {restakeData?.concentrationMetrics.top33PercentCount ?? 'N/A'}
             <InfoTooltip content="The minimum number of restakers required to collectively control 1/3 of the total restaked ETH. A higher number indicates more decentralization and is generally better for the ecosystem's health." />
           </p>
           <p className="mb-2">
             Operators needed for 1/3 control:{' '}
-            {Math.ceil(
-              (currentPlatformData.keyMetrics.activeOperators ?? 0) / 3,
-            )}
+            {Math.ceil((test?.concentrationMetrics.top33PercentCount ?? 0) / 3)}
             <InfoTooltip content="The minimum number of operators required to collectively control 1/3 of the total restaked ETH. Similar to the restaker metric, a higher number here indicates more decentralization and is preferable for ecosystem resilience." />
           </p>
         </div>
@@ -143,10 +140,10 @@ const Overview: React.FC<OverviewProps> = ({ currentPlatformData }) => {
           height={300}
           style={{ aspectRatio: '4/3' }}
         >
+          {/* TODO: colocar la data de test*/}
           <Treemap
             data={operatorData}
             dataKey="value"
-            // ratio={4 / 3}
             stroke="#fff"
             fill="#1a202c"
           >

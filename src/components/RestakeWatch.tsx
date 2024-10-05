@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,6 +16,12 @@ import OperatorOverview from './OperatorOverview';
 import RestakerOverview from './RestakerOverview';
 import Overview from './Overview';
 import Footer from './Footer';
+import {
+  OperatorData,
+  OperatorDataFormated,
+  StakerData,
+} from '../app/interface/operatorData.interface';
+import { fetchOperatorData, fetchStakerData } from '../app/api/restake/restake';
 
 // const COLORS = ['#4A90E2', '#50C878', '#9B59B6', '#F39C12'];
 // const CHART_COLORS = ['#4A90E2', '#E8F4FD'];
@@ -163,6 +169,67 @@ const RestakeWatch: React.FC = () => {
   const currentPlatformData = platformData[activePlatform];
   const lastUpdateDate = 'September 15, 2024'; // Add this line for the last update date
 
+  // Operator Data
+  const [operatorData, setOperatorData] = useState<any | null>(null);
+  const [, setIsLoadingOperatorData] = useState(false);
+
+  const fetchOperatorDataCallback = useCallback(async () => {
+    try {
+      setIsLoadingOperatorData(true);
+      const data = await fetchOperatorData();
+      data.operatorData = data.operatorData.map((operator: OperatorData) => ({
+        operatorAddress: operator['Operator Address'].substr(2, 25),
+        // operatorName: operator['Operator Name'],
+        marketShared: operator['Market Share'].toFixed(6),
+        ethRestaked: operator['ETH Restaked'].toFixed(6),
+        numberOfStrategies: operator['Number of Strategies'],
+        mostUsedStrategies: operator['Most Used Strategy'],
+      }));
+      const OperatorDataFormated = data;
+      setOperatorData(OperatorDataFormated);
+    } catch (error) {
+      console.error('Ha ocurrido un error');
+    } finally {
+      setIsLoadingOperatorData(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!operatorData) {
+      fetchOperatorDataCallback();
+    }
+  }, [operatorData, fetchOperatorDataCallback]);
+
+  const [stakerData, setStakerData] = useState<any | null>(null);
+  const [, setIsLoadingStakerData] = useState(false);
+
+  const fetchStakerDataCallback = useCallback(async () => {
+    try {
+      setIsLoadingStakerData(true);
+      const data = await fetchStakerData();
+      data.stakerData = data.stakerData.map((data: StakerData) => ({
+        restakerAddress: data['Staker Address'].substr(2, 25),
+        // restakerName: data['Staker Name'],
+        amountRestaked: data['Market Share'].toFixed(2),
+        // percentageOfTotal: data['Percentage of Total'],
+        numberOfStrategies: data['Number of Strategies'],
+        mostUsedStrategies: data['Most Used Strategy'],
+      }));
+      const stakerDataResponse = data;
+      setStakerData(stakerDataResponse);
+    } catch (error) {
+      console.error('Ha ocurrido un error');
+    } finally {
+      setIsLoadingStakerData(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!stakerData) {
+      fetchStakerDataCallback();
+    }
+  }, [stakerData, fetchStakerDataCallback]);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 text-gray-900">
       <div className="flex flex-1">
@@ -210,7 +277,7 @@ const RestakeWatch: React.FC = () => {
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               <div className="mb-4 text-sm text-gray-500">
-                Last updated: {lastUpdateDate}
+                Last updated: {operatorData?.lastUpdated ?? 'N/A'}
               </div>
 
               <Alert
@@ -258,7 +325,8 @@ const RestakeWatch: React.FC = () => {
                 <TabsContent value="overview" className="space-y-6">
                   <Overview
                     currentPlatformData={currentPlatformData as any}
-                    // metricThresholds={metricThresholds as any}
+                    test={operatorData}
+                    restakeData={stakerData}
                   />
                 </TabsContent>
 
