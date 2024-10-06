@@ -1,24 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LabelList,
-} from 'recharts';
-import { TrendingUp } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
   Table,
   TableBody,
   TableCell,
@@ -31,6 +12,7 @@ import { Skeleton } from './ui/skeleton';
 import { StakerData } from '../app/interface/operatorData.interface';
 
 interface RestakerData {
+  ethRestaked: any;
   restakerAddress: string;
   // restakerName: string;
   amountRestaked: string;
@@ -57,14 +39,15 @@ const RestakerOverview: React.FC = () => {
       setIsLoadingStakerData(true);
       const data = await fetchStakerData();
       const stakerDataResponse = data.stakerData.map((data: StakerData) => ({
-        restakerAddress: data['Staker Address'].substr(2, 25),
-        // restakerName: data['Staker Name'],
-        amountRestaked: data['Market Share'].toFixed(2),
-        // percentageOfTotal: data['Percentage of Total'],
+        restakerAddress: data['Staker Address'],
+        amountRestaked: Number(data['Market Share'] * 100).toFixed(2),
+        ethRestaked: new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2,
+        }).format(Number(data['ETH Restaked'].toFixed(2))),
         numberOfStrategies: data['Number of Strategies'],
         mostUsedStrategies: data['Most Used Strategy'],
       }));
-      console.log(stakerDataResponse);
       setStakerData(stakerDataResponse);
     } catch (error) {
       console.error('Ha ocurrido un error');
@@ -129,9 +112,8 @@ const RestakerOverview: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Restaker Address</TableHead>
-                {/* <TableHead>Restaker Name</TableHead> */}
                 <TableHead>Market Share</TableHead>
-                {/* <TableHead>Percentage of Total</TableHead> */}
+                <TableHead>ETH Restaked</TableHead>
                 <TableHead>Number of Strategies</TableHead>
                 <TableHead>Most Used Strategy</TableHead>
               </TableRow>
@@ -143,9 +125,8 @@ const RestakerOverview: React.FC = () => {
                     <TableCell className="font-mono">
                       {row.restakerAddress}
                     </TableCell>
-                    {/* <TableCell>{row.restakerName}</TableCell> */}
-                    <TableCell>{row.amountRestaked}</TableCell>
-                    {/* <TableCell>{row.percentageOfTotal}</TableCell> */}
+                    <TableCell>{row.amountRestaked + '%'}</TableCell>
+                    <TableCell>{row.ethRestaked}</TableCell>
                     <TableCell>{row.numberOfStrategies}</TableCell>
                     <TableCell>{row.mostUsedStrategies}</TableCell>
                   </TableRow>

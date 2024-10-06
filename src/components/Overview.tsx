@@ -49,26 +49,28 @@ const Overview: React.FC<OverviewProps> = ({
     : [
         ...metricsKeys.map((key) => ({
           name: key.replaceAll('_', ' '),
-          value:
+          value: Number(
             currentPlatformData.majorOperatorGroupMetrics[
               key
-            ].total_eth_restaked.toFixed(4),
+            ].total_eth_restaked.toFixed(2),
+          ),
         })),
         {
           name: 'Others',
-          value: (
-            currentPlatformData?.totalETHRestaked -
-            metricsKeys.reduce((acc, curr) => {
-              acc +=
-                currentPlatformData.majorOperatorGroupMetrics[curr]
-                  .total_eth_restaked;
-              return acc;
-            }, 0)
-          ).toFixed(4),
+          //Calcula la sumatoria de todos los restaked y le resta el total restaked
+          value: Number(
+            (
+              currentPlatformData?.totalETHRestaked -
+              metricsKeys.reduce((acc, curr) => {
+                acc +=
+                  currentPlatformData.majorOperatorGroupMetrics[curr]
+                    .total_eth_restaked;
+                return acc;
+              }, 0)
+            ).toFixed(2),
+          ),
         },
       ];
-
-  console.log(operatorData);
 
   return (
     <div className="space-y-6">
@@ -89,21 +91,45 @@ const Overview: React.FC<OverviewProps> = ({
             Key Metrics
           </h3>
           <p className="mb-2">
-            Total Restaked: {currentPlatformData?.totalETHRestaked ?? 'N/A'} ETH
+            Total Restaked:{' '}
+            {currentPlatformData?.totalETHRestaked
+              ? new Intl.NumberFormat('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(
+                  Number(currentPlatformData?.totalETHRestaked.toFixed(2)),
+                ) + ' ETH'
+              : 'N/A'}
             <InfoTooltip content="The total amount of ETH that has been restaked across all operators and strategies." />
           </p>
           <p className="mb-2">
-            Active Operators: {currentPlatformData?.activeEntities ?? 'N/A'}
+            Active Operators:{' '}
+            {currentPlatformData?.activeEntities
+              ? new Intl.NumberFormat('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                }).format(Number(currentPlatformData?.activeEntities))
+              : 'N/A'}
             <InfoTooltip content="The number of operators currently active in the restaking ecosystem." />
           </p>
           <p className="mb-2">
-            Active Restakers: {restakeData?.activeRestakers ?? 'N/A'}
+            Active Restakers:{' '}
+            {restakeData?.activeRestakers
+              ? new Intl.NumberFormat('en-US', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                }).format(Number(restakeData?.activeRestakers))
+              : 'N/A'}
             <InfoTooltip content="The total number of unique addresses that have restaked ETH." />
           </p>
           <p className="mb-2">
             Staker Herfindahl Index:
-            {restakeData?.concentrationMetrics.herfindahlIndex?.toFixed(4) ??
-              'N/A'}
+            {restakeData?.concentrationMetrics?.herfindahlIndex
+              ? ' ' +
+                Number(
+                  restakeData?.concentrationMetrics.herfindahlIndex * 100,
+                ).toFixed(2)
+              : 'N/A'}
             <InfoTooltip
               content="The Herfindahl Index measures market concentration. It's calculated as the sum of squared market shares. Values range from 0 to 1, where 0 indicates perfect competition and 1 indicates a monopoly. For restaking:
             • Below 0.01: Very low concentration
@@ -115,9 +141,13 @@ const Overview: React.FC<OverviewProps> = ({
           </p>
           <p className="mb-2">
             Operator Herfindahl Index:
-            {currentPlatformData?.concentrationMetrics.herfindahlIndex?.toFixed(
-              4,
-            ) ?? 'N/A'}
+            {currentPlatformData?.concentrationMetrics.herfindahlIndex
+              ? ' ' +
+                Number(
+                  currentPlatformData?.concentrationMetrics.herfindahlIndex *
+                    100,
+                ).toFixed(2)
+              : 'N/A'}
             <InfoTooltip content="Similar to the Staker Herfindahl Index, but for operators. It measures the concentration of restaked ETH among operators. Interpretation is the same as the Staker Herfindahl Index." />
           </p>
         </div>
@@ -144,39 +174,43 @@ const Overview: React.FC<OverviewProps> = ({
           Share of Total Restaked ETH by Major Operators
         </h2>
 
-        <ResponsiveContainer
-          width="100%"
-          height={300}
-          style={{ aspectRatio: '4/3' }}
-        >
-          <Treemap
-            data={operatorData}
-            dataKey="value"
-            stroke="#fff"
-            fill="#1a202c"
+        {operatorData && (
+          <ResponsiveContainer
+            width="100%"
+            height={300}
+            style={{ aspectRatio: '4/3' }}
           >
-            {operatorData &&
-              operatorData.map((_entry, index) => (
+            <Treemap
+              data={operatorData}
+              dataKey="value"
+              stroke="#fff"
+              fill="#1a202c"
+            >
+              {operatorData.map((_entry, index) => (
                 <Treemap
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
                 />
               ))}
-            <RechartsTooltip
-              content={({ payload }) => {
-                if (payload && payload.length) {
-                  const data = payload[0].payload;
-                  return (
-                    <div className="bg-white p-2 shadow-md rounded text-gray-800">
-                      <p>{`${data.name}: ${data.value}%`}</p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-          </Treemap>
-        </ResponsiveContainer>
+              <RechartsTooltip
+                content={({ payload }) => {
+                  if (payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-white p-2 shadow-md rounded text-gray-800">
+                        <p>{`${data.name}: ${new Intl.NumberFormat('en-US', {
+                          minimumFractionDigits: 1,
+                          maximumFractionDigits: 2,
+                        }).format(data.value)} ETH`}</p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+            </Treemap>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

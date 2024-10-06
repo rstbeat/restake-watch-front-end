@@ -110,3 +110,11 @@ export interface OperatorDataFormated {
   numberOfStrategies: number;
   mostUsedStrategies: string;
 }
+
+export interface RestakerDataFormatted {
+  ethRestaked: any;
+  restakerAddress: string;
+  amountRestaked: string;
+  numberOfStrategies: number;
+  mostUsedStrategies: string;
+}
