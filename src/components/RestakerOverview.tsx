@@ -130,10 +130,10 @@ const RestakerOverview: React.FC = () => {
               <TableRow>
                 <TableHead>Restaker Address</TableHead>
                 {/* <TableHead>Restaker Name</TableHead> */}
-                <TableHead>Amount Restaked (ETH)</TableHead>
+                <TableHead>Market Share</TableHead>
                 {/* <TableHead>Percentage of Total</TableHead> */}
                 <TableHead>Number of Strategies</TableHead>
-                <TableHead>Most Used Strategies</TableHead>
+                <TableHead>Most Used Strategy</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

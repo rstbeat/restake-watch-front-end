@@ -28,16 +28,10 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchOperatorData } from '../app/api/restake/restake';
-import { OperatorData } from '../app/interface/operatorData.interface';
-
-interface OperatorDataFormated {
-  operatorAddress: string;
-  // operatorName: string;
-  marketShared: string;
-  ethRestaked: string;
-  numberOfStrategies: number;
-  mostUsedStrategies: string;
-}
+import {
+  OperatorData,
+  OperatorDataFormated,
+} from '../app/interface/operatorData.interface';
 
 const weeklyOperatorData = [
   { week: 'Week 1', operators: 5 },
@@ -60,7 +54,7 @@ const OperatorOverview: React.FC = () => {
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
       setIsLoadingOperatorData(true);
-      const data = await fetchOperatorData();
+      const data = await fetchOperatorData() as any;
       const operatorDataResponse = data.operatorData.map(
         (operator: OperatorData) => ({
           operatorAddress: operator['Operator Address'].substr(2, 25),
@@ -139,7 +133,7 @@ const OperatorOverview: React.FC = () => {
                 <TableHead>Market Share</TableHead>
                 <TableHead>ETH Restaked</TableHead>
                 <TableHead>Number of Strategies</TableHead>
-                <TableHead>Most Used Strategies</TableHead>
+                <TableHead>Most Used Strategy</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
