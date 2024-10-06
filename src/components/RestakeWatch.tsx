@@ -18,6 +18,7 @@ import Overview from './Overview';
 import Footer from './Footer';
 import {
   OperatorData,
+  OperatorDataFormated,
   OperatorDataResponse,
   StakerData,
 } from '../app/interface/operatorData.interface';
@@ -25,13 +26,6 @@ import { fetchOperatorData, fetchStakerData } from '../app/api/restake/restake';
 
 // const COLORS = ['#4A90E2', '#50C878', '#9B59B6', '#F39C12'];
 // const CHART_COLORS = ['#4A90E2', '#E8F4FD'];
-
-interface Thresholds {
-  min: number;
-  max: number;
-  green: number;
-  yellow: number;
-}
 
 // const getStatusColor = (value: number, thresholds: Thresholds): string => {
 //   if (value <= thresholds.green) return 'bg-green-500';
@@ -161,7 +155,6 @@ const RestakeWatch: React.FC = () => {
   };
 
   const currentPlatformData = platformData[activePlatform];
-  const lastUpdateDate = 'September 15, 2024'; // Add this line for the last update date
 
   // Operator Data
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
@@ -174,10 +167,12 @@ const RestakeWatch: React.FC = () => {
       setIsLoadingOperatorData(true);
       const data = (await fetchOperatorData()) as any;
       data.operatorData = data.operatorData.map((operator: OperatorData) => ({
-        operatorAddress: operator['Operator Address'].substr(2, 25),
-        // operatorName: operator['Operator Name'],
-        marketShared: operator['Market Share'].toFixed(6),
-        ethRestaked: operator['ETH Restaked'].toFixed(6),
+        operatorAddress: operator['Operator Address'],
+        marketShared: Number(operator['Market Share'] * 100).toFixed(2),
+        ethRestaked: new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2,
+        }).format(Number(operator['ETH Restaked'].toFixed(2))),
         numberOfStrategies: operator['Number of Strategies'],
         mostUsedStrategies: operator['Most Used Strategy'],
       }));
@@ -326,7 +321,7 @@ const RestakeWatch: React.FC = () => {
                 </TabsContent>
 
                 <TabsContent value="operators" className="space-y-6">
-                  <OperatorOverview />
+                  <OperatorOverview operatorData={operatorData?.operatorData as any} />
                 </TabsContent>
 
                 <TabsContent value="restakers" className="space-y-6">

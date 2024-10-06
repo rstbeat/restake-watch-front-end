@@ -42,43 +42,13 @@ const weeklyOperatorData = [
   { week: 'Week 6', operators: 8 },
 ];
 
-const OperatorOverview: React.FC = () => {
-  // const mockData = generateMockData(50);
+interface OperatorOverviewProps {
+  operatorData: OperatorDataFormated[] | null;
+}
 
-  // Operator Data
-  const [operatorData, setOperatorData] = useState<
-    OperatorDataFormated[] | null
-  >(null);
-  const [, setIsLoadingOperatorData] = useState(false);
-
-  const fetchOperatorDataCallback = useCallback(async () => {
-    try {
-      setIsLoadingOperatorData(true);
-      const data = await fetchOperatorData() as any;
-      const operatorDataResponse = data.operatorData.map(
-        (operator: OperatorData) => ({
-          operatorAddress: operator['Operator Address'].substr(2, 25),
-          // operatorName: operator['Operator Name'],
-          marketShared: operator['Market Share'].toFixed(6),
-          ethRestaked: operator['ETH Restaked'].toFixed(6),
-          numberOfStrategies: operator['Number of Strategies'],
-          mostUsedStrategies: operator['Most Used Strategy'],
-        }),
-      );
-      setOperatorData(operatorDataResponse);
-    } catch (error) {
-      console.error('Ha ocurrido un error');
-    } finally {
-      setIsLoadingOperatorData(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!operatorData) {
-      fetchOperatorDataCallback();
-    }
-  }, [operatorData, fetchOperatorDataCallback]);
-
+const OperatorOverview: React.FC<OperatorOverviewProps> = ({
+  operatorData,
+}) => {
   return (
     <div className="space-y-6">
       {/* <Card>
@@ -129,7 +99,6 @@ const OperatorOverview: React.FC = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Operator Address</TableHead>
-                {/* <TableHead>Operator Name</TableHead> */}
                 <TableHead>Market Share</TableHead>
                 <TableHead>ETH Restaked</TableHead>
                 <TableHead>Number of Strategies</TableHead>
@@ -143,8 +112,7 @@ const OperatorOverview: React.FC = () => {
                     <TableCell className="font-mono">
                       {row.operatorAddress}
                     </TableCell>
-                    {/* <TableCell>{row.operatorName}</TableCell> */}
-                    <TableCell>{row.marketShared}</TableCell>
+                    <TableCell>{row.marketShared + '%'}</TableCell>
                     <TableCell>{row.ethRestaked}</TableCell>
                     <TableCell>{row.numberOfStrategies}</TableCell>
                     <TableCell>{row.mostUsedStrategies}</TableCell>
