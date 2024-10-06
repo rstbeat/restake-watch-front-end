@@ -42,47 +42,71 @@ export interface OperatorData {
 }
 
 export interface StakerData {
-    'Staker Address': string;
-    'ETH Restaked': number;
-    'Number of Strategies': number;
-    'Most Used Strategy': string;
-    'Recent Transactions': RecentTransaction[];
-    'Recent Transaction_Sum': number;
-    'Market Share': number;
-    'Largest Strategy': string;
-    'Largest Strategy ETH': number;
-    'ETH in Binance': number;
-    'ETH in Coinbase': number;
-    'ETH in Lido': number;
-    'ETH in Mantle': number;
-    'ETH in Rocket_Pool': number;
-    'ETH in Stader': number;
-    'ETH in Swell': number;
-    'ETH in UNKNOWN': number;
-  }
+  'Staker Address': string;
+  'ETH Restaked': number;
+  'Number of Strategies': number;
+  'Most Used Strategy': string;
+  'Recent Transactions': RecentTransaction[];
+  'Recent Transaction_Sum': number;
+  'Market Share': number;
+  'Largest Strategy': string;
+  'Largest Strategy ETH': number;
+  'ETH in Binance': number;
+  'ETH in Coinbase': number;
+  'ETH in Lido': number;
+  'ETH in Mantle': number;
+  'ETH in Rocket_Pool': number;
+  'ETH in Stader': number;
+  'ETH in Swell': number;
+  'ETH in UNKNOWN': number;
+}
+
+interface OperatorMetrics {
+  eth_restaked: number;
+  market_share: number;
+}
+
+interface MajorOperatorGroupMetrics {
+  sub_operators: {
+    [operatorAddress: string]: OperatorMetrics;
+  };
+  total_eth_restaked: number;
+  total_market_share: number;
+}
+
+interface MajorOperatorData {
+  [groupName: string]: MajorOperatorGroupMetrics;
+}
 
 export interface OperatorDataResponse {
   concentrationMetrics: ConcentrationMetrics;
   behaviorAnalysis: BehaviorAnalysis;
   totalCount: number;
   lastUpdated: string;
-  operatorData: OperatorData[];
+  operatorData: OperatorData[] | OperatorDataFormated[];
+  totalETHRestaked: number;
+  activeEntities: number;
+  activeRestakers: number;
+  majorOperatorGroupMetrics: MajorOperatorData;
 }
 
 export interface StakerDataResponse {
-    concentrationMetrics: ConcentrationMetrics;
-    behaviorAnalysis: BehaviorAnalysis;
-    totalCount: number;
-    lastUpdated: string;
-    stakerData: StakerData[];
-  }
+  concentrationMetrics: ConcentrationMetrics;
+  behaviorAnalysis: BehaviorAnalysis;
+  totalCount: number;
+  lastUpdated: string;
+  stakerData: StakerData[];
+  totalETHRestaked: number;
+  activeEntities: number;
+  activeRestakers: number;
+  remainingStakersMetrics: OperatorMetrics
+  top10StakersMetrics: OperatorMetrics
+}
 
-  export interface OperatorDataFormated {
-    operatorAddress: string;
-    // operatorName: string;
-    marketShared: string;
-    ethRestaked: string;
-    numberOfStrategies: number;
-    mostUsedStrategies: string;
-  }
-  
+export interface OperatorDataFormated {
+  operatorAddress: string;
+  marketShared: string;
+  ethRestaked: string;
+  numberOfStrategies: number;
+  mostUsedStrategies: string;
+}

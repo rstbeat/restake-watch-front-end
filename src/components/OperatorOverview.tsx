@@ -54,7 +54,7 @@ const OperatorOverview: React.FC = () => {
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
       setIsLoadingOperatorData(true);
-      const data = await fetchOperatorData();
+      const data = await fetchOperatorData() as any;
       const operatorDataResponse = data.operatorData.map(
         (operator: OperatorData) => ({
           operatorAddress: operator['Operator Address'].substr(2, 25),

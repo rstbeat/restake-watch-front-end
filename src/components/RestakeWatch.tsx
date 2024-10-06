@@ -18,7 +18,7 @@ import Overview from './Overview';
 import Footer from './Footer';
 import {
   OperatorData,
-  OperatorDataFormated,
+  OperatorDataResponse,
   StakerData,
 } from '../app/interface/operatorData.interface';
 import { fetchOperatorData, fetchStakerData } from '../app/api/restake/restake';
@@ -160,23 +160,19 @@ const RestakeWatch: React.FC = () => {
     },
   };
 
-  const metricThresholds: Record<string, Thresholds> = {
-    p2pMarketShare: { min: 0, max: 1, green: 0.1, yellow: 0.18 },
-    stakerHerfindahl: { min: 0, max: 1, green: 0.1, yellow: 0.18 },
-    top33PercentOperators: { min: 1, max: 20, green: 10, yellow: 5 },
-  };
-
   const currentPlatformData = platformData[activePlatform];
   const lastUpdateDate = 'September 15, 2024'; // Add this line for the last update date
 
   // Operator Data
-  const [operatorData, setOperatorData] = useState<any | null>(null);
+  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
+    null,
+  );
   const [, setIsLoadingOperatorData] = useState(false);
 
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
       setIsLoadingOperatorData(true);
-      const data = await fetchOperatorData();
+      const data = (await fetchOperatorData()) as any;
       data.operatorData = data.operatorData.map((operator: OperatorData) => ({
         operatorAddress: operator['Operator Address'].substr(2, 25),
         // operatorName: operator['Operator Name'],
@@ -324,8 +320,7 @@ const RestakeWatch: React.FC = () => {
                 {/* TODO: Revisar el por qué currentPlatformdata y metricThresholds tienen errores al pasar la data */}
                 <TabsContent value="overview" className="space-y-6">
                   <Overview
-                    currentPlatformData={currentPlatformData as any}
-                    test={operatorData}
+                    currentPlatformData={operatorData}
                     restakeData={stakerData}
                   />
                 </TabsContent>

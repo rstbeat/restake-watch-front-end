@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Treemap,
   ResponsiveContainer,
@@ -6,6 +6,7 @@ import {
 } from 'recharts';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
+import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 
 const COLORS = [
   '#1a202c',
@@ -16,22 +17,9 @@ const COLORS = [
   '#cbd5e0',
 ];
 
-interface PlatformData {
-  operatorData: { name: string; value: number }[];
-  keyMetrics: {
-    totalRestaked: number | null;
-    activeOperators: number | null;
-    totalRestakers: number | null;
-    stakerHerfindahl: number | null;
-    operatorHerfindahl: number | null;
-    top33PercentOperators: number | null;
-  };
-}
-
 interface OverviewProps {
-  currentPlatformData: PlatformData;
-  test?: any;
-  restakeData?: any;
+  currentPlatformData: OperatorDataResponse | null;
+  restakeData: any | null;
 }
 
 const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
@@ -52,18 +40,34 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
 
 const Overview: React.FC<OverviewProps> = ({
   currentPlatformData,
-  test,
   restakeData,
 }) => {
-  // TODO: colocar la data de test y eliminar esto
-  const operatorData = [
-    { name: 'P2P.org', value: 32.98 },
-    { name: 'Luganodes', value: 15.5 },
-    { name: 'Pier Two', value: 12.3 },
-    { name: 'Finoa Consensus Services', value: 10.2 },
-    { name: 'DSRV', value: 8.5 },
-    { name: 'Others', value: 20.52 },
-  ];
+  const metricsKeys = !currentPlatformData?.majorOperatorGroupMetrics
+    ? []
+    : Object.keys(currentPlatformData?.majorOperatorGroupMetrics);
+  const operatorData = !currentPlatformData?.majorOperatorGroupMetrics
+    ? []
+    : [
+        ...metricsKeys.map((key) => ({
+          name: key.replaceAll('_', ' '),
+          value:
+            currentPlatformData.majorOperatorGroupMetrics[key]
+              .total_eth_restaked,
+        })),
+        {
+          name: 'Others',
+          value:
+            currentPlatformData?.totalETHRestaked -
+            metricsKeys.reduce((acc, curr) => {
+              acc +=
+                currentPlatformData.majorOperatorGroupMetrics[curr]
+                  .total_eth_restaked;
+              return acc;
+            }, 0),
+        },
+      ];
+
+  console.log(operatorData);
 
   return (
     <div className="space-y-6">
@@ -84,11 +88,11 @@ const Overview: React.FC<OverviewProps> = ({
             Key Metrics
           </h3>
           <p className="mb-2">
-            Total Restaked: {test?.totalETHRestaked ?? 'N/A'} ETH
+            Total Restaked: {currentPlatformData?.totalETHRestaked ?? 'N/A'} ETH
             <InfoTooltip content="The total amount of ETH that has been restaked across all operators and strategies." />
           </p>
           <p className="mb-2">
-            Active Operators: {test?.activeEntities ?? 'N/A'}
+            Active Operators: {currentPlatformData?.activeEntities ?? 'N/A'}
             <InfoTooltip content="The number of operators currently active in the restaking ecosystem." />
           </p>
           <p className="mb-2">
@@ -96,7 +100,7 @@ const Overview: React.FC<OverviewProps> = ({
             <InfoTooltip content="The total number of unique addresses that have restaked ETH." />
           </p>
           <p className="mb-2">
-            Staker Herfindahl Index:{' '}
+            Staker Herfindahl Index:
             {restakeData?.concentrationMetrics.herfindahlIndex?.toFixed(4) ??
               'N/A'}
             <InfoTooltip
@@ -109,8 +113,10 @@ const Overview: React.FC<OverviewProps> = ({
             />
           </p>
           <p className="mb-2">
-            Operator Herfindahl Index:{' '}
-            {test?.concentrationMetrics.herfindahlIndex?.toFixed(4) ?? 'N/A'}
+            Operator Herfindahl Index:
+            {currentPlatformData?.concentrationMetrics.herfindahlIndex?.toFixed(
+              4,
+            ) ?? 'N/A'}
             <InfoTooltip content="Similar to the Staker Herfindahl Index, but for operators. It measures the concentration of restaked ETH among operators. Interpretation is the same as the Staker Herfindahl Index." />
           </p>
         </div>
@@ -119,13 +125,16 @@ const Overview: React.FC<OverviewProps> = ({
             Control Thresholds
           </h3>
           <p className="mb-2">
-            Restakers needed for 1/3 control:{' '}
+            Restakers needed for 1/3 control:
             {restakeData?.concentrationMetrics.top33PercentCount ?? 'N/A'}
             <InfoTooltip content="The minimum number of restakers required to collectively control 1/3 of the total restaked ETH. A higher number indicates more decentralization and is generally better for the ecosystem's health." />
           </p>
           <p className="mb-2">
-            Operators needed for 1/3 control:{' '}
-            {Math.ceil((test?.concentrationMetrics.top33PercentCount ?? 0) / 3)}
+            Operators needed for 1/3 control:
+            {Math.ceil(
+              (currentPlatformData?.concentrationMetrics.top33PercentCount ??
+                0) / 3,
+            )}
             <InfoTooltip content="The minimum number of operators required to collectively control 1/3 of the total restaked ETH. Similar to the restaker metric, a higher number here indicates more decentralization and is preferable for ecosystem resilience." />
           </p>
         </div>
@@ -135,24 +144,25 @@ const Overview: React.FC<OverviewProps> = ({
         <h2 className="text-xl font-semibold mb-4 text-gray-800">
           Share of Total Restaked ETH by Major Operators
         </h2>
+
         <ResponsiveContainer
           width="100%"
           height={300}
           style={{ aspectRatio: '4/3' }}
         >
-          {/* TODO: colocar la data de test*/}
           <Treemap
             data={operatorData}
             dataKey="value"
             stroke="#fff"
             fill="#1a202c"
           >
-            {operatorData.map((entry, index) => (
-              <Treemap
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
+            {operatorData &&
+              operatorData.map((entry, index) => (
+                <Treemap
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
             <RechartsTooltip
               content={({ payload }) => {
                 if (payload && payload.length) {
