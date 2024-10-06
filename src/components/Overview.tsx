@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import {
   Treemap,
   ResponsiveContainer,
@@ -51,19 +50,21 @@ const Overview: React.FC<OverviewProps> = ({
         ...metricsKeys.map((key) => ({
           name: key.replaceAll('_', ' '),
           value:
-            currentPlatformData.majorOperatorGroupMetrics[key]
-              .total_eth_restaked,
+            currentPlatformData.majorOperatorGroupMetrics[
+              key
+            ].total_eth_restaked.toFixed(4),
         })),
         {
           name: 'Others',
-          value:
+          value: (
             currentPlatformData?.totalETHRestaked -
             metricsKeys.reduce((acc, curr) => {
               acc +=
                 currentPlatformData.majorOperatorGroupMetrics[curr]
                   .total_eth_restaked;
               return acc;
-            }, 0),
+            }, 0)
+          ).toFixed(4),
         },
       ];
 
@@ -131,10 +132,8 @@ const Overview: React.FC<OverviewProps> = ({
           </p>
           <p className="mb-2">
             Operators needed for 1/3 control:
-            {Math.ceil(
-              (currentPlatformData?.concentrationMetrics.top33PercentCount ??
-                0) / 3,
-            )}
+            {currentPlatformData?.concentrationMetrics.top33PercentCount ??
+              'N/A'}
             <InfoTooltip content="The minimum number of operators required to collectively control 1/3 of the total restaked ETH. Similar to the restaker metric, a higher number here indicates more decentralization and is preferable for ecosystem resilience." />
           </p>
         </div>
@@ -157,7 +156,7 @@ const Overview: React.FC<OverviewProps> = ({
             fill="#1a202c"
           >
             {operatorData &&
-              operatorData.map((entry, index) => (
+              operatorData.map((_entry, index) => (
                 <Treemap
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
