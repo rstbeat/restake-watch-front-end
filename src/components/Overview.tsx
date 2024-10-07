@@ -110,7 +110,7 @@ const Overview: React.FC<OverviewProps> = ({
                   maximumFractionDigits: 0,
                 }).format(Number(currentPlatformData?.activeEntities))
               : 'N/A'}
-            <InfoTooltip content="The number of operators currently active in the restaking ecosystem." />
+            <InfoTooltip content="The number of operators currently active in the restaking ecosystem. Active means they have a positive amount of ETH restaked." />
           </p>
           <p className="mb-2">
             Active Restakers:{' '}
@@ -120,7 +120,7 @@ const Overview: React.FC<OverviewProps> = ({
                   maximumFractionDigits: 0,
                 }).format(Number(restakeData?.activeRestakers))
               : 'N/A'}
-            <InfoTooltip content="The total number of unique addresses that have restaked ETH." />
+            <InfoTooltip content="The total number of unique restaker addresses that have restaked ETH. Active means they have a positive amount of ETH restaked." />
           </p>
           <p className="mb-2">
             Staker Herfindahl Index:
