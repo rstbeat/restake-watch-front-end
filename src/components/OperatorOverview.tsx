@@ -1,23 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LabelList,
-} from 'recharts';
-import { TrendingUp } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import React, { useState, useMemo } from 'react';
+import { ChevronUp, ChevronDown, ArrowUpDown, AlertTriangle, Copy, Check } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -27,94 +9,141 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { fetchOperatorData } from '../app/api/restake/restake';
-import {
-  OperatorData,
-  OperatorDataFormated,
-} from '../app/interface/operatorData.interface';
-
-const weeklyOperatorData = [
-  { week: 'Week 1', operators: 5 },
-  { week: 'Week 2', operators: 6 },
-  { week: 'Week 3', operators: 4 },
-  { week: 'Week 4', operators: 7 },
-  { week: 'Week 5', operators: 5 },
-  { week: 'Week 6', operators: 8 },
-];
+import { OperatorDataFormated } from '../app/interface/operatorData.interface';
+import { Button } from '@/components/ui/button';
 
 interface OperatorOverviewProps {
   operatorData: OperatorDataFormated[] | null;
 }
 
-const OperatorOverview: React.FC<OperatorOverviewProps> = ({
-  operatorData,
-}) => {
+const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData }) => {
+  const [sortColumn, setSortColumn] = useState<keyof OperatorDataFormated>('marketShared');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+
+
+  const sortedData = useMemo(() => {
+    if (!operatorData) return null;
+    return [...operatorData].sort((a, b) => {
+      if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
+      if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [operatorData, sortColumn, sortDirection]);
+
+  const handleSort = (column: keyof OperatorDataFormated) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  const SortIcon = ({ column }: { column: keyof OperatorDataFormated }) => {
+    if (column !== sortColumn) return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    return sortDirection === 'asc' ? (
+      <ChevronUp className="ml-2 h-4 w-4" />
+    ) : (
+      <ChevronDown className="ml-2 h-4 w-4" />
+    );
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedAddress(text);
+      setTimeout(() => setCopiedAddress(null), 2000);
+    });
+  };
+
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
   return (
     <div className="space-y-6">
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>
-            Operators Needed to Control 1/3 of Total Restaked ETH
-          </CardTitle>
-          <CardDescription>Weekly data since May 2024</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={weeklyOperatorData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="week" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="operators" fill="#8884d8">
-                <LabelList dataKey="operators" position="top" />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-        <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="flex gap-2 font-medium leading-none">
-            Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-          </div>
-          <div className="leading-none text-muted-foreground">
-            Showing weekly data for the last 6 weeks
-          </div>
-        </CardFooter>
-      </Card> */}
-
       <div className="bg-white p-6 rounded-lg mt-8 shadow-md">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-          <span className="mr-2">⏱️</span>
-          Concentration of stake among operators
+        <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center">
+          <span className="mr-2">🏢</span>
+          Top 50 Operators by Market Share
         </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Displaying the concentration of restaked ETH among the most significant operators in the ecosystem
+        </p>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[50px]">#</TableHead>
                 <TableHead>Operator Address</TableHead>
-                <TableHead>Market Share</TableHead>
-                <TableHead>ETH Restaked</TableHead>
-                <TableHead>Number of Strategies</TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort('marketShared')}
+                    className="font-semibold"
+                  >
+                    Market Share
+                    <SortIcon column="marketShared" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort('ethRestaked')}
+                    className="font-semibold"
+                  >
+                    ETH Restaked
+                    <SortIcon column="ethRestaked" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort('numberOfStrategies')}
+                    className="font-semibold"
+                  >
+                    Strategies
+                    <SortIcon column="numberOfStrategies" />
+                  </Button>
+                </TableHead>
                 <TableHead>Most Used Strategy</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {operatorData ? (
-                operatorData.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-mono">
-                      {row.operatorAddress}
+              {sortedData ? (
+                sortedData.map((row, index) => (
+                  <TableRow key={row.operatorAddress} className="hover:bg-gray-50">
+                    <TableCell className="font-semibold">{index + 1}</TableCell>
+                    <TableCell className="font-mono text-sm">
+                      <div className="flex items-center">
+                        <span className="mr-2">{truncateAddress(row.operatorAddress)}</span>
+                        <Button
+                          variant="ghost"
+                          onClick={() => copyToClipboard(row.operatorAddress)}
+                          className="p-1"
+                          title={copiedAddress === row.operatorAddress ? "Copied!" : "Copy full address"}
+                        >
+                          {copiedAddress === row.operatorAddress ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
-                    <TableCell>{row.marketShared + '%'}</TableCell>
-                    <TableCell>{row.ethRestaked}</TableCell>
-                    <TableCell>{row.numberOfStrategies}</TableCell>
+                    <TableCell className="font-semibold">
+                      <div className="flex items-center">
+                        {parseFloat(row.marketShared).toFixed(2)}%
+                        {parseFloat(row.marketShared) > 10 && (
+                          <AlertTriangle 
+                            className="ml-2 h-4 w-4 text-yellow-500" 
+                            title="High market share concentration"
+                          />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{parseFloat(row.ethRestaked).toLocaleString()} ETH</TableCell>
+                    <TableCell className="text-center">{row.numberOfStrategies}</TableCell>
                     <TableCell>{row.mostUsedStrategies}</TableCell>
                   </TableRow>
                 ))

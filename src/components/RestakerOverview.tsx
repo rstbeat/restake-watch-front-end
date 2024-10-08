@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import { ChevronUp, ChevronDown, ArrowUpDown, AlertTriangle, Copy, Check } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -7,32 +8,25 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { fetchStakerData } from '../app/api/restake/restake';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from './ui/skeleton';
+import { fetchStakerData } from '../app/api/restake/restake';
 import { StakerData } from '../app/interface/operatorData.interface';
 
 interface RestakerData {
-  ethRestaked: any;
   restakerAddress: string;
-  // restakerName: string;
   amountRestaked: string;
-  // percentageOfTotal: string;
+  ethRestaked: string;
   numberOfStrategies: number;
   mostUsedStrategies: string;
 }
 
-const weeklyRestakerData = [
-  { week: 'Week 1', restakers: 1000 },
-  { week: 'Week 2', restakers: 1200 },
-  { week: 'Week 3', restakers: 950 },
-  { week: 'Week 4', restakers: 1300 },
-  { week: 'Week 5', restakers: 1100 },
-  { week: 'Week 6', restakers: 1400 },
-];
-
 const RestakerOverview: React.FC = () => {
   const [stakerData, setStakerData] = useState<RestakerData[] | null>(null);
-  const [, setIsLoadingStakerData] = useState(false);
+  const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
+  const [sortColumn, setSortColumn] = useState<keyof RestakerData>('amountRestaked');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
   const fetchStakerDataCallback = useCallback(async () => {
     try {
@@ -50,7 +44,7 @@ const RestakerOverview: React.FC = () => {
       }));
       setStakerData(stakerDataResponse);
     } catch (error) {
-      console.error('Ha ocurrido un error');
+      console.error('An error occurred while fetching staker data', error);
     } finally {
       setIsLoadingStakerData(false);
     }
@@ -62,72 +56,130 @@ const RestakerOverview: React.FC = () => {
     }
   }, [stakerData, fetchStakerDataCallback]);
 
+  const sortedData = useMemo(() => {
+    if (!stakerData) return null;
+    return [...stakerData].sort((a, b) => {
+      const aValue = a[sortColumn];
+      const bValue = b[sortColumn];
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [stakerData, sortColumn, sortDirection]);
+
+  const handleSort = (column: keyof RestakerData) => {
+    if (column === sortColumn) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  const SortIcon = ({ column }: { column: keyof RestakerData }) => {
+    if (column !== sortColumn) return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    return sortDirection === 'asc' ? (
+      <ChevronUp className="ml-2 h-4 w-4" />
+    ) : (
+      <ChevronDown className="ml-2 h-4 w-4" />
+    );
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedAddress(text);
+      setTimeout(() => setCopiedAddress(null), 2000);
+    });
+  };
+
+  const truncateAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
   return (
     <div className="space-y-6">
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>
-            Restakers Needed to Control 1/3 of Total Restaked ETH
-          </CardTitle>
-          <CardDescription>Weekly data since May 2024</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={weeklyRestakerData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 20,
-                bottom: 5,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="week" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="restakers" fill="#82ca9d">
-                <LabelList dataKey="restakers" position="top" />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </CardContent>
-        <CardFooter className="flex-col items-start gap-2 text-sm">
-          <div className="flex gap-2 font-medium leading-none">
-            Trending up by 3.8% this month <TrendingUp className="h-4 w-4" />
-          </div>
-          <div className="leading-none text-muted-foreground">
-            Showing weekly data for the last 6 weeks
-          </div>
-        </CardFooter>
-      </Card> */}
-
       <div className="bg-white p-6 rounded-lg mt-8 shadow-md">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-          <span className="mr-2">⏱️</span>
-          Distribution of stake among restakers
+        <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center">
+          <span className="mr-2">🏆</span>
+          Top 50 Restakers by Market Share
         </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Displaying the distribution of restaked ETH among the most significant restakers in the ecosystem
+        </p>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[50px]">#</TableHead>
                 <TableHead>Restaker Address</TableHead>
-                <TableHead>Market Share</TableHead>
-                <TableHead>ETH Restaked</TableHead>
-                <TableHead>Number of Strategies</TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort('amountRestaked')}
+                    className="font-semibold"
+                  >
+                    Market Share
+                    <SortIcon column="amountRestaked" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort('ethRestaked')}
+                    className="font-semibold"
+                  >
+                    ETH Restaked
+                    <SortIcon column="ethRestaked" />
+                  </Button>
+                </TableHead>
+                <TableHead>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort('numberOfStrategies')}
+                    className="font-semibold"
+                  >
+                    Strategies
+                    <SortIcon column="numberOfStrategies" />
+                  </Button>
+                </TableHead>
                 <TableHead>Most Used Strategy</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {stakerData ? (
-                stakerData.map((row, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-mono">
-                      {row.restakerAddress}
+              {sortedData ? (
+                sortedData.map((row, index) => (
+                  <TableRow key={row.restakerAddress} className="hover:bg-gray-50">
+                    <TableCell className="font-semibold">{index + 1}</TableCell>
+                    <TableCell className="font-mono text-sm">
+                      <div className="flex items-center">
+                        <span className="mr-2">{truncateAddress(row.restakerAddress)}</span>
+                        <Button
+                          variant="ghost"
+                          onClick={() => copyToClipboard(row.restakerAddress)}
+                          className="p-1"
+                          title={copiedAddress === row.restakerAddress ? "Copied!" : "Copy full address"}
+                        >
+                          {copiedAddress === row.restakerAddress ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
-                    <TableCell>{row.amountRestaked + '%'}</TableCell>
+                    <TableCell className="font-semibold">
+                      <div className="flex items-center">
+                        {row.amountRestaked}%
+                        {parseFloat(row.amountRestaked) > 5 && (
+                          <AlertTriangle 
+                            className="ml-2 h-4 w-4 text-yellow-500" 
+                            title="High market share concentration"
+                          />
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>{row.ethRestaked}</TableCell>
-                    <TableCell>{row.numberOfStrategies}</TableCell>
+                    <TableCell className="text-center">{row.numberOfStrategies}</TableCell>
                     <TableCell>{row.mostUsedStrategies}</TableCell>
                   </TableRow>
                 ))

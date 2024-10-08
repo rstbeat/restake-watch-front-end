@@ -122,7 +122,7 @@ const RestakeWatch: React.FC = () => {
         top33PercentOperators: 2,
       },
       criticalAlert:
-        'P2P.org controls over 30% of restaked ETH, posing significant centralization risks.',
+      'Significant Centralization Risk: P2P.org controls over 28% of restaked ETH. Combined with other major operators (Luganodes, DSRV, Pier Two, and Finoa Consensus), these entities control more than 50% of all restaked ETH. This concentration poses substantial risks to the network´s decentralization and resilience.',
     },
     symbiotic: {
       // Placeholder data
