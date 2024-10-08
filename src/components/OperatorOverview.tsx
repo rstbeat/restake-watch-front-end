@@ -135,10 +135,11 @@ const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData }) => 
                       <div className="flex items-center">
                         {parseFloat(row.marketShared).toFixed(2)}%
                         {parseFloat(row.marketShared) > 10 && (
-                          <AlertTriangle 
-                            className="ml-2 h-4 w-4 text-yellow-500" 
-                            title="High market share concentration"
-                          />
+                          <span title="High market share concentration">
+                            <AlertTriangle 
+                              className="ml-2 h-4 w-4 text-yellow-500"
+                            />
+                          </span>
                         )}
                       </div>
                     </TableCell>
