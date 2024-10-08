@@ -171,14 +171,15 @@ const RestakerOverview: React.FC = () => {
                       <div className="flex items-center">
                         {row.amountRestaked}%
                         {parseFloat(row.amountRestaked) > 5 && (
-                          <AlertTriangle 
-                            className="ml-2 h-4 w-4 text-yellow-500" 
-                            title="High market share concentration"
-                          />
+                          <span title="High market share concentration">
+                            <AlertTriangle 
+                              className="ml-2 h-4 w-4 text-yellow-500"
+                            />
+                          </span>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{row.ethRestaked}</TableCell>
+                    <TableCell>{row.ethRestaked} ETH</TableCell>
                     <TableCell className="text-center">{row.numberOfStrategies}</TableCell>
                     <TableCell>{row.mostUsedStrategies}</TableCell>
                   </TableRow>
