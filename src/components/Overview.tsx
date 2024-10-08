@@ -46,23 +46,43 @@ const RiskAssessment = () => {
       <CardHeader className="pb-2">
         <div className="flex items-center">
           <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2" />
-          <h3 className="text-lg font-semibold text-gray-800">Risk Assessment</h3>
+          <h3 className="text-lg font-semibold text-gray-800">
+            Risk Assessment
+          </h3>
         </div>
       </CardHeader>
       <CardContent>
-        <p className="mb-2 font-medium">The current operator landscape presents significant centralization risks:</p>
+        <p className="mb-2 font-medium">
+          The current operator landscape presents significant centralization
+          risks:
+        </p>
         <ul className="list-disc pl-5 mb-2 space-y-1">
-          <li>Only 5 operators are needed to control 1/3 of restaked ETH, indicating a high concentration of power.</li>
-          <li>Major operators, particularly P2P, hold substantial market shares, potentially compromising network decentralization.</li>
+          <li>
+            Only 5 operators are needed to control 1/3 of restaked ETH,
+            indicating a high concentration of power.
+          </li>
+          <li>
+            Major operators, particularly P2P, hold substantial market shares,
+            potentially compromising network decentralization.
+          </li>
         </ul>
-        <p className="mb-2 italic">However, the restaker market appears more evenly distributed, which partially mitigates overall centralization concerns.</p>
-        <p className="font-medium">Key: Implement measures to prevent further consolidation among top operators; Encourage growth of mid-sized operators.</p>
+        <p className="mb-2 italic">
+          However, the restaker market appears more evenly distributed, which
+          partially mitigates overall centralization concerns.
+        </p>
+        <p className="font-medium">
+          Key: Implement measures to prevent further consolidation among top
+          operators; Encourage growth of mid-sized operators.
+        </p>
       </CardContent>
     </Card>
   );
 };
 
-const SemaphoreIndicator: React.FC<{ value: number, thresholds: { green: number, yellow: number } }> = ({ value, thresholds }) => {
+const SemaphoreIndicator: React.FC<{
+  value: number;
+  thresholds: { green: number; yellow: number };
+}> = ({ value, thresholds }) => {
   let color = 'bg-red-500';
   if (value >= thresholds.green) {
     color = 'bg-green-500';
@@ -89,21 +109,43 @@ const CompactNotes = () => {
       {isOpen && (
         <CardContent>
           <div className="text-sm text-gray-700 space-y-3">
-            <p><strong>1. EIGEN Token:</strong> The value and distribution of the EIGEN token are not yet factored into these metrics. This requires further research to understand how its distribution may rebalance the concentration of stake.</p>
-            
-            <p><strong>2. ETH Value Conversion:</strong> To obtain the ETH value, we perform conversions between assets on different strategies (e.g., Lido, Swell). These conversion rates are variable. The rates used in these calculations were last updated on October 5, 2023.</p>
-            
-            <p><strong>3. Data Source:</strong> Currently, the metrics are derived from data in the EigenLayer Delegation Manager smart contract. Future iterations will incorporate data from additional smart contracts for a more comprehensive analysis.</p>
-            
-            <p><strong>4. Future Enhancements:</strong> The Restake Watch project is continuously evolving. Upcoming updates will include:</p>
+            <p>
+              <strong>1. EIGEN Token:</strong> The value and distribution of the
+              EIGEN token are not yet factored into these metrics. This requires
+              further research to understand how its distribution may rebalance
+              the concentration of stake.
+            </p>
+
+            <p>
+              <strong>2. ETH Value Conversion:</strong> To obtain the ETH value,
+              we perform conversions between assets on different strategies
+              (e.g., Lido, Swell). These conversion rates are variable. The
+              rates used in these calculations were last updated on October 5,
+              2023.
+            </p>
+
+            <p>
+              <strong>3. Data Source:</strong> Currently, the metrics are
+              derived from data in the EigenLayer Delegation Manager smart
+              contract. Future iterations will incorporate data from additional
+              smart contracts for a more comprehensive analysis.
+            </p>
+
+            <p>
+              <strong>4. Future Enhancements:</strong> The Restake Watch project
+              is continuously evolving. Upcoming updates will include:
+            </p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Additional concentration metrics</li>
               <li>Withdrawal times from operators</li>
               <li>Presence and distribution of validators (DVT)</li>
               <li>Others!</li>
             </ul>
-            
-            <p><strong>Note:</strong> These enhancements aim to provide a more holistic view of the restaking ecosystem and its associated risks.</p>
+
+            <p>
+              <strong>Note:</strong> These enhancements aim to provide a more
+              holistic view of the restaking ecosystem and its associated risks.
+            </p>
           </div>
         </CardContent>
       )}
@@ -112,7 +154,9 @@ const CompactNotes = () => {
 };
 
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
-  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(null);
+  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -130,17 +174,22 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const totalRestaked = operatorData?.totalETHRestaked || 0;
   const majorOperatorData = !operatorData?.majorOperatorGroupMetrics
     ? []
-    : Object.entries(operatorData.majorOperatorGroupMetrics).map(([key, value]) => {
-        const ethAmount = Number(value.total_eth_restaked.toFixed(2));
-        return {
-          name: key.replaceAll('_', ' '),
-          value: ethAmount,
-          percentage: ((ethAmount / totalRestaked) * 100).toFixed(2),
-        };
-      });
+    : Object.entries(operatorData.majorOperatorGroupMetrics).map(
+        ([key, value]) => {
+          const ethAmount = Number(value.total_eth_restaked.toFixed(2));
+          return {
+            name: key.replaceAll('_', ' '),
+            value: ethAmount,
+            percentage: ((ethAmount / totalRestaked) * 100).toFixed(2),
+          };
+        },
+      );
 
   // Add "Others" category if there's any remaining ETH
-  const totalMajorOperators = majorOperatorData.reduce((acc, curr) => acc + curr.value, 0);
+  const totalMajorOperators = majorOperatorData.reduce(
+    (acc, curr) => acc + curr.value,
+    0,
+  );
   if (totalRestaked > totalMajorOperators) {
     const othersAmount = totalRestaked - totalMajorOperators;
     majorOperatorData.push({
@@ -165,7 +214,8 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           </CardHeader>
           <CardContent>
             <p className="mb-2">
-              Total Restaked: {new Intl.NumberFormat('en-US').format(totalRestaked)} ETH
+              Total Restaked:{' '}
+              {new Intl.NumberFormat('en-US').format(totalRestaked)} ETH
               <InfoTooltip content="The total amount of ETH that has been restaked across all operators and strategies." />
             </p>
             <p className="mb-2">
@@ -180,24 +230,32 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         </Card>
         <Card>
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-800">Market Concentration Metrics</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              Market Concentration Metrics
+            </h3>
           </CardHeader>
           <CardContent>
             <h4 className="font-semibold mt-2 mb-2">Restaker Metrics</h4>
             <p className="mb-2">
-              Restakers needed for 1/3 control: {restakeData?.concentrationMetrics?.top33PercentCount || 'N/A'}
-              <SemaphoreIndicator 
-                value={restakeData?.concentrationMetrics?.top33PercentCount || 0} 
-                thresholds={restakerThresholds} 
+              Restakers needed for 1/3 control:{' '}
+              {restakeData?.concentrationMetrics?.top33PercentCount || 'N/A'}
+              <SemaphoreIndicator
+                value={
+                  restakeData?.concentrationMetrics?.top33PercentCount || 0
+                }
+                thresholds={restakerThresholds}
               />
               <InfoTooltip content="The minimum number of restakers required to collectively control 1/3 of the total restaked ETH. Higher numbers indicate better decentralization. Green: >20, Yellow: >10, Red: ≤10" />
             </p>
             <h4 className="font-semibold mt-4 mb-2">Operator Metrics</h4>
             <p className="mb-2">
-              Operators needed for 1/3 control: {operatorData?.concentrationMetrics?.top33PercentCount || 'N/A'}
-              <SemaphoreIndicator 
-                value={operatorData?.concentrationMetrics?.top33PercentCount || 0} 
-                thresholds={operatorThresholds} 
+              Operators needed for 1/3 control:{' '}
+              {operatorData?.concentrationMetrics?.top33PercentCount || 'N/A'}
+              <SemaphoreIndicator
+                value={
+                  operatorData?.concentrationMetrics?.top33PercentCount || 0
+                }
+                thresholds={operatorThresholds}
               />
               <InfoTooltip content="The minimum number of operators required to collectively control 1/3 of the total restaked ETH. Higher numbers indicate better decentralization. Green: >15, Yellow: >8, Red: ≤8" />
             </p>
@@ -207,15 +265,22 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
 
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold text-gray-800">Share of Total Restaked ETH by Major Operators</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Share of Total Restaked ETH by Major Operators
+          </h2>
           <p className="text-sm text-gray-600 mt-1">
-            This chart represents operator groups that manage multiple individual operators. 
-            The data shown is the aggregated sum for each group.
+            This chart represents operator groups that manage multiple
+            individual operators. The data shown is the aggregated sum for each
+            group.
           </p>
         </CardHeader>
         <CardContent>
           {majorOperatorData.length > 0 && (
-            <ResponsiveContainer width="100%" height={300} style={{ aspectRatio: '4/3' }}>
+            <ResponsiveContainer
+              width="100%"
+              height={300}
+              style={{ aspectRatio: '4/3' }}
+            >
               <Treemap
                 data={majorOperatorData}
                 dataKey="value"

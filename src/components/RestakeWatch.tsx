@@ -22,7 +22,8 @@ import { fetchStakerData } from '../app/api/restake/restake';
 type PlatformType = 'eigenlayer' | 'symbiotic' | 'karak';
 
 const RestakeWatch: React.FC = () => {
-  const [activePlatform, setActivePlatform] = useState<PlatformType>('eigenlayer');
+  const [activePlatform, setActivePlatform] =
+    useState<PlatformType>('eigenlayer');
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
@@ -66,7 +67,11 @@ const RestakeWatch: React.FC = () => {
       return (
         <div className="text-center py-8">
           <h2 className="text-2xl font-bold mb-4">Coming Soon</h2>
-          <p>Data for {activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)} is not yet available.</p>
+          <p>
+            Data for{' '}
+            {activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)}{' '}
+            is not yet available.
+          </p>
         </div>
       );
     }
@@ -161,7 +166,8 @@ const RestakeWatch: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {activePlatform === 'eigenlayer' && (
                 <div className="mb-4 text-sm text-gray-500">
-                  Last updated: {/* You may want to add a lastUpdated field to your staker data */}
+                  Last updated:{' '}
+                  {/* You may want to add a lastUpdated field to your staker data */}
                 </div>
               )}
 
@@ -171,11 +177,14 @@ const RestakeWatch: React.FC = () => {
                   className="mb-6 bg-red-100 border-red-400 text-red-800"
                 >
                   <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>
-                    Critical Alert for EigenLayer
-                  </AlertTitle>
+                  <AlertTitle>Critical Alert for EigenLayer</AlertTitle>
                   <AlertDescription>
-                    Significant Centralization Risk: P2P.org controls over 28% of restaked ETH. Combined with other major operators (Luganodes, DSRV, Pier Two, and Finoa Consensus), these entities control more than 50% of all restaked ETH. This concentration poses substantial risks to the network&apos;s decentralization and resilience.
+                    Significant Centralization Risk: P2P.org controls over 28%
+                    of restaked ETH. Combined with other major operators
+                    (Luganodes, DSRV, Pier Two, and Finoa Consensus), these
+                    entities control more than 50% of all restaked ETH. This
+                    concentration poses substantial risks to the network&apos;s
+                    decentralization and resilience.
                   </AlertDescription>
                 </Alert>
               )}

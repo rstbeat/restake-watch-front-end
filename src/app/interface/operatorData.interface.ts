@@ -99,8 +99,8 @@ export interface StakerDataResponse {
   totalETHRestaked: number;
   activeEntities: number;
   activeRestakers: number;
-  remainingStakersMetrics: OperatorMetrics
-  top10StakersMetrics: OperatorMetrics
+  remainingStakersMetrics: OperatorMetrics;
+  top10StakersMetrics: OperatorMetrics;
 }
 
 export interface OperatorDataFormated {

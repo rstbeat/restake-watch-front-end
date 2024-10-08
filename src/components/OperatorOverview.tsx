@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, ArrowUpDown, AlertTriangle, Copy, Check } from 'lucide-react';
+import {
+  ChevronUp,
+  ChevronDown,
+  ArrowUpDown,
+  AlertTriangle,
+  Copy,
+  Check,
+} from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -14,9 +21,12 @@ import { fetchOperatorData } from '../app/api/restake/restake';
 import { OperatorDataFormated } from '../app/interface/operatorData.interface';
 
 const OperatorOverview: React.FC = () => {
-  const [operatorData, setOperatorData] = useState<OperatorDataFormated[] | null>(null);
+  const [operatorData, setOperatorData] = useState<
+    OperatorDataFormated[] | null
+  >(null);
   const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
-  const [sortColumn, setSortColumn] = useState<keyof OperatorDataFormated>('marketShared');
+  const [sortColumn, setSortColumn] =
+    useState<keyof OperatorDataFormated>('marketShared');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
@@ -24,16 +34,17 @@ const OperatorOverview: React.FC = () => {
     try {
       setIsLoadingOperatorData(true);
       const data = await fetchOperatorData();
-      const operatorDataResponse = data?.operatorData?.map((item: any) => ({
-        operatorAddress: item['Operator Address'] || '',
-        marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
-        ethRestaked: new Intl.NumberFormat('en-US', {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 2,
-        }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
-        numberOfStrategies: item['Number of Strategies'] || 0,
-        mostUsedStrategies: item['Most Used Strategy'] || '',
-      })) || [];
+      const operatorDataResponse =
+        data?.operatorData?.map((item: any) => ({
+          operatorAddress: item['Operator Address'] || '',
+          marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
+          ethRestaked: new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 2,
+          }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
+          numberOfStrategies: item['Number of Strategies'] || 0,
+          mostUsedStrategies: item['Most Used Strategy'] || '',
+        })) || [];
       setOperatorData(operatorDataResponse);
     } catch (error) {
       console.error('An error occurred while fetching operator data', error);
@@ -98,7 +109,8 @@ const OperatorOverview: React.FC = () => {
           Top 50 Operators by Market Share
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          Displaying the concentration of restaked ETH among the most significant operators in the ecosystem
+          Displaying the concentration of restaked ETH among the most
+          significant operators in the ecosystem
         </p>
         <div className="overflow-x-auto">
           <Table>
@@ -148,17 +160,26 @@ const OperatorOverview: React.FC = () => {
                 </TableRow>
               ) : sortedData && sortedData.length > 0 ? (
                 sortedData.map((row, index) => (
-                  <TableRow key={row.operatorAddress || index} className="hover:bg-gray-50">
+                  <TableRow
+                    key={row.operatorAddress || index}
+                    className="hover:bg-gray-50"
+                  >
                     <TableCell className="font-semibold">{index + 1}</TableCell>
                     <TableCell className="font-mono text-sm">
                       <div className="flex items-center">
-                        <span className="mr-2">{truncateAddress(row.operatorAddress)}</span>
+                        <span className="mr-2">
+                          {truncateAddress(row.operatorAddress)}
+                        </span>
                         {row.operatorAddress && (
                           <Button
                             variant="ghost"
                             onClick={() => copyToClipboard(row.operatorAddress)}
                             className="p-1"
-                            title={copiedAddress === row.operatorAddress ? "Copied!" : "Copy full address"}
+                            title={
+                              copiedAddress === row.operatorAddress
+                                ? 'Copied!'
+                                : 'Copy full address'
+                            }
                           >
                             {copiedAddress === row.operatorAddress ? (
                               <Check className="h-4 w-4 text-green-500" />
@@ -174,15 +195,15 @@ const OperatorOverview: React.FC = () => {
                         {row.marketShared}%
                         {parseFloat(row.marketShared) > 10 && (
                           <span title="High market share concentration">
-                            <AlertTriangle 
-                              className="ml-2 h-4 w-4 text-yellow-500"
-                            />
+                            <AlertTriangle className="ml-2 h-4 w-4 text-yellow-500" />
                           </span>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>{row.ethRestaked} ETH</TableCell>
-                    <TableCell className="text-center">{row.numberOfStrategies}</TableCell>
+                    <TableCell className="text-center">
+                      {row.numberOfStrategies}
+                    </TableCell>
                     <TableCell>{row.mostUsedStrategies}</TableCell>
                   </TableRow>
                 ))

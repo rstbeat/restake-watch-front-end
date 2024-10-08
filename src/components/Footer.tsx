@@ -8,7 +8,6 @@ const Footer: React.FC = () => {
         <span role="img" aria-label="heart">
           ❤️
         </span>{' '}
-        
       </p>
     </footer>
   );

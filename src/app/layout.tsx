@@ -15,10 +15,11 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: 'Restake Watch',
-  description: 'Independent watchdog for restaking. Monitor operator concentration and analyze risks in the restaking ecosystem.',
+  description:
+    'Independent watchdog for restaking. Monitor operator concentration and analyze risks in the restaking ecosystem.',
   icons: {
     icon: '/favicon.ico',
-  }
+  },
 };
 
 export default function RootLayout({

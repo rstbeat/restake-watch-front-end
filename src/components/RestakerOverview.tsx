@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, ArrowUpDown, AlertTriangle, Copy, Check } from 'lucide-react';
+import {
+  ChevronUp,
+  ChevronDown,
+  ArrowUpDown,
+  AlertTriangle,
+  Copy,
+  Check,
+} from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -24,7 +31,8 @@ interface RestakerData {
 const RestakerOverview: React.FC = () => {
   const [stakerData, setStakerData] = useState<RestakerData[] | null>(null);
   const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
-  const [sortColumn, setSortColumn] = useState<keyof RestakerData>('amountRestaked');
+  const [sortColumn, setSortColumn] =
+    useState<keyof RestakerData>('amountRestaked');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
@@ -104,7 +112,8 @@ const RestakerOverview: React.FC = () => {
           Top 50 Restakers by Market Share
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          Displaying the distribution of restaked ETH among the most significant restakers in the ecosystem
+          Displaying the distribution of restaked ETH among the most significant
+          restakers in the ecosystem
         </p>
         <div className="overflow-x-auto">
           <Table>
@@ -148,16 +157,25 @@ const RestakerOverview: React.FC = () => {
             <TableBody>
               {sortedData ? (
                 sortedData.map((row, index) => (
-                  <TableRow key={row.restakerAddress} className="hover:bg-gray-50">
+                  <TableRow
+                    key={row.restakerAddress}
+                    className="hover:bg-gray-50"
+                  >
                     <TableCell className="font-semibold">{index + 1}</TableCell>
                     <TableCell className="font-mono text-sm">
                       <div className="flex items-center">
-                        <span className="mr-2">{truncateAddress(row.restakerAddress)}</span>
+                        <span className="mr-2">
+                          {truncateAddress(row.restakerAddress)}
+                        </span>
                         <Button
                           variant="ghost"
                           onClick={() => copyToClipboard(row.restakerAddress)}
                           className="p-1"
-                          title={copiedAddress === row.restakerAddress ? "Copied!" : "Copy full address"}
+                          title={
+                            copiedAddress === row.restakerAddress
+                              ? 'Copied!'
+                              : 'Copy full address'
+                          }
                         >
                           {copiedAddress === row.restakerAddress ? (
                             <Check className="h-4 w-4 text-green-500" />
@@ -172,15 +190,15 @@ const RestakerOverview: React.FC = () => {
                         {row.amountRestaked}%
                         {parseFloat(row.amountRestaked) > 5 && (
                           <span title="High market share concentration">
-                            <AlertTriangle 
-                              className="ml-2 h-4 w-4 text-yellow-500"
-                            />
+                            <AlertTriangle className="ml-2 h-4 w-4 text-yellow-500" />
                           </span>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>{row.ethRestaked} ETH</TableCell>
-                    <TableCell className="text-center">{row.numberOfStrategies}</TableCell>
+                    <TableCell className="text-center">
+                      {row.numberOfStrategies}
+                    </TableCell>
                     <TableCell>{row.mostUsedStrategies}</TableCell>
                   </TableRow>
                 ))
