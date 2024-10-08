@@ -16,11 +16,8 @@ import OperatorOverview from './OperatorOverview';
 import RestakerOverview from './RestakerOverview';
 import Overview from './Overview';
 import Footer from './Footer';
-import {
-  OperatorDataResponse,
-  StakerData,
-} from '../app/interface/operatorData.interface';
-import { fetchOperatorData, fetchStakerData } from '../app/api/restake/restake';
+import { StakerData } from '../app/interface/operatorData.interface';
+import { fetchStakerData } from '../app/api/restake/restake';
 
 type PlatformType = 'eigenlayer' | 'symbiotic' | 'karak';
 
@@ -31,9 +28,7 @@ const RestakeWatch: React.FC = () => {
   const [showBanner, setShowBanner] = useState(true);
   const aboutRef = useRef<HTMLDivElement>(null);
 
-  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(null);
   const [stakerData, setStakerData] = useState<any | null>(null);
-  const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
   const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
 
   useEffect(() => {
@@ -49,26 +44,11 @@ const RestakeWatch: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const fetchOperatorDataCallback = useCallback(async () => {
-    if (activePlatform !== 'eigenlayer') return;
-    try {
-      setIsLoadingOperatorData(true);
-      const data = await fetchOperatorData();
-      // Process data as before
-      setOperatorData(data);
-    } catch (error) {
-      console.error('Error fetching operator data:', error);
-    } finally {
-      setIsLoadingOperatorData(false);
-    }
-  }, [activePlatform]);
-
   const fetchStakerDataCallback = useCallback(async () => {
     if (activePlatform !== 'eigenlayer') return;
     try {
       setIsLoadingStakerData(true);
       const data = await fetchStakerData();
-      // Process data as before
       setStakerData(data);
     } catch (error) {
       console.error('Error fetching staker data:', error);
@@ -78,9 +58,8 @@ const RestakeWatch: React.FC = () => {
   }, [activePlatform]);
 
   useEffect(() => {
-    fetchOperatorDataCallback();
     fetchStakerDataCallback();
-  }, [fetchOperatorDataCallback, fetchStakerDataCallback]);
+  }, [fetchStakerDataCallback]);
 
   const renderContent = () => {
     if (activePlatform !== 'eigenlayer') {
@@ -121,13 +100,13 @@ const RestakeWatch: React.FC = () => {
 
         <TabsContent value="overview" className="space-y-6">
           {Overview && <Overview
-            currentPlatformData={operatorData}
+            currentPlatformData={null}
             restakeData={stakerData}
           />}
         </TabsContent>
 
         <TabsContent value="operators" className="space-y-6">
-          {OperatorOverview && <OperatorOverview operatorData={operatorData?.operatorData || []} />}
+          {OperatorOverview && <OperatorOverview />}
         </TabsContent>
 
         <TabsContent value="restakers" className="space-y-6">
@@ -185,24 +164,24 @@ const RestakeWatch: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {activePlatform === 'eigenlayer' && (
                 <div className="mb-4 text-sm text-gray-500">
-                  Last updated: {operatorData?.lastUpdated ?? 'N/A'}
+                  Last updated: {/* You may want to add a lastUpdated field to your staker data */}
                 </div>
               )}
 
-{activePlatform === 'eigenlayer' && (
-            <Alert
-              variant="destructive"
-              className="mb-6 bg-red-100 border-red-400 text-red-800"
-            >
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>
-                Critical Alert for EigenLayer
-              </AlertTitle>
-              <AlertDescription>
-                Significant Centralization Risk: P2P.org controls over 28% of restaked ETH. Combined with other major operators (Luganodes, DSRV, Pier Two, and Finoa Consensus), these entities control more than 50% of all restaked ETH. This concentration poses substantial risks to the network&apos;s decentralization and resilience.
-              </AlertDescription>
-            </Alert>
-          )}
+              {activePlatform === 'eigenlayer' && (
+                <Alert
+                  variant="destructive"
+                  className="mb-6 bg-red-100 border-red-400 text-red-800"
+                >
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>
+                    Critical Alert for EigenLayer
+                  </AlertTitle>
+                  <AlertDescription>
+                    Significant Centralization Risk: P2P.org controls over 28% of restaked ETH. Combined with other major operators (Luganodes, DSRV, Pier Two, and Finoa Consensus), these entities control more than 50% of all restaked ETH. This concentration poses substantial risks to the network&apos;s decentralization and resilience.
+                  </AlertDescription>
+                </Alert>
+              )}
 
               {renderContent()}
 
