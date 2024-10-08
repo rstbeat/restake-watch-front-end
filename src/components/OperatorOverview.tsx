@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { ChevronUp, ChevronDown, ArrowUpDown, AlertTriangle, Copy, Check } from 'lucide-react';
 import {
   Table,
@@ -9,24 +9,57 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
-import { OperatorDataFormated } from '../app/interface/operatorData.interface';
 import { Button } from '@/components/ui/button';
+import { fetchOperatorData } from '../app/api/restake/restake';
+import { OperatorDataFormated } from '../app/interface/operatorData.interface';
 
 interface OperatorOverviewProps {
   operatorData: OperatorDataFormated[] | null;
 }
 
-const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData }) => {
+const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData: initialOperatorData }) => {
+  const [operatorData, setOperatorData] = useState<OperatorDataFormated[] | null>(initialOperatorData);
+  const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
   const [sortColumn, setSortColumn] = useState<keyof OperatorDataFormated>('marketShared');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
+  const fetchOperatorDataCallback = useCallback(async () => {
+    try {
+      setIsLoadingOperatorData(true);
+      const data = await fetchOperatorData();
+      // Assuming the data structure is similar to what we have in RestakerOverview
+      const operatorDataResponse = data.operatorData.map((data: any) => ({
+        operatorAddress: data['Operator Address'],
+        marketShared: Number(data['Market Share'] * 100).toFixed(2),
+        ethRestaked: new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2,
+        }).format(Number(data['ETH Restaked'].toFixed(2))),
+        numberOfStrategies: data['Number of Strategies'],
+        mostUsedStrategies: data['Most Used Strategy'],
+      }));
+      setOperatorData(operatorDataResponse);
+    } catch (error) {
+      console.error('An error occurred while fetching operator data', error);
+    } finally {
+      setIsLoadingOperatorData(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!operatorData) {
+      fetchOperatorDataCallback();
+    }
+  }, [operatorData, fetchOperatorDataCallback]);
 
   const sortedData = useMemo(() => {
     if (!operatorData) return null;
     return [...operatorData].sort((a, b) => {
-      if (a[sortColumn] < b[sortColumn]) return sortDirection === 'asc' ? -1 : 1;
-      if (a[sortColumn] > b[sortColumn]) return sortDirection === 'asc' ? 1 : -1;
+      const aValue = a[sortColumn];
+      const bValue = b[sortColumn];
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
   }, [operatorData, sortColumn, sortDirection]);
@@ -57,6 +90,7 @@ const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData }) => 
   };
 
   const truncateAddress = (address: string) => {
+    if (!address) return 'N/A';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
@@ -112,28 +146,30 @@ const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData }) => 
             <TableBody>
               {sortedData ? (
                 sortedData.map((row, index) => (
-                  <TableRow key={row.operatorAddress} className="hover:bg-gray-50">
+                  <TableRow key={row.operatorAddress || index} className="hover:bg-gray-50">
                     <TableCell className="font-semibold">{index + 1}</TableCell>
                     <TableCell className="font-mono text-sm">
                       <div className="flex items-center">
                         <span className="mr-2">{truncateAddress(row.operatorAddress)}</span>
-                        <Button
-                          variant="ghost"
-                          onClick={() => copyToClipboard(row.operatorAddress)}
-                          className="p-1"
-                          title={copiedAddress === row.operatorAddress ? "Copied!" : "Copy full address"}
-                        >
-                          {copiedAddress === row.operatorAddress ? (
-                            <Check className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
+                        {row.operatorAddress && (
+                          <Button
+                            variant="ghost"
+                            onClick={() => copyToClipboard(row.operatorAddress)}
+                            className="p-1"
+                            title={copiedAddress === row.operatorAddress ? "Copied!" : "Copy full address"}
+                          >
+                            {copiedAddress === row.operatorAddress ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="font-semibold">
                       <div className="flex items-center">
-                        {parseFloat(row.marketShared).toFixed(2)}%
+                        {row.marketShared}%
                         {parseFloat(row.marketShared) > 10 && (
                           <span title="High market share concentration">
                             <AlertTriangle 
@@ -143,7 +179,7 @@ const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData }) => 
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{parseFloat(row.ethRestaked).toLocaleString()} ETH</TableCell>
+                    <TableCell>{row.ethRestaked} ETH</TableCell>
                     <TableCell className="text-center">{row.numberOfStrategies}</TableCell>
                     <TableCell>{row.mostUsedStrategies}</TableCell>
                   </TableRow>
