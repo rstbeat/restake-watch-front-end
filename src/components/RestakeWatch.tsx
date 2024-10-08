@@ -17,74 +17,24 @@ import RestakerOverview from './RestakerOverview';
 import Overview from './Overview';
 import Footer from './Footer';
 import {
-  OperatorData,
-  OperatorDataFormated,
   OperatorDataResponse,
   StakerData,
 } from '../app/interface/operatorData.interface';
 import { fetchOperatorData, fetchStakerData } from '../app/api/restake/restake';
 
-// const COLORS = ['#4A90E2', '#50C878', '#9B59B6', '#F39C12'];
-// const CHART_COLORS = ['#4A90E2', '#E8F4FD'];
-
-// const getStatusColor = (value: number, thresholds: Thresholds): string => {
-//   if (value <= thresholds.green) return 'bg-green-500';
-//   if (value <= thresholds.yellow) return 'bg-yellow-500';
-//   return 'bg-red-500';
-// };
-
-// interface MetricCardProps {
-//   title: string;
-//   value: number | null;
-//   thresholds: Thresholds;
-//   format?: (v: number | null) => string;
-// }
-
-// const MetricCard: React.FC<MetricCardProps> = ({
-//   title,
-//   value,
-//   thresholds,
-//   format = (v) => v?.toString() ?? 'N/A',
-// }) => {
-//   const statusColor =
-//     value !== null ? getStatusColor(value, thresholds) : 'bg-gray-300';
-//   return (
-//     <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 transition-all duration-300 hover:shadow-lg">
-//       <h3 className="text-lg font-semibold mb-3 text-gray-800">{title}</h3>
-//       <div className="flex items-center justify-between">
-//         <span className="text-3xl font-bold text-gray-900">
-//           {format(value)}
-//         </span>
-//         <div className={`w-4 h-4 rounded-full ${statusColor}`}></div>
-//       </div>
-//     </div>
-//   );
-// };
-
-interface PlatformData {
-  operatorData: { name: string; value: number }[];
-  monthlyTVLData: { date: string; tvl: number }[];
-  keyMetrics: {
-    totalRestaked: number | null;
-    activeOperators: number | null;
-    totalRestakers: number | null;
-    p2pMarketShare: number | null;
-    stakerHerfindahl: number | null;
-    top33PercentOperators: number | null;
-  };
-  criticalAlert: string;
-}
-
 type PlatformType = 'eigenlayer' | 'symbiotic' | 'karak';
 
 const RestakeWatch: React.FC = () => {
-  // State declarations
-  const [activePlatform, setActivePlatform] =
-    useState<PlatformType>('eigenlayer');
+  const [activePlatform, setActivePlatform] = useState<PlatformType>('eigenlayer');
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
   const aboutRef = useRef<HTMLDivElement>(null);
+
+  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(null);
+  const [stakerData, setStakerData] = useState<any | null>(null);
+  const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
+  const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -99,127 +49,93 @@ const RestakeWatch: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const platformData: Record<PlatformType, PlatformData> = {
-    eigenlayer: {
-      operatorData: [
-        { name: 'P2P.org', value: 50 },
-        { name: 'Other large operators', value: 30 },
-        { name: 'Small operators', value: 20 },
-      ],
-      monthlyTVLData: [
-        { date: '2024-04', tvl: 1000000 },
-        { date: '2024-05', tvl: 1100000 },
-        { date: '2024-06', tvl: 1250000 },
-        { date: '2024-07', tvl: 1400000 },
-        { date: '2024-08', tvl: 1300000 },
-      ],
-      keyMetrics: {
-        totalRestaked: 1300000,
-        activeOperators: 680,
-        totalRestakers: 93674,
-        p2pMarketShare: 0.329807,
-        stakerHerfindahl: 4,
-        top33PercentOperators: 2,
-      },
-      criticalAlert:
-      'Significant Centralization Risk: P2P.org controls over 28% of restaked ETH. Combined with other major operators (Luganodes, DSRV, Pier Two, and Finoa Consensus), these entities control more than 50% of all restaked ETH. This concentration poses substantial risks to the network´s decentralization and resilience.',
-    },
-    symbiotic: {
-      // Placeholder data
-      operatorData: [],
-      monthlyTVLData: [],
-      keyMetrics: {
-        totalRestaked: null,
-        activeOperators: null,
-        totalRestakers: null,
-        p2pMarketShare: null,
-        stakerHerfindahl: null,
-        top33PercentOperators: null,
-      },
-      criticalAlert: 'Data collection for Symbiotic is in progress.',
-    },
-    karak: {
-      // Placeholder data
-      operatorData: [],
-      monthlyTVLData: [],
-      keyMetrics: {
-        totalRestaked: null,
-        activeOperators: null,
-        totalRestakers: null,
-        p2pMarketShare: null,
-        stakerHerfindahl: null,
-        top33PercentOperators: null,
-      },
-      criticalAlert: 'Data collection for Karak is in progress.',
-    },
-  };
-
-  const currentPlatformData = platformData[activePlatform];
-
-  // Operator Data
-  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
-    null,
-  );
-  const [, setIsLoadingOperatorData] = useState(false);
-
   const fetchOperatorDataCallback = useCallback(async () => {
+    if (activePlatform !== 'eigenlayer') return;
     try {
       setIsLoadingOperatorData(true);
-      const data = (await fetchOperatorData()) as any;
-      data.operatorData = data.operatorData.map((operator: OperatorData) => ({
-        operatorAddress: operator['Operator Address'],
-        marketShared: Number(operator['Market Share'] * 100).toFixed(2),
-        ethRestaked: new Intl.NumberFormat('en-US', {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 2,
-        }).format(Number(operator['ETH Restaked'].toFixed(2))),
-        numberOfStrategies: operator['Number of Strategies'],
-        mostUsedStrategies: operator['Most Used Strategy'],
-      }));
-      const OperatorDataFormated = data;
-      setOperatorData(OperatorDataFormated);
+      const data = await fetchOperatorData();
+      // Process data as before
+      setOperatorData(data);
     } catch (error) {
-      console.error('Ha ocurrido un error');
+      console.error('Error fetching operator data:', error);
     } finally {
       setIsLoadingOperatorData(false);
     }
-  }, []);
-
-  useEffect(() => {
-    if (!operatorData) {
-      fetchOperatorDataCallback();
-    }
-  }, [operatorData, fetchOperatorDataCallback]);
-
-  const [stakerData, setStakerData] = useState<any | null>(null);
-  const [, setIsLoadingStakerData] = useState(false);
+  }, [activePlatform]);
 
   const fetchStakerDataCallback = useCallback(async () => {
+    if (activePlatform !== 'eigenlayer') return;
     try {
       setIsLoadingStakerData(true);
       const data = await fetchStakerData();
-      data.stakerData = data.stakerData.map((data: StakerData) => ({
-        restakerAddress: data['Staker Address'].substr(2, 25),
-        // restakerName: data['Staker Name'],
-        amountRestaked: data['Market Share'].toFixed(2),
-        // percentageOfTotal: data['Percentage of Total'],
-        numberOfStrategies: data['Number of Strategies'],
-        mostUsedStrategies: data['Most Used Strategy'],
-      }));
-      const stakerDataResponse = data;
-      setStakerData(stakerDataResponse);
+      // Process data as before
+      setStakerData(data);
     } catch (error) {
-      console.error('Ha ocurrido un error');
+      console.error('Error fetching staker data:', error);
     } finally {
       setIsLoadingStakerData(false);
     }
-  }, []);
+  }, [activePlatform]);
 
   useEffect(() => {
-    if (!stakerData) {
-      fetchStakerDataCallback();
+    fetchOperatorDataCallback();
+    fetchStakerDataCallback();
+  }, [fetchOperatorDataCallback, fetchStakerDataCallback]);
+
+  const renderContent = () => {
+    if (activePlatform !== 'eigenlayer') {
+      return (
+        <div className="text-center py-8">
+          <h2 className="text-2xl font-bold mb-4">Coming Soon</h2>
+          <p>Data for {activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)} is not yet available.</p>
+        </div>
+      );
     }
-  }, [stakerData, fetchStakerDataCallback]);
+
+    return (
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
+        <TabsList className="bg-white rounded-lg shadow-md">
+          <TabsTrigger
+            value="overview"
+            className="data-[state=active]:bg-blue-100"
+          >
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="operators"
+            className="data-[state=active]:bg-blue-100"
+          >
+            Operators
+          </TabsTrigger>
+          <TabsTrigger
+            value="restakers"
+            className="data-[state=active]:bg-blue-100"
+          >
+            Restakers
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <Overview
+            currentPlatformData={operatorData}
+            restakeData={stakerData}
+          />
+        </TabsContent>
+
+        <TabsContent value="operators" className="space-y-6">
+          <OperatorOverview operatorData={operatorData?.operatorData as any} />
+        </TabsContent>
+
+        <TabsContent value="restakers" className="space-y-6">
+          <RestakerOverview />
+        </TabsContent>
+      </Tabs>
+    );
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 text-gray-900">
@@ -267,67 +183,28 @@ const RestakeWatch: React.FC = () => {
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="mb-4 text-sm text-gray-500">
-                Last updated: {operatorData?.lastUpdated ?? 'N/A'}
-              </div>
+              {activePlatform === 'eigenlayer' && (
+                <div className="mb-4 text-sm text-gray-500">
+                  Last updated: {operatorData?.lastUpdated ?? 'N/A'}
+                </div>
+              )}
 
-              <Alert
-                variant="destructive"
-                className="mb-6 bg-red-100 border-red-400 text-red-800"
-              >
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>
-                  Critical Alert for{' '}
-                  {activePlatform.charAt(0).toUpperCase() +
-                    activePlatform.slice(1)}
-                </AlertTitle>
-                <AlertDescription>
-                  {currentPlatformData.criticalAlert}
-                </AlertDescription>
-              </Alert>
+              {activePlatform === 'eigenlayer' && (
+                <Alert
+                  variant="destructive"
+                  className="mb-6 bg-red-100 border-red-400 text-red-800"
+                >
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>
+                    Critical Alert for EigenLayer
+                  </AlertTitle>
+                  <AlertDescription>
+                    Significant Centralization Risk: P2P.org controls over 28% of restaked ETH. Combined with other major operators (Luganodes, DSRV, Pier Two, and Finoa Consensus), these entities control more than 50% of all restaked ETH. This concentration poses substantial risks to the network's decentralization and resilience.
+                  </AlertDescription>
+                </Alert>
+              )}
 
-              <Tabs
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="space-y-6"
-              >
-                <TabsList className="bg-white rounded-lg shadow-md">
-                  <TabsTrigger
-                    value="overview"
-                    className="data-[state=active]:bg-blue-100"
-                  >
-                    Overview
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="operators"
-                    className="data-[state=active]:bg-blue-100"
-                  >
-                    Operators
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="restakers"
-                    className="data-[state=active]:bg-blue-100"
-                  >
-                    Restakers
-                  </TabsTrigger>
-                </TabsList>
-
-                {/* TODO: Revisar el por qué currentPlatformdata y metricThresholds tienen errores al pasar la data */}
-                <TabsContent value="overview" className="space-y-6">
-                  <Overview
-                    currentPlatformData={operatorData}
-                    restakeData={stakerData}
-                  />
-                </TabsContent>
-
-                <TabsContent value="operators" className="space-y-6">
-                  <OperatorOverview operatorData={operatorData?.operatorData as any} />
-                </TabsContent>
-
-                <TabsContent value="restakers" className="space-y-6">
-                  <RestakerOverview />
-                </TabsContent>
-              </Tabs>
+              {renderContent()}
 
               <div
                 ref={aboutRef}
