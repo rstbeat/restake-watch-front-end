@@ -189,20 +189,20 @@ const RestakeWatch: React.FC = () => {
                 </div>
               )}
 
-              {activePlatform === 'eigenlayer' && (
-                <Alert
-                  variant="destructive"
-                  className="mb-6 bg-red-100 border-red-400 text-red-800"
-                >
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>
-                    Critical Alert for EigenLayer
-                  </AlertTitle>
-                  <AlertDescription>
-                    Significant Centralization Risk: P2P.org controls over 28% of restaked ETH. Combined with other major operators (Luganodes, DSRV, Pier Two, and Finoa Consensus), these entities control more than 50% of all restaked ETH. This concentration poses substantial risks to the network's decentralization and resilience.
-                  </AlertDescription>
-                </Alert>
-              )}
+{activePlatform === 'eigenlayer' && (
+            <Alert
+              variant="destructive"
+              className="mb-6 bg-red-100 border-red-400 text-red-800"
+            >
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>
+                Critical Alert for EigenLayer
+              </AlertTitle>
+              <AlertDescription>
+                Significant Centralization Risk: P2P.org controls over 28% of restaked ETH. Combined with other major operators (Luganodes, DSRV, Pier Two, and Finoa Consensus), these entities control more than 50% of all restaked ETH. This concentration poses substantial risks to the network&apos;s decentralization and resilience.
+              </AlertDescription>
+            </Alert>
+          )}
 
               {renderContent()}
 
