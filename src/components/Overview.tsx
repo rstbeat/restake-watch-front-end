@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Treemap,
   ResponsiveContainer,
@@ -9,7 +9,7 @@ import { InfoCircledIcon } from '@radix-ui/react-icons';
 import { AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
-
+import { fetchOperatorData } from '../app/api/restake/restake';
 
 const COLORS = [
   '#1a202c',
@@ -21,7 +21,6 @@ const COLORS = [
 ];
 
 interface OverviewProps {
-  currentPlatformData: OperatorDataResponse | null;
   restakeData: any | null;
 }
 
@@ -112,15 +111,26 @@ const CompactNotes = () => {
   );
 };
 
+const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
+  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(null);
 
-const Overview: React.FC<OverviewProps> = ({
-  currentPlatformData,
-  restakeData,
-}) => {
-  const totalRestaked = currentPlatformData?.totalETHRestaked || 0;
-  const operatorData = !currentPlatformData?.majorOperatorGroupMetrics
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await fetchOperatorData();
+        setOperatorData(data);
+      } catch (error) {
+        console.error('Error fetching operator data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const totalRestaked = operatorData?.totalETHRestaked || 0;
+  const majorOperatorData = !operatorData?.majorOperatorGroupMetrics
     ? []
-    : Object.entries(currentPlatformData.majorOperatorGroupMetrics).map(([key, value]) => {
+    : Object.entries(operatorData.majorOperatorGroupMetrics).map(([key, value]) => {
         const ethAmount = Number(value.total_eth_restaked.toFixed(2));
         return {
           name: key.replaceAll('_', ' '),
@@ -130,10 +140,10 @@ const Overview: React.FC<OverviewProps> = ({
       });
 
   // Add "Others" category if there's any remaining ETH
-  const totalMajorOperators = operatorData.reduce((acc, curr) => acc + curr.value, 0);
+  const totalMajorOperators = majorOperatorData.reduce((acc, curr) => acc + curr.value, 0);
   if (totalRestaked > totalMajorOperators) {
     const othersAmount = totalRestaked - totalMajorOperators;
-    operatorData.push({
+    majorOperatorData.push({
       name: 'Others',
       value: Number(othersAmount.toFixed(2)),
       percentage: ((othersAmount / totalRestaked) * 100).toFixed(2),
@@ -159,7 +169,7 @@ const Overview: React.FC<OverviewProps> = ({
               <InfoTooltip content="The total amount of ETH that has been restaked across all operators and strategies." />
             </p>
             <p className="mb-2">
-              Active Operators: {currentPlatformData?.activeEntities || 'N/A'}
+              Active Operators: {operatorData?.activeEntities || 'N/A'}
               <InfoTooltip content="The number of operators currently active in the restaking ecosystem. Active means they have a positive amount of ETH restaked." />
             </p>
             <p className="mb-2">
@@ -184,9 +194,9 @@ const Overview: React.FC<OverviewProps> = ({
             </p>
             <h4 className="font-semibold mt-4 mb-2">Operator Metrics</h4>
             <p className="mb-2">
-              Operators needed for 1/3 control: {currentPlatformData?.concentrationMetrics?.top33PercentCount || 'N/A'}
+              Operators needed for 1/3 control: {operatorData?.concentrationMetrics?.top33PercentCount || 'N/A'}
               <SemaphoreIndicator 
-                value={currentPlatformData?.concentrationMetrics?.top33PercentCount || 0} 
+                value={operatorData?.concentrationMetrics?.top33PercentCount || 0} 
                 thresholds={operatorThresholds} 
               />
               <InfoTooltip content="The minimum number of operators required to collectively control 1/3 of the total restaked ETH. Higher numbers indicate better decentralization. Green: >15, Yellow: >8, Red: ≤8" />
@@ -204,15 +214,15 @@ const Overview: React.FC<OverviewProps> = ({
           </p>
         </CardHeader>
         <CardContent>
-          {operatorData.length > 0 && (
+          {majorOperatorData.length > 0 && (
             <ResponsiveContainer width="100%" height={300} style={{ aspectRatio: '4/3' }}>
               <Treemap
-                data={operatorData}
+                data={majorOperatorData}
                 dataKey="value"
                 stroke="#fff"
                 fill="#1a202c"
               >
-                {operatorData.map((_entry, index) => (
+                {majorOperatorData.map((_entry, index) => (
                   <Treemap
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}

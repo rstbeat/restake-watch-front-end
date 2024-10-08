@@ -99,10 +99,7 @@ const RestakeWatch: React.FC = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {Overview && <Overview
-            currentPlatformData={null}
-            restakeData={stakerData}
-          />}
+          {Overview && <Overview restakeData={stakerData} />}
         </TabsContent>
 
         <TabsContent value="operators" className="space-y-6">
