@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown, ArrowUpDown, AlertTriangle, Copy, Check } from 'lucide-react';
 import {
   Table,
@@ -8,17 +8,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { fetchOperatorData } from '../app/api/restake/restake';
 import { OperatorDataFormated } from '../app/interface/operatorData.interface';
 
-interface OperatorOverviewProps {
-  operatorData: OperatorDataFormated[] | null;
-}
-
-const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData: initialOperatorData }) => {
-  const [operatorData, setOperatorData] = useState<OperatorDataFormated[] | null>(initialOperatorData);
+const OperatorOverview: React.FC = () => {
+  const [operatorData, setOperatorData] = useState<OperatorDataFormated[] | null>(null);
   const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
   const [sortColumn, setSortColumn] = useState<keyof OperatorDataFormated>('marketShared');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -28,20 +24,20 @@ const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData: initi
     try {
       setIsLoadingOperatorData(true);
       const data = await fetchOperatorData();
-      // Assuming the data structure is similar to what we have in RestakerOverview
-      const operatorDataResponse = data.operatorData.map((data: any) => ({
-        operatorAddress: data['Operator Address'],
-        marketShared: Number(data['Market Share'] * 100).toFixed(2),
+      const operatorDataResponse = data?.operatorData?.map((item: any) => ({
+        operatorAddress: item['Operator Address'] || '',
+        marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
         ethRestaked: new Intl.NumberFormat('en-US', {
           minimumFractionDigits: 1,
           maximumFractionDigits: 2,
-        }).format(Number(data['ETH Restaked'].toFixed(2))),
-        numberOfStrategies: data['Number of Strategies'],
-        mostUsedStrategies: data['Most Used Strategy'],
-      }));
+        }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
+        numberOfStrategies: item['Number of Strategies'] || 0,
+        mostUsedStrategies: item['Most Used Strategy'] || '',
+      })) || [];
       setOperatorData(operatorDataResponse);
     } catch (error) {
       console.error('An error occurred while fetching operator data', error);
+      setOperatorData([]);
     } finally {
       setIsLoadingOperatorData(false);
     }
@@ -144,7 +140,13 @@ const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData: initi
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedData ? (
+              {isLoadingOperatorData ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    <Skeleton className="w-full h-[20px] rounded-full" />
+                  </TableCell>
+                </TableRow>
+              ) : sortedData && sortedData.length > 0 ? (
                 sortedData.map((row, index) => (
                   <TableRow key={row.operatorAddress || index} className="hover:bg-gray-50">
                     <TableCell className="font-semibold">{index + 1}</TableCell>
@@ -187,7 +189,7 @@ const OperatorOverview: React.FC<OperatorOverviewProps> = ({ operatorData: initi
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center">
-                    <Skeleton className="w-full h-[20px] rounded-full" />
+                    No operator data available
                   </TableCell>
                 </TableRow>
               )}
