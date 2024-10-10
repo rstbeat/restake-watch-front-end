@@ -5,7 +5,9 @@ import { ChevronRight } from 'lucide-react';
 const TimelineItem = ({ date, title, description }) => (
   <div className="flex-shrink-0 w-64 mr-8">
     <div className="bg-white p-4 rounded-lg shadow-md h-full border-t-4 border-[#1a202c]">
-      <time className="text-sm font-medium text-[#1a202c] mb-2 block">{date}</time>
+      <time className="text-sm font-medium text-[#1a202c] mb-2 block">
+        {date}
+      </time>
       <h3 className="text-lg font-semibold text-[#1a202c] mb-2">{title}</h3>
       <p className="text-sm text-gray-600">{description}</p>
     </div>
@@ -17,7 +19,9 @@ const Roadmap = () => {
     <Card className="mt-8 overflow-hidden">
       <CardHeader>
         <h2 className="text-2xl font-bold text-[#1a202c]">Roadmap</h2>
-        <p className="text-sm text-gray-600">Our upcoming milestones and features</p>
+        <p className="text-sm text-gray-600">
+          Our upcoming milestones and features
+        </p>
       </CardHeader>
       <CardContent className="p-0">
         <div className="relative">

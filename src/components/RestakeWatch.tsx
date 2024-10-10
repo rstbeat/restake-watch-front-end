@@ -1,5 +1,15 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { AlertTriangle, X, Twitter, ChevronRight, Eye, Shield, BarChart2, DollarSign, Coffee } from 'lucide-react';
+import {
+  AlertTriangle,
+  X,
+  Twitter,
+  ChevronRight,
+  Eye,
+  Shield,
+  BarChart2,
+  DollarSign,
+  Coffee,
+} from 'lucide-react';
 import { MessageCircle } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -213,7 +223,9 @@ const RestakeWatch: React.FC = () => {
                   </div>
                 </div>
                 <p className="text-sm italic text-gray-400 mt-2 self-start">
-                  (We know it&apos;s not the prettiest site, but hey, we&apos;re engineers, not designers! We promise to make it look better... eventually.)
+                  (We know it&apos;s not the prettiest site, but hey, we&apos;re
+                  engineers, not designers! We promise to make it look better...
+                  eventually.)
                 </p>
               </div>
             </div>
@@ -260,52 +272,66 @@ const RestakeWatch: React.FC = () => {
                     The L2BEAT of the Restaking Ecosystem
                   </p>
                   <p className="text-sm italic text-gray-500 ml-4">
-                    (Yes, we know we&apos;re still ugly, but we&apos;re engineers. I promise we&apos;ll hire a designer!)
+                    (Yes, we know we&apos;re still ugly, but we&apos;re
+                    engineers. I promise we&apos;ll hire a designer!)
                   </p>
                 </div>
-                
+
                 <div className="space-y-6">
-                  
-                  
                   <div className="flex items-center space-x-4">
                     <Shield className="w-6 h-6 text-green-500 flex-shrink-0" />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">Impartial Analysis</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        Impartial Analysis
+                      </h3>
                       <p className="text-gray-700">
-                        As an autonomous watchdog, we offer neutral, fact-based interpretations of data points, helping users understand the complexities of restaking protocols.
+                        As an autonomous watchdog, we offer neutral, fact-based
+                        interpretations of data points, helping users understand
+                        the complexities of restaking protocols.
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-4">
                     <BarChart2 className="w-6 h-6 text-purple-500 flex-shrink-0" />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">Beyond Basic Metrics</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        Beyond Basic Metrics
+                      </h3>
                       <p className="text-gray-700">
-                        Our analyses go beyond TVL to include metrics on security, decentralization, and overall health of restaking projects.
+                        Our analyses go beyond TVL to include metrics on
+                        security, decentralization, and overall health of
+                        restaking projects.
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center space-x-4">
                     <DollarSign className="w-6 h-6 text-orange-500 flex-shrink-0" />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">Ecosystem Support</h3>
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        Ecosystem Support
+                      </h3>
                       <p className="text-gray-700">
-                        Supported by Ethereum Foundation grants, we&apos;re seeking additional funding to enhance our monitoring capabilities and advance the ecosystem.
+                        Supported by Ethereum Foundation grants, we&apos;re
+                        seeking additional funding to enhance our monitoring
+                        capabilities and advance the ecosystem.
                       </p>
                     </div>
                   </div>
                 </div>
-                
+
                 <p className="text-gray-700 leading-relaxed mt-8">
-                  Restake Watch is committed to serving the best interests of users and the broader ecosystem, providing the critical insights needed to navigate the evolving world of restaking.
+                  Restake Watch is committed to serving the best interests of
+                  users and the broader ecosystem, providing the critical
+                  insights needed to navigate the evolving world of restaking.
                 </p>
 
                 <div className="flex items-center justify-end mt-6 text-gray-500 italic">
                   <Coffee className="w-5 h-5 mr-2" />
                   <p className="text-sm">
-                    Powered by coffee, late nights, and a burning desire to understand what the heck is going on in restaking.
+                    Powered by coffee, late nights, and a burning desire to
+                    understand what the heck is going on in restaking.
                   </p>
                 </div>
               </div>
