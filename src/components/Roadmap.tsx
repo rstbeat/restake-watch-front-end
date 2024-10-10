@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { ChevronRight } from 'lucide-react';
 
-const TimelineItem = ({ date, title, description }) => (
+interface TimelineItemProps {
+  date: string;
+  title: string;
+  description: string;
+}
+
+const TimelineItem: React.FC<TimelineItemProps> = ({
+  date,
+  title,
+  description,
+}) => (
   <div className="flex-shrink-0 w-64 mr-8">
     <div className="bg-white p-4 rounded-lg shadow-md h-full border-t-4 border-[#1a202c]">
       <time className="text-sm font-medium text-[#1a202c] mb-2 block">
@@ -14,7 +24,27 @@ const TimelineItem = ({ date, title, description }) => (
   </div>
 );
 
-const Roadmap = () => {
+const Roadmap: React.FC = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (element) {
+      const animateScroll = () => {
+        const currentScroll = element.scrollLeft;
+        const maxScroll = element.scrollWidth - element.clientWidth;
+        if (currentScroll < maxScroll) {
+          element.scrollTo(currentScroll + 1, 0);
+        } else {
+          element.scrollTo(0, 0);
+        }
+      };
+
+      const intervalId = setInterval(animateScroll, 50);
+      return () => clearInterval(intervalId);
+    }
+  }, []);
+
   return (
     <Card className="mt-8 overflow-hidden">
       <CardHeader>
@@ -25,7 +55,10 @@ const Roadmap = () => {
       </CardHeader>
       <CardContent className="p-0">
         <div className="relative">
-          <div className="flex overflow-x-auto py-4 px-6 scrollbar-hide">
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto py-4 px-6 scrollbar-hide"
+          >
             <TimelineItem
               date="October 2023"
               title="Paper Launch"

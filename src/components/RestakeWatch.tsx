@@ -29,6 +29,7 @@ import RestakerOverview from './RestakerOverview';
 import Overview from './Overview';
 import Footer from './Footer';
 import Roadmap from './Roadmap';
+import About from './About';
 import { StakerData } from '../app/interface/operatorData.interface';
 import { fetchStakerData } from '../app/api/restake/restake';
 
@@ -259,81 +260,8 @@ const RestakeWatch: React.FC = () => {
 
               <Roadmap />
 
-              <div
-                id="about"
-                ref={aboutRef}
-                className="mt-12 bg-white p-8 rounded-lg shadow-md border border-gray-200 transition-opacity duration-500"
-              >
-                <h2 className="text-3xl font-bold mb-2 text-gray-800">
-                  About restake.watch
-                </h2>
-                <div className="flex items-center justify-between mb-6">
-                  <p className="text-xl font-semibold text-gray-600">
-                    The L2BEAT of the Restaking Ecosystem
-                  </p>
-                  <p className="text-sm italic text-gray-500 ml-4">
-                    (Yes, we know we&apos;re still ugly, but we&apos;re
-                    engineers. I promise we&apos;ll hire a designer!)
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-4">
-                    <Shield className="w-6 h-6 text-green-500 flex-shrink-0" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        Impartial Analysis
-                      </h3>
-                      <p className="text-gray-700">
-                        As an autonomous watchdog, we offer neutral, fact-based
-                        interpretations of data points, helping users understand
-                        the complexities of restaking protocols.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-4">
-                    <BarChart2 className="w-6 h-6 text-purple-500 flex-shrink-0" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        Beyond Basic Metrics
-                      </h3>
-                      <p className="text-gray-700">
-                        Our analyses go beyond TVL to include metrics on
-                        security, decentralization, and overall health of
-                        restaking projects.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-4">
-                    <DollarSign className="w-6 h-6 text-orange-500 flex-shrink-0" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        Ecosystem Support
-                      </h3>
-                      <p className="text-gray-700">
-                        Supported by Ethereum Foundation grants, we&apos;re
-                        seeking additional funding to enhance our monitoring
-                        capabilities and advance the ecosystem.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-gray-700 leading-relaxed mt-8">
-                  Restake Watch is committed to serving the best interests of
-                  users and the broader ecosystem, providing the critical
-                  insights needed to navigate the evolving world of restaking.
-                </p>
-
-                <div className="flex items-center justify-end mt-6 text-gray-500 italic">
-                  <Coffee className="w-5 h-5 mr-2" />
-                  <p className="text-sm">
-                    Powered by coffee, late nights, and a burning desire to
-                    understand what the heck is going on in restaking.
-                  </p>
-                </div>
+              <div id="about">
+                <About />
               </div>
             </div>
           </main>
