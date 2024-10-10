@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, X, Twitter, ChevronRight } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
+import { Eye, Shield, BarChart2, DollarSign } from 'lucide-react';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -163,11 +166,59 @@ const RestakeWatch: React.FC = () => {
           )}
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+          <div className="bg-gray-900 text-white py-4 px-4 sm:px-6 lg:px-8 shadow-md">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl mb-0">
+              restake.watch
+            </h1>
+            <p className="text-sm sm:text-base text-gray-300 italic font-light tracking-wide mt-0">
+              The L2Beat of the Restaking Ecosystem
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-4">
+          <a
+            href="https://twitter.com/restakewatch"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white hover:text-blue-400 transition-colors"
+            aria-label="Twitter"
+          >
+            <Twitter size={20} />
+          </a>
+          <a
+            href="https://t.me/espejelomar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white hover:text-blue-400 transition-colors"
+            aria-label="Telegram"
+          >
+            <MessageCircle size={20} />
+          </a>
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-white border-white hover:bg-gray-800"
+            onClick={() => {
+              const aboutSection = document.getElementById('about');
+              if (aboutSection) {
+                aboutSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            Learn More
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {activePlatform === 'eigenlayer' && (
                 <div className="mb-4 text-sm text-gray-500">
-                  Last updated:{' '}
-                  {/* You may want to add a lastUpdated field to your staker data */}
+                  Last updated: {/* Add your last updated logic here */}
                 </div>
               )}
 
@@ -183,7 +234,7 @@ const RestakeWatch: React.FC = () => {
                     of restaked ETH. Combined with other major operators
                     (Luganodes, DSRV, Pier Two, and Finoa Consensus), these
                     entities control more than 50% of all restaked ETH. This
-                    concentration poses substantial risks to the network&apos;s
+                    concentration poses substantial risks to the network's
                     decentralization and resilience.
                   </AlertDescription>
                 </Alert>
@@ -192,30 +243,55 @@ const RestakeWatch: React.FC = () => {
               {renderContent()}
 
               <div
-                ref={aboutRef}
-                className="mt-12 bg-white p-8 rounded-lg shadow-md border border-gray-200 transition-opacity duration-500"
-              >
-                <h2 className="text-2xl font-bold mb-4 text-gray-800">
-                  About Restake Watch
-                </h2>
-                <p className="text-gray-700 leading-relaxed">
-                  Restake Watch is a public goods organization, soon to be a
-                  company, dedicated to providing transparency to the restaking
-                  ecosystem. We aim to serve as an impartial and autonomous
-                  watchdog, always acting in the best interest of users and the
-                  broader ecosystem.
-                </p>
-                <p className="text-gray-700 leading-relaxed mt-4">
-                  Our commitment is to remain genuinely neutral and grounded in
-                  reality and facts. We receive generous funding from the
-                  Ethereum Foundation Ecosystem Support Grants.
-                </p>
-                <p className="text-gray-700 leading-relaxed mt-4">
-                  Additionally, we are actively seeking further funding and
-                  donations to enhance our monitoring capabilities and continue
-                  advancing the ecosystem.
-                </p>
-              </div>
+        id="about"
+        ref={aboutRef}
+        className="mt-12 bg-white p-8 rounded-lg shadow-md border border-gray-200 transition-opacity duration-500"
+      >
+        <h2 className="text-3xl font-bold mb-2 text-gray-800">
+          About restake.watch
+        </h2>
+        <p className="text-xl font-semibold mb-6 text-gray-600">
+          The L2BEAT of the Restaking Ecosystem
+        </p>
+        
+        <div className="space-y-6">
+          
+          
+          <div className="flex items-center space-x-4">
+            <Shield className="w-6 h-6 text-green-500 flex-shrink-0" />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Impartial Analysis</h3>
+              <p className="text-gray-700">
+                As an autonomous watchdog, we offer neutral, fact-based interpretations of data points, helping users understand the complexities of restaking protocols.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <BarChart2 className="w-6 h-6 text-purple-500 flex-shrink-0" />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Beyond Basic Metrics</h3>
+              <p className="text-gray-700">
+                Our analyses go beyond TVL to include metrics on security, decentralization, and overall health of restaking projects.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-4">
+            <DollarSign className="w-6 h-6 text-orange-500 flex-shrink-0" />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800">Ecosystem Support</h3>
+              <p className="text-gray-700">
+                Supported by Ethereum Foundation grants, we're seeking additional funding to enhance our monitoring capabilities and advance the ecosystem.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <p className="text-gray-700 leading-relaxed mt-8">
+          Restake Watch is committed to serving the best interests of users and the broader ecosystem, providing the critical insights needed to navigate the evolving world of restaking.
+        </p>
+      </div>
             </div>
           </main>
         </div>
