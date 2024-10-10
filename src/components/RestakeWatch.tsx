@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { AlertTriangle, X, Twitter, ChevronRight } from 'lucide-react';
+import { AlertTriangle, X, Twitter, ChevronRight, Eye, Shield, BarChart2, DollarSign, Coffee } from 'lucide-react';
 import { MessageCircle } from 'lucide-react';
-import { Eye, Shield, BarChart2, DollarSign, Coffee } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -20,6 +18,7 @@ import OperatorOverview from './OperatorOverview';
 import RestakerOverview from './RestakerOverview';
 import Overview from './Overview';
 import Footer from './Footer';
+import Roadmap from './Roadmap';
 import { StakerData } from '../app/interface/operatorData.interface';
 import { fetchStakerData } from '../app/api/restake/restake';
 
@@ -246,6 +245,8 @@ const RestakeWatch: React.FC = () => {
 
               {renderContent()}
 
+              <Roadmap />
+
               <div
                 id="about"
                 ref={aboutRef}
@@ -264,15 +265,7 @@ const RestakeWatch: React.FC = () => {
                 </div>
                 
                 <div className="space-y-6">
-                  <div className="flex items-center space-x-4">
-                    <Eye className="w-6 h-6 text-blue-500 flex-shrink-0" />
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">Transparency First</h3>
-                      <p className="text-gray-700">
-                        We provide transparent and verifiable insights into emerging restaking technologies, crucial for Ethereum&apos;s scalability and security.
-                      </p>
-                    </div>
-                  </div>
+                  
                   
                   <div className="flex items-center space-x-4">
                     <Shield className="w-6 h-6 text-green-500 flex-shrink-0" />
