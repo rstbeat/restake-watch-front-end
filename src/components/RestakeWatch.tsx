@@ -225,7 +225,7 @@ const RestakeWatch: React.FC = () => {
                 </div>
                 <p className="text-sm italic text-gray-400 mt-2 self-start">
                   (We know it&apos;s not the prettiest site, but hey, we&apos;re
-                  engineers, not designers! We promise to make it look better...
+                  engineers and economists, not designers! We promise to make it look better...
                   eventually.)
                 </p>
               </div>

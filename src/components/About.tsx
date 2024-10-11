@@ -42,7 +42,7 @@ const About: React.FC = () => {
           <FeatureItem
             icon={<DollarSign className="w-5 h-5 text-orange-500" />}
             title="Ecosystem Support"
-            description="Supported by Ethereum Foundation grants, we're seeking additional funding to enhance our monitoring capabilities and advance the ecosystem."
+            description="Supported by an Ethereum Foundation grant 🙏, we're seeking additional funding to enhance our monitoring capabilities and advance the ecosystem."
           />
         </div>
 
@@ -55,7 +55,7 @@ const About: React.FC = () => {
         <div className="flex items-center justify-end mt-4 text-gray-500 italic">
           <Coffee className="w-4 h-4 mr-2" />
           <p className="text-xs">
-            Powered by coffee, late nights, and a burning desire to understand
+            Powered by coffee and a burning desire to understand
             restaking.
           </p>
         </div>
