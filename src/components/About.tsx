@@ -24,7 +24,7 @@ const About: React.FC = () => {
           About restake.watch
         </h2>
         <p className="text-sm text-gray-600">
-          The L2BEAT of the Restaking Ecosystem
+          The L2Beat of the Restaking Ecosystem
         </p>
       </CardHeader>
       <CardContent>

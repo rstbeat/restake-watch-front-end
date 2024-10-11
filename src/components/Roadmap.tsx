@@ -66,7 +66,7 @@ const Roadmap: React.FC = () => {
             />
             <TimelineItem
               date="November 2023"
-              title="DVT Risk Metrics"
+              title="DVT and Withdraws Risk Metrics"
               description="Adding DVT risk metrics and withdrawal times for operators"
             />
             <TimelineItem
