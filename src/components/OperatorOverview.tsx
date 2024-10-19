@@ -58,7 +58,7 @@ const OperatorOverview: React.FC = () => {
     try {
       setIsLoadingOperatorData(true);
       const data = await fetchOperatorData();
-      const operatorDataResponse = data?.operatorData?.map((item: any) => ({
+      const operatorDataResponse: OperatorDataFormated[] = data?.operatorData?.map((item: any) => ({
         operatorAddress: item['Operator Address'] || '',
         marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
         ethRestaked: new Intl.NumberFormat('en-US', {
@@ -67,6 +67,7 @@ const OperatorOverview: React.FC = () => {
         }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
         numberOfStrategies: item['Number of Strategies'] || 0,
         dvtTechnology: item['DVT Technology'] || 'None',
+        mostUsedStrategies: item['Most Used Strategies'] || [], // Add this line
       })) || [];
       setOperatorData(operatorDataResponse);
     } catch (error) {
