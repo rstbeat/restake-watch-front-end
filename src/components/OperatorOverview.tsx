@@ -71,7 +71,7 @@ const OperatorOverview: React.FC = () => {
           }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
           numberOfStrategies: item['Number of Strategies'] || 0,
           dvtTechnology: item['DVT Technology'] || 'None',
-          mostUsedStrategies: item['Most Used Strategies'] || [], // Add this line
+          mostUsedStrategies: item['Most Used Strategies'] || [],
         })) || [];
       setOperatorData(operatorDataResponse);
     } catch (error) {

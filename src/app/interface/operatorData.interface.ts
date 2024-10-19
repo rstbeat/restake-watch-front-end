@@ -108,7 +108,8 @@ export interface OperatorDataFormated {
   marketShared: string;
   ethRestaked: string;
   numberOfStrategies: number;
-  mostUsedStrategies: string;
+  dvtTechnology: string;
+  mostUsedStrategies: string[];
 }
 
 export interface RestakerDataFormatted {
