@@ -7,6 +7,7 @@ import {
   Copy,
   Check,
   Search,
+  Info,
 } from 'lucide-react';
 import {
   Table,
@@ -19,8 +20,26 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { fetchOperatorData } from '../app/api/restake/restake';
 import { OperatorDataFormated } from '../app/interface/operatorData.interface';
+
+const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
+  <Tooltip.Provider>
+    <Tooltip.Root>
+      <Tooltip.Trigger asChild>
+        <Info className="inline-block ml-2 cursor-help h-4 w-4 text-gray-500" />
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs">
+          <p className="text-sm">{content}</p>
+          <Tooltip.Arrow className="fill-gray-800" />
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
+  </Tooltip.Provider>
+);
 
 const OperatorOverview: React.FC = () => {
   const [operatorData, setOperatorData] = useState<OperatorDataFormated[] | null>(null);
@@ -29,6 +48,7 @@ const OperatorOverview: React.FC = () => {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showOnlyDVT, setShowOnlyDVT] = useState(false);
 
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
@@ -42,7 +62,7 @@ const OperatorOverview: React.FC = () => {
           maximumFractionDigits: 2,
         }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
         numberOfStrategies: item['Number of Strategies'] || 0,
-        mostUsedStrategies: item['Most Used Strategy'] || '',
+        dvtTechnology: item['DVT Technology'] || 'None',
       })) || [];
       setOperatorData(operatorDataResponse);
     } catch (error) {
@@ -65,6 +85,7 @@ const OperatorOverview: React.FC = () => {
       .filter((operator) =>
         operator.operatorAddress.toLowerCase().includes(searchTerm.toLowerCase())
       )
+      .filter((operator) => !showOnlyDVT || operator.dvtTechnology !== 'None')
       .sort((a, b) => {
         const aValue = a[sortColumn];
         const bValue = b[sortColumn];
@@ -72,7 +93,7 @@ const OperatorOverview: React.FC = () => {
         if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [operatorData, sortColumn, sortDirection, searchTerm]);
+  }, [operatorData, sortColumn, sortDirection, searchTerm, showOnlyDVT]);
 
   const handleSort = (column: keyof OperatorDataFormated) => {
     if (column === sortColumn) {
@@ -114,8 +135,8 @@ const OperatorOverview: React.FC = () => {
         <p className="text-sm text-gray-600 mb-4">
           Displaying the concentration of restaked ETH among the most significant operators in the ecosystem
         </p>
-        <div className="mb-4">
-          <div className="relative">
+        <div className="mb-4 flex items-center space-x-4">
+          <div className="relative flex-grow">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               type="text"
@@ -124,6 +145,19 @@ const OperatorOverview: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8"
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="show-only-dvt"
+              checked={showOnlyDVT}
+              onCheckedChange={(checked) => setShowOnlyDVT(checked as boolean)}
+            />
+            <label
+              htmlFor="show-only-dvt"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Show only DVT operators
+            </label>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -162,7 +196,10 @@ const OperatorOverview: React.FC = () => {
                     <SortIcon column="numberOfStrategies" />
                   </Button>
                 </TableHead>
-                <TableHead>Most Used Strategy</TableHead>
+                <TableHead>
+                  DVT Status
+                  <InfoTooltip content="DVT (Distributed Validator Technology) improves validator security and decentralization. Obol is a leading DVT solution that enables validators to be run by multiple machines and operators, enhancing fault-tolerance and reducing slashing risk." />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -218,7 +255,16 @@ const OperatorOverview: React.FC = () => {
                     <TableCell className="text-center">
                       {row.numberOfStrategies}
                     </TableCell>
-                    <TableCell>{row.mostUsedStrategies}</TableCell>
+                    <TableCell>
+                      {row.dvtTechnology !== 'None' ? (
+                        <div className="flex items-center">
+                          <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                          <span className="text-green-600">{row.dvtTechnology}</span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-500">None</span>
+                      )}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
