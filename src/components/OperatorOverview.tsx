@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Copy,
   Check,
+  Search,
 } from 'lucide-react';
 import {
   Table,
@@ -17,34 +18,32 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 import { fetchOperatorData } from '../app/api/restake/restake';
 import { OperatorDataFormated } from '../app/interface/operatorData.interface';
 
 const OperatorOverview: React.FC = () => {
-  const [operatorData, setOperatorData] = useState<
-    OperatorDataFormated[] | null
-  >(null);
+  const [operatorData, setOperatorData] = useState<OperatorDataFormated[] | null>(null);
   const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
-  const [sortColumn, setSortColumn] =
-    useState<keyof OperatorDataFormated>('marketShared');
+  const [sortColumn, setSortColumn] = useState<keyof OperatorDataFormated>('marketShared');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
       setIsLoadingOperatorData(true);
       const data = await fetchOperatorData();
-      const operatorDataResponse =
-        data?.operatorData?.map((item: any) => ({
-          operatorAddress: item['Operator Address'] || '',
-          marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
-          ethRestaked: new Intl.NumberFormat('en-US', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 2,
-          }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
-          numberOfStrategies: item['Number of Strategies'] || 0,
-          mostUsedStrategies: item['Most Used Strategy'] || '',
-        })) || [];
+      const operatorDataResponse = data?.operatorData?.map((item: any) => ({
+        operatorAddress: item['Operator Address'] || '',
+        marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
+        ethRestaked: new Intl.NumberFormat('en-US', {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2,
+        }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
+        numberOfStrategies: item['Number of Strategies'] || 0,
+        mostUsedStrategies: item['Most Used Strategy'] || '',
+      })) || [];
       setOperatorData(operatorDataResponse);
     } catch (error) {
       console.error('An error occurred while fetching operator data', error);
@@ -60,16 +59,20 @@ const OperatorOverview: React.FC = () => {
     }
   }, [operatorData, fetchOperatorDataCallback]);
 
-  const sortedData = useMemo(() => {
+  const filteredAndSortedData = useMemo(() => {
     if (!operatorData) return null;
-    return [...operatorData].sort((a, b) => {
-      const aValue = a[sortColumn];
-      const bValue = b[sortColumn];
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [operatorData, sortColumn, sortDirection]);
+    return [...operatorData]
+      .filter((operator) =>
+        operator.operatorAddress.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        const aValue = a[sortColumn];
+        const bValue = b[sortColumn];
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+  }, [operatorData, sortColumn, sortDirection, searchTerm]);
 
   const handleSort = (column: keyof OperatorDataFormated) => {
     if (column === sortColumn) {
@@ -109,9 +112,20 @@ const OperatorOverview: React.FC = () => {
           Top 50 Operators by Market Share
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          Displaying the concentration of restaked ETH among the most
-          significant operators in the ecosystem
+          Displaying the concentration of restaked ETH among the most significant operators in the ecosystem
         </p>
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Search by Operator Address"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -158,8 +172,8 @@ const OperatorOverview: React.FC = () => {
                     <Skeleton className="w-full h-[20px] rounded-full" />
                   </TableCell>
                 </TableRow>
-              ) : sortedData && sortedData.length > 0 ? (
-                sortedData.map((row, index) => (
+              ) : filteredAndSortedData && filteredAndSortedData.length > 0 ? (
+                filteredAndSortedData.map((row, index) => (
                   <TableRow
                     key={row.operatorAddress || index}
                     className="hover:bg-gray-50"

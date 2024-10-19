@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Copy,
   Check,
+  Search,
 } from 'lucide-react';
 import {
   Table,
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from './ui/skeleton';
+import { Input } from '@/components/ui/input';
 import { fetchStakerData } from '../app/api/restake/restake';
 import { StakerData } from '../app/interface/operatorData.interface';
 
@@ -31,10 +33,10 @@ interface RestakerData {
 const RestakerOverview: React.FC = () => {
   const [stakerData, setStakerData] = useState<RestakerData[] | null>(null);
   const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
-  const [sortColumn, setSortColumn] =
-    useState<keyof RestakerData>('amountRestaked');
+  const [sortColumn, setSortColumn] = useState<keyof RestakerData>('amountRestaked');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const fetchStakerDataCallback = useCallback(async () => {
     try {
@@ -64,16 +66,20 @@ const RestakerOverview: React.FC = () => {
     }
   }, [stakerData, fetchStakerDataCallback]);
 
-  const sortedData = useMemo(() => {
+  const filteredAndSortedData = useMemo(() => {
     if (!stakerData) return null;
-    return [...stakerData].sort((a, b) => {
-      const aValue = a[sortColumn];
-      const bValue = b[sortColumn];
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [stakerData, sortColumn, sortDirection]);
+    return [...stakerData]
+      .filter((staker) =>
+        staker.restakerAddress.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => {
+        const aValue = a[sortColumn];
+        const bValue = b[sortColumn];
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+  }, [stakerData, sortColumn, sortDirection, searchTerm]);
 
   const handleSort = (column: keyof RestakerData) => {
     if (column === sortColumn) {
@@ -115,6 +121,18 @@ const RestakerOverview: React.FC = () => {
           Displaying the distribution of restaked ETH among the most significant
           restakers in the ecosystem
         </p>
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Search by Restaker Address"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -155,8 +173,14 @@ const RestakerOverview: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedData ? (
-                sortedData.map((row, index) => (
+              {isLoadingStakerData ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    <Skeleton className="w-full h-[20px] rounded-full" />
+                  </TableCell>
+                </TableRow>
+              ) : filteredAndSortedData && filteredAndSortedData.length > 0 ? (
+                filteredAndSortedData.map((row, index) => (
                   <TableRow
                     key={row.restakerAddress}
                     className="hover:bg-gray-50"
@@ -205,7 +229,7 @@ const RestakerOverview: React.FC = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center">
-                    <Skeleton className="w-full h-[20px] rounded-full" />
+                    No restaker data available
                   </TableCell>
                 </TableRow>
               )}
