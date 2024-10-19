@@ -8,6 +8,8 @@ import {
   Check,
   Search,
   Info,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import {
   Table,
@@ -49,6 +51,8 @@ const OperatorOverview: React.FC = () => {
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showOnlyDVT, setShowOnlyDVT] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(50);
 
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
@@ -95,6 +99,21 @@ const OperatorOverview: React.FC = () => {
       });
   }, [operatorData, sortColumn, sortDirection, searchTerm, showOnlyDVT]);
 
+  const paginatedData = useMemo(() => {
+    if (!filteredAndSortedData) return null;
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedData.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedData, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [showOnlyDVT, searchTerm]);
+
+  const totalPages = useMemo(() => {
+    if (!filteredAndSortedData) return 0;
+    return Math.ceil(filteredAndSortedData.length / itemsPerPage);
+  }, [filteredAndSortedData, itemsPerPage]);
+
   const handleSort = (column: keyof OperatorDataFormated) => {
     if (column === sortColumn) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -130,10 +149,10 @@ const OperatorOverview: React.FC = () => {
       <div className="bg-white p-6 rounded-lg mt-8 shadow-md">
         <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center">
           <span className="mr-2">🏢</span>
-          Top 50 Operators by Market Share
+          All Operators by Market Share
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          Displaying the concentration of restaked ETH among the most significant operators in the ecosystem
+        Displaying the concentration of restaked ETH among all operators in the ecosystem
         </p>
         <div className="mb-4 flex items-center space-x-4">
           <div className="relative flex-grow">
@@ -192,7 +211,7 @@ const OperatorOverview: React.FC = () => {
                     onClick={() => handleSort('numberOfStrategies')}
                     className="font-semibold"
                   >
-                    Strategies
+                    # Strategies
                     <SortIcon column="numberOfStrategies" />
                   </Button>
                 </TableHead>
@@ -209,8 +228,8 @@ const OperatorOverview: React.FC = () => {
                     <Skeleton className="w-full h-[20px] rounded-full" />
                   </TableCell>
                 </TableRow>
-              ) : filteredAndSortedData && filteredAndSortedData.length > 0 ? (
-                filteredAndSortedData.map((row, index) => (
+              ) : paginatedData && paginatedData.length > 0 ? (
+                paginatedData.map((row, index) => (
                   <TableRow
                     key={row.operatorAddress || index}
                     className="hover:bg-gray-50"
@@ -265,7 +284,7 @@ const OperatorOverview: React.FC = () => {
                         <span className="text-gray-500">None</span>
                       )}
                     </TableCell>
-                  </TableRow>
+                    </TableRow>
                 ))
               ) : (
                 <TableRow>
@@ -276,6 +295,34 @@ const OperatorOverview: React.FC = () => {
               )}
             </TableBody>
           </Table>
+        </div>
+        <div className="mt-4 flex items-center justify-between">
+          <div>
+            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredAndSortedData?.length || 0)} of {filteredAndSortedData?.length || 0} operators
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <div className="text-sm">
+              Page {currentPage} of {totalPages}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

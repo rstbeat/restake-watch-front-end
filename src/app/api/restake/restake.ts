@@ -14,18 +14,15 @@ const fetchOperatorData = async (): Promise<OperatorDataResponse | null> => {
       headers: {
         'Content-Type': 'application/json',
       },
+      params: {
+        limit: 10000 // Using a very high number to fetch all operators
+      }
     });
     const data = response.data;
-
+    
     return data;
   } catch (err: unknown) {
-    // if (err instanceof Error) {
-    //     const errorResponse = (err as { response?: { data?: any } }).response?.data;
-    //     console.error(errorResponse || err.message);
-    // } else {
-    //     console.error(err);
-    // }
-    console.error('Error operator data');
+    console.error('Error fetching operator data');
     return null;
   }
 };
