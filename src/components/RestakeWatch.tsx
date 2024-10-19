@@ -30,20 +30,26 @@ import Overview from './Overview';
 import Footer from './Footer';
 import Roadmap from './Roadmap';
 import About from './About';
-import { StakerData, OperatorDataResponse } from '../app/interface/operatorData.interface';
+import {
+  StakerData,
+  OperatorDataResponse,
+} from '../app/interface/operatorData.interface';
 import { fetchStakerData, fetchOperatorData } from '../app/api/restake/restake';
 
 type PlatformType = 'eigenlayer' | 'symbiotic' | 'karak';
 
 const RestakeWatch: React.FC = () => {
-  const [activePlatform, setActivePlatform] = useState<PlatformType>('eigenlayer');
+  const [activePlatform, setActivePlatform] =
+    useState<PlatformType>('eigenlayer');
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
   const aboutRef = useRef<HTMLDivElement>(null);
 
   const [stakerData, setStakerData] = useState<any | null>(null);
-  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(null);
+  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
+    null,
+  );
   const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
   const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
 
@@ -98,7 +104,7 @@ const RestakeWatch: React.FC = () => {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      timeZone: 'UTC'
+      timeZone: 'UTC',
     };
     return new Date(dateString).toLocaleString('en-US', options) + ' UTC';
   };
@@ -252,22 +258,26 @@ const RestakeWatch: React.FC = () => {
                 </div>
                 <p className="text-sm italic text-gray-400 mt-2 self-start">
                   (We know it&apos;s not the prettiest site, but hey, we&apos;re
-                  engineers and economists, not designers! We promise to make it look better...
-                  eventually.)
+                  engineers and economists, not designers! We promise to make it
+                  look better... eventually.)
                 </p>
               </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {activePlatform === 'eigenlayer' && (
-            <div className="mb-4 text-sm text-gray-500">
-              <p>
-                Last updated: {operatorData?.lastUpdated ? formatDate(operatorData.lastUpdated) : 'Loading...'}
-              </p>
-              <p className="mt-1 italic">
-                Starting from the first week of November, data will be updated daily.
-              </p>
-            </div>
+              {activePlatform === 'eigenlayer' && (
+                <div className="mb-4 text-sm text-gray-500">
+                  <p>
+                    Last updated:{' '}
+                    {operatorData?.lastUpdated
+                      ? formatDate(operatorData.lastUpdated)
+                      : 'Loading...'}
+                  </p>
+                  <p className="mt-1 italic">
+                    Starting from the first week of November, data will be
+                    updated daily.
+                  </p>
+                </div>
               )}
 
               {activePlatform === 'eigenlayer' && (

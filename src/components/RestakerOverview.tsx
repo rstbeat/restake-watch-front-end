@@ -33,7 +33,8 @@ interface RestakerData {
 const RestakerOverview: React.FC = () => {
   const [stakerData, setStakerData] = useState<RestakerData[] | null>(null);
   const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
-  const [sortColumn, setSortColumn] = useState<keyof RestakerData>('amountRestaked');
+  const [sortColumn, setSortColumn] =
+    useState<keyof RestakerData>('amountRestaked');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,7 +71,7 @@ const RestakerOverview: React.FC = () => {
     if (!stakerData) return null;
     return [...stakerData]
       .filter((staker) =>
-        staker.restakerAddress.toLowerCase().includes(searchTerm.toLowerCase())
+        staker.restakerAddress.toLowerCase().includes(searchTerm.toLowerCase()),
       )
       .sort((a, b) => {
         const aValue = a[sortColumn];

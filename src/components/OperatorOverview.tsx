@@ -44,9 +44,12 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
 );
 
 const OperatorOverview: React.FC = () => {
-  const [operatorData, setOperatorData] = useState<OperatorDataFormated[] | null>(null);
+  const [operatorData, setOperatorData] = useState<
+    OperatorDataFormated[] | null
+  >(null);
   const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
-  const [sortColumn, setSortColumn] = useState<keyof OperatorDataFormated>('marketShared');
+  const [sortColumn, setSortColumn] =
+    useState<keyof OperatorDataFormated>('marketShared');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -58,17 +61,18 @@ const OperatorOverview: React.FC = () => {
     try {
       setIsLoadingOperatorData(true);
       const data = await fetchOperatorData();
-      const operatorDataResponse: OperatorDataFormated[] = data?.operatorData?.map((item: any) => ({
-        operatorAddress: item['Operator Address'] || '',
-        marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
-        ethRestaked: new Intl.NumberFormat('en-US', {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 2,
-        }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
-        numberOfStrategies: item['Number of Strategies'] || 0,
-        dvtTechnology: item['DVT Technology'] || 'None',
-        mostUsedStrategies: item['Most Used Strategies'] || [], // Add this line
-      })) || [];
+      const operatorDataResponse: OperatorDataFormated[] =
+        data?.operatorData?.map((item: any) => ({
+          operatorAddress: item['Operator Address'] || '',
+          marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
+          ethRestaked: new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 2,
+          }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
+          numberOfStrategies: item['Number of Strategies'] || 0,
+          dvtTechnology: item['DVT Technology'] || 'None',
+          mostUsedStrategies: item['Most Used Strategies'] || [], // Add this line
+        })) || [];
       setOperatorData(operatorDataResponse);
     } catch (error) {
       console.error('An error occurred while fetching operator data', error);
@@ -88,7 +92,9 @@ const OperatorOverview: React.FC = () => {
     if (!operatorData) return null;
     return [...operatorData]
       .filter((operator) =>
-        operator.operatorAddress.toLowerCase().includes(searchTerm.toLowerCase())
+        operator.operatorAddress
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()),
       )
       .filter((operator) => !showOnlyDVT || operator.dvtTechnology !== 'None')
       .sort((a, b) => {
@@ -153,7 +159,8 @@ const OperatorOverview: React.FC = () => {
           All Operators by Market Share
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-        Displaying the concentration of restaked ETH among all operators in the ecosystem
+          Displaying the concentration of restaked ETH among all operators in
+          the ecosystem
         </p>
         <div className="mb-4 flex items-center space-x-4">
           <div className="relative flex-grow">
@@ -279,13 +286,15 @@ const OperatorOverview: React.FC = () => {
                       {row.dvtTechnology !== 'None' ? (
                         <div className="flex items-center">
                           <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                          <span className="text-green-600">{row.dvtTechnology}</span>
+                          <span className="text-green-600">
+                            {row.dvtTechnology}
+                          </span>
                         </div>
                       ) : (
                         <span className="text-gray-500">None</span>
                       )}
                     </TableCell>
-                    </TableRow>
+                  </TableRow>
                 ))
               ) : (
                 <TableRow>
@@ -299,13 +308,18 @@ const OperatorOverview: React.FC = () => {
         </div>
         <div className="mt-4 flex items-center justify-between">
           <div>
-            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredAndSortedData?.length || 0)} of {filteredAndSortedData?.length || 0} operators
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            {Math.min(
+              currentPage * itemsPerPage,
+              filteredAndSortedData?.length || 0,
+            )}{' '}
+            of {filteredAndSortedData?.length || 0} operators
           </div>
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -317,7 +331,9 @@ const OperatorOverview: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
               disabled={currentPage === totalPages}
             >
               Next
