@@ -189,8 +189,18 @@ const MetricCard: React.FC<MetricCardProps> = ({
   </div>
 );
 
-// New SemaphoreIndicator for EnhancedMetrics
-const SemaphoreIndicator = ({ value, thresholds }) => {
+interface SemaphoreIndicatorProps {
+  value: number;
+  thresholds: {
+    green: number;
+    yellow: number;
+  };
+}
+
+const SemaphoreIndicator: React.FC<SemaphoreIndicatorProps> = ({
+  value,
+  thresholds,
+}) => {
   let color =
     value >= thresholds.green
       ? 'bg-green-500'
