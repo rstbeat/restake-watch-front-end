@@ -19,6 +19,7 @@ import {
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchOperatorData } from '../app/api/restake/restake';
+import { LucideIcon } from 'lucide-react';
 
 const COLORS = [
   '#1a202c',
@@ -149,8 +150,19 @@ const CompactNotes = () => {
   );
 };
 
-// New MetricCard component for EnhancedMetrics
-const MetricCard = ({ icon: Icon, label, value, tooltip }) => (
+interface MetricCardProps {
+  icon: LucideIcon;
+  label: string;
+  value: string | number;
+  tooltip: string;
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({
+  icon: Icon,
+  label,
+  value,
+  tooltip,
+}) => (
   <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
     <div className="flex items-start justify-between">
       <div className="flex-1">
@@ -194,20 +206,43 @@ const SemaphoreIndicator = ({ value, thresholds }) => {
   );
 };
 
-const EnhancedMetrics = ({ restakeData, operatorData }) => {
+interface EnhancedMetricsProps {
+  restakeData: {
+    activeRestakers?: number;
+    concentrationMetrics?: {
+      top33PercentCount?: number;
+    };
+  } | null;
+  operatorData: {
+    totalETHRestaked?: number;
+    activeEntities?: number;
+    concentrationMetrics?: {
+      top33PercentCount?: number;
+    };
+  } | null;
+}
+
+const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
+  restakeData,
+  operatorData,
+}) => {
   const restakerThresholds = { green: 20, yellow: 10 };
   const operatorThresholds = { green: 15, yellow: 8 };
-  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
         <CardContent className="pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Key Metrics</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Key Metrics
+          </h3>
           <div className="grid grid-cols-1 gap-4">
             <MetricCard
               icon={Wallet}
               label="Total Restaked ETH"
-              value={new Intl.NumberFormat('en-US').format(operatorData?.totalETHRestaked || 0)}
+              value={new Intl.NumberFormat('en-US').format(
+                operatorData?.totalETHRestaked || 0,
+              )}
               tooltip="The total amount of ETH that has been restaked across all operators and strategies."
             />
             <MetricCard
@@ -228,7 +263,9 @@ const EnhancedMetrics = ({ restakeData, operatorData }) => {
 
       <Card>
         <CardContent className="pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Risk Metrics</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Risk Metrics
+          </h3>
           <div className="space-y-6">
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
@@ -241,19 +278,22 @@ const EnhancedMetrics = ({ restakeData, operatorData }) => {
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
-                        The minimum number of restakers required to control 1/3 of total restaked ETH. Higher is better.
+                        The minimum number of restakers required to control 1/3
+                        of total restaked ETH. Higher is better.
                         <Tooltip.Arrow className="fill-gray-800" />
                       </Tooltip.Content>
                     </Tooltip.Portal>
                   </Tooltip.Root>
                 </Tooltip.Provider>
               </h4>
-              <SemaphoreIndicator 
-                value={restakeData?.concentrationMetrics?.top33PercentCount || 0}
+              <SemaphoreIndicator
+                value={
+                  restakeData?.concentrationMetrics?.top33PercentCount || 0
+                }
                 thresholds={restakerThresholds}
               />
             </div>
-            
+
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
                 <Shield className="h-4 w-4 mr-2" />
@@ -265,15 +305,18 @@ const EnhancedMetrics = ({ restakeData, operatorData }) => {
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
-                        The minimum number of operators required to control 1/3 of total restaked ETH. Higher is better.
+                        The minimum number of operators required to control 1/3
+                        of total restaked ETH. Higher is better.
                         <Tooltip.Arrow className="fill-gray-800" />
                       </Tooltip.Content>
                     </Tooltip.Portal>
                   </Tooltip.Root>
                 </Tooltip.Provider>
               </h4>
-              <SemaphoreIndicator 
-                value={operatorData?.concentrationMetrics?.top33PercentCount || 0}
+              <SemaphoreIndicator
+                value={
+                  operatorData?.concentrationMetrics?.top33PercentCount || 0
+                }
                 thresholds={operatorThresholds}
               />
             </div>
@@ -281,7 +324,7 @@ const EnhancedMetrics = ({ restakeData, operatorData }) => {
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
                 <ServerCog className="h-4 w-4 mr-2" />
-                Operators using DVT (Obol)
+                DVT Operators (Obol)
                 <Tooltip.Provider>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
@@ -289,7 +332,8 @@ const EnhancedMetrics = ({ restakeData, operatorData }) => {
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
-                        Decentralized Validator Technology (DVT) enables validators to be run by multiple machines, enhancing security and reducing slashing risk.
+                        DVT enables validators to be run by multiple machines,
+                        enhancing security and reducing slashing risk.
                         <Tooltip.Arrow className="fill-gray-800" />
                       </Tooltip.Content>
                     </Tooltip.Portal>
@@ -298,7 +342,9 @@ const EnhancedMetrics = ({ restakeData, operatorData }) => {
               </h4>
               <div className="mt-2 flex items-center">
                 <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                <span className="ml-2 text-2xl font-semibold text-gray-900">7</span>
+                <span className="ml-2 text-2xl font-semibold text-gray-900">
+                  7
+                </span>
               </div>
             </div>
           </div>
