@@ -6,7 +6,16 @@ import {
 } from 'recharts';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
-import { AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  AlertTriangle,
+  ChevronDown,
+  ChevronUp,
+  Shield,
+  Users,
+  Wallet,
+  Network,
+  ServerCog,
+} from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchOperatorData } from '../app/api/restake/restake';
@@ -79,19 +88,6 @@ const RiskAssessment = () => {
   );
 };
 
-const SemaphoreIndicator: React.FC<{
-  value: number;
-  thresholds: { green: number; yellow: number };
-}> = ({ value, thresholds }) => {
-  let color = 'bg-red-500';
-  if (value >= thresholds.green) {
-    color = 'bg-green-500';
-  } else if (value >= thresholds.yellow) {
-    color = 'bg-yellow-500';
-  }
-  return <span className={`inline-block w-3 h-3 rounded-full ml-2 ${color}`} />;
-};
-
 const CompactNotes = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -153,6 +149,165 @@ const CompactNotes = () => {
   );
 };
 
+// New MetricCard component for EnhancedMetrics
+const MetricCard = ({ icon: Icon, label, value, tooltip }) => (
+  <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div className="flex items-start justify-between">
+      <div className="flex-1">
+        <div className="flex items-center space-x-2">
+          <Icon className="h-5 w-5 text-gray-500" />
+          <h3 className="text-sm font-medium text-gray-600">{label}</h3>
+          <Tooltip.Provider>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <InfoCircledIcon className="h-4 w-4 text-gray-400 cursor-help" />
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
+                  {tooltip}
+                  <Tooltip.Arrow className="fill-gray-800" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        </div>
+        <p className="mt-2 text-2xl font-semibold text-gray-900">{value}</p>
+      </div>
+    </div>
+  </div>
+);
+
+// New SemaphoreIndicator for EnhancedMetrics
+const SemaphoreIndicator = ({ value, thresholds }) => {
+  let color =
+    value >= thresholds.green
+      ? 'bg-green-500'
+      : value >= thresholds.yellow
+        ? 'bg-yellow-500'
+        : 'bg-red-500';
+
+  return (
+    <div className="flex items-center mt-2">
+      <div className={`w-2 h-2 rounded-full ${color}`} />
+      <span className="ml-2 text-2xl font-semibold text-gray-900">{value}</span>
+    </div>
+  );
+};
+
+const EnhancedMetrics = ({ restakeData, operatorData }) => {
+  const restakerThresholds = { green: 20, yellow: 10 };
+  const operatorThresholds = { green: 15, yellow: 8 };
+  
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Key Metrics</h3>
+          <div className="grid grid-cols-1 gap-4">
+            <MetricCard
+              icon={Wallet}
+              label="Total Restaked ETH"
+              value={new Intl.NumberFormat('en-US').format(operatorData?.totalETHRestaked || 0)}
+              tooltip="The total amount of ETH that has been restaked across all operators and strategies."
+            />
+            <MetricCard
+              icon={Users}
+              label="Active Operators"
+              value={operatorData?.activeEntities || 'N/A'}
+              tooltip="The number of operators currently active in the restaking ecosystem."
+            />
+            <MetricCard
+              icon={Network}
+              label="Active Restakers"
+              value={restakeData?.activeRestakers || 'N/A'}
+              tooltip="The total number of unique addresses that have restaked ETH."
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Risk Metrics</h3>
+          <div className="space-y-6">
+            <div>
+              <h4 className="text-sm font-medium text-gray-600 flex items-center">
+                <Shield className="h-4 w-4 mr-2" />
+                Restakers needed for 1/3 control
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <InfoCircledIcon className="ml-2 h-4 w-4 text-gray-400 cursor-help" />
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
+                        The minimum number of restakers required to control 1/3 of total restaked ETH. Higher is better.
+                        <Tooltip.Arrow className="fill-gray-800" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              </h4>
+              <SemaphoreIndicator 
+                value={restakeData?.concentrationMetrics?.top33PercentCount || 0}
+                thresholds={restakerThresholds}
+              />
+            </div>
+            
+            <div>
+              <h4 className="text-sm font-medium text-gray-600 flex items-center">
+                <Shield className="h-4 w-4 mr-2" />
+                Operators needed for 1/3 control
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <InfoCircledIcon className="ml-2 h-4 w-4 text-gray-400 cursor-help" />
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
+                        The minimum number of operators required to control 1/3 of total restaked ETH. Higher is better.
+                        <Tooltip.Arrow className="fill-gray-800" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              </h4>
+              <SemaphoreIndicator 
+                value={operatorData?.concentrationMetrics?.top33PercentCount || 0}
+                thresholds={operatorThresholds}
+              />
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium text-gray-600 flex items-center">
+                <ServerCog className="h-4 w-4 mr-2" />
+                Operators using DVT (Obol)
+                <Tooltip.Provider>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <InfoCircledIcon className="ml-2 h-4 w-4 text-gray-400 cursor-help" />
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
+                        Decentralized Validator Technology (DVT) enables validators to be run by multiple machines, enhancing security and reducing slashing risk.
+                        <Tooltip.Arrow className="fill-gray-800" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              </h4>
+              <div className="mt-2 flex items-center">
+                <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                <span className="ml-2 text-2xl font-semibold text-gray-900">7</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
     null,
@@ -185,13 +340,12 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         },
       );
 
-  // Add "Others" category if there's any remaining ETH
-  const totalMajorOperators = majorOperatorData.reduce(
-    (acc, curr) => acc + curr.value,
-    0,
-  );
-  if (totalRestaked > totalMajorOperators) {
-    const othersAmount = totalRestaked - totalMajorOperators;
+  if (
+    totalRestaked > majorOperatorData.reduce((acc, curr) => acc + curr.value, 0)
+  ) {
+    const othersAmount =
+      totalRestaked -
+      majorOperatorData.reduce((acc, curr) => acc + curr.value, 0);
     majorOperatorData.push({
       name: 'Others',
       value: Number(othersAmount.toFixed(2)),
@@ -199,69 +353,12 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     });
   }
 
-  const restakerThresholds = { green: 20, yellow: 10 };
-  const operatorThresholds = { green: 15, yellow: 8 };
-
   return (
     <div className="space-y-6">
       <RiskAssessment />
-      <CompactNotes />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-800">Key Metrics</h3>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-2">
-              Total Restaked:{' '}
-              {new Intl.NumberFormat('en-US').format(totalRestaked)} ETH
-              <InfoTooltip content="The total amount of ETH that has been restaked across all operators and strategies." />
-            </p>
-            <p className="mb-2">
-              Active Operators: {operatorData?.activeEntities || 'N/A'}
-              <InfoTooltip content="The number of operators currently active in the restaking ecosystem. Active means they have a positive amount of ETH restaked." />
-            </p>
-            <p className="mb-2">
-              Active Restakers: {restakeData?.activeRestakers || 'N/A'}
-              <InfoTooltip content="The total number of unique restaker addresses that have restaked ETH. Active means they have a positive amount of ETH restaked." />
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-800">
-              Market Concentration Metrics
-            </h3>
-          </CardHeader>
-          <CardContent>
-            <h4 className="font-semibold mt-2 mb-2">Restaker Metrics</h4>
-            <p className="mb-2">
-              Restakers needed for 1/3 control:{' '}
-              {restakeData?.concentrationMetrics?.top33PercentCount || 'N/A'}
-              <SemaphoreIndicator
-                value={
-                  restakeData?.concentrationMetrics?.top33PercentCount || 0
-                }
-                thresholds={restakerThresholds}
-              />
-              <InfoTooltip content="The minimum number of restakers required to collectively control 1/3 of the total restaked ETH. Higher numbers indicate better decentralization. Green: >20, Yellow: >10, Red: ≤10" />
-            </p>
-            <h4 className="font-semibold mt-4 mb-2">Operator Metrics</h4>
-            <p className="mb-2">
-              Operators needed for 1/3 control:{' '}
-              {operatorData?.concentrationMetrics?.top33PercentCount || 'N/A'}
-              <SemaphoreIndicator
-                value={
-                  operatorData?.concentrationMetrics?.top33PercentCount || 0
-                }
-                thresholds={operatorThresholds}
-              />
-              <InfoTooltip content="The minimum number of operators required to collectively control 1/3 of the total restaked ETH. Higher numbers indicate better decentralization. Green: >15, Yellow: >8, Red: ≤8" />
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Replace the old metrics section with EnhancedMetrics */}
+      <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
 
       <Card>
         <CardHeader>
@@ -316,6 +413,8 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           )}
         </CardContent>
       </Card>
+
+      <CompactNotes />
     </div>
   );
 };
