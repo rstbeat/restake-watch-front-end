@@ -39,6 +39,9 @@ const fetchStakerData = async () => {
       headers: {
         'Content-Type': 'application/json',
       },
+      params: {
+        limit: 1000, // Using a very high number to fetch all operators
+      },
     });
     const data = response.data;
 
