@@ -34,7 +34,8 @@ interface RestakerData {
 const RestakerOverview: React.FC = () => {
   const [stakerData, setStakerData] = useState<RestakerData[] | null>(null);
   const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
-  const [sortColumn, setSortColumn] = useState<keyof RestakerData>('amountRestaked');
+  const [sortColumn, setSortColumn] =
+    useState<keyof RestakerData>('amountRestaked');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,16 +46,17 @@ const RestakerOverview: React.FC = () => {
     try {
       setIsLoadingStakerData(true);
       const data = await fetchStakerData();
-      const stakerDataResponse = data?.stakerData?.map((data: any) => ({
-        restakerAddress: data['Staker Address'],
-        amountRestaked: Number(data['Market Share'] * 100).toFixed(2),
-        ethRestaked: new Intl.NumberFormat('en-US', {
-          minimumFractionDigits: 1,
-          maximumFractionDigits: 2,
-        }).format(Number(data['ETH Restaked'].toFixed(2))),
-        numberOfStrategies: data['Number of Strategies'],
-        mostUsedStrategies: data['Most Used Strategy'],
-      })) || [];
+      const stakerDataResponse =
+        data?.stakerData?.map((data: any) => ({
+          restakerAddress: data['Staker Address'],
+          amountRestaked: Number(data['Market Share'] * 100).toFixed(2),
+          ethRestaked: new Intl.NumberFormat('en-US', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 2,
+          }).format(Number(data['ETH Restaked'].toFixed(2))),
+          numberOfStrategies: data['Number of Strategies'],
+          mostUsedStrategies: data['Most Used Strategy'],
+        })) || [];
       setStakerData(stakerDataResponse);
     } catch (error) {
       console.error('An error occurred while fetching staker data', error);
@@ -138,7 +140,8 @@ const RestakerOverview: React.FC = () => {
           Top 1,000 Restakers by Market Share
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          Displaying the distribution of restaked ETH among the top 1,000 restakers in the ecosystem
+          Displaying the distribution of restaked ETH among the top 1,000
+          restakers in the ecosystem
         </p>
         <div className="mb-4">
           <div className="relative">
