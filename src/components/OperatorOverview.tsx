@@ -43,6 +43,27 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
   </Tooltip.Provider>
 );
 
+// Updated Badge component to fix dynamic class issues
+const Badge: React.FC<{ color: string; text: string }> = ({ color, text }) => {
+  const colorClasses: { [key: string]: string } = {
+    red: 'bg-red-100 text-red-800',
+    yellow: 'bg-yellow-100 text-yellow-800',
+    green: 'bg-green-100 text-green-800',
+    blue: 'bg-blue-100 text-blue-800',
+    gray: 'bg-gray-100 text-gray-800',
+  };
+
+  const classes = colorClasses[color] || colorClasses['gray'];
+
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${classes}`}
+    >
+      {text}
+    </span>
+  );
+};
+
 const OperatorOverview: React.FC = () => {
   const [operatorData, setOperatorData] = useState<
     OperatorDataFormated[] | null
@@ -56,6 +77,8 @@ const OperatorOverview: React.FC = () => {
   const [showOnlyDVT, setShowOnlyDVT] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(50);
+  const [selectedProfessionalOperators, setSelectedProfessionalOperators] =
+    useState<string[]>([]);
 
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
@@ -64,11 +87,15 @@ const OperatorOverview: React.FC = () => {
       const operatorDataResponse: OperatorDataFormated[] =
         data?.operatorData?.map((item: any) => ({
           operatorAddress: item['Operator Address'] || '',
-          marketShared: Number((item['Market Share'] || 0) * 100).toFixed(2),
+          operatorName: item['Operator Name'] || 'Unknown',
+          majorOperator: item['Major Operator'] || '',
+          marketShared: Number((item['Market Share'] || 0) * 100).toFixed(1),
           ethRestaked: new Intl.NumberFormat('en-US', {
+            notation: 'compact',
+            compactDisplay: 'short',
             minimumFractionDigits: 1,
             maximumFractionDigits: 2,
-          }).format(Number((item['ETH Restaked'] || 0).toFixed(2))),
+          }).format(Number(item['ETH Restaked'] || 0)),
           numberOfStrategies: item['Number of Strategies'] || 0,
           dvtTechnology: item['DVT Technology'] || 'None',
           mostUsedStrategies: item['Most Used Strategies'] || [],
@@ -88,15 +115,42 @@ const OperatorOverview: React.FC = () => {
     }
   }, [operatorData, fetchOperatorDataCallback]);
 
+  const professionalOperators = useMemo(() => {
+    if (!operatorData) return [];
+    const operatorsSet = new Set<string>();
+    operatorData.forEach((operator) => {
+      if (operator.majorOperator) {
+        operatorsSet.add(operator.majorOperator);
+      }
+    });
+    return Array.from(operatorsSet);
+  }, [operatorData]);
+
   const filteredAndSortedData = useMemo(() => {
     if (!operatorData) return null;
     return [...operatorData]
-      .filter((operator) =>
-        operator.operatorAddress
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()),
-      )
-      .filter((operator) => !showOnlyDVT || operator.dvtTechnology !== 'None')
+      .filter((operator) => {
+        const matchesSearchTerm =
+          operator.operatorAddress
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          operator.operatorName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          (operator.majorOperator &&
+            operator.majorOperator
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()));
+
+        const matchesProfessionalOperator =
+          selectedProfessionalOperators.length === 0 ||
+          (operator.majorOperator &&
+            selectedProfessionalOperators.includes(operator.majorOperator));
+
+        const matchesDVT = !showOnlyDVT || operator.dvtTechnology !== 'None';
+
+        return matchesSearchTerm && matchesProfessionalOperator && matchesDVT;
+      })
       .sort((a, b) => {
         const aValue = a[sortColumn];
         const bValue = b[sortColumn];
@@ -104,7 +158,14 @@ const OperatorOverview: React.FC = () => {
         if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [operatorData, sortColumn, sortDirection, searchTerm, showOnlyDVT]);
+  }, [
+    operatorData,
+    sortColumn,
+    sortDirection,
+    searchTerm,
+    showOnlyDVT,
+    selectedProfessionalOperators,
+  ]);
 
   const paginatedData = useMemo(() => {
     if (!filteredAndSortedData) return null;
@@ -114,7 +175,7 @@ const OperatorOverview: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [showOnlyDVT, searchTerm]);
+  }, [showOnlyDVT, searchTerm, selectedProfessionalOperators]);
 
   const totalPages = useMemo(() => {
     if (!filteredAndSortedData) return 0;
@@ -167,7 +228,7 @@ const OperatorOverview: React.FC = () => {
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               type="text"
-              placeholder="Search by Operator Address"
+              placeholder="Search by Name, Address, or Professional Operator"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8"
@@ -186,14 +247,62 @@ const OperatorOverview: React.FC = () => {
               Show only DVT operators
             </label>
           </div>
+          <div className="flex items-center space-x-2">
+            <div>
+              <label
+                htmlFor="professional-operator-select"
+                className="text-sm font-medium leading-none"
+              >
+                Professional Operator
+              </label>
+              <select
+                id="professional-operator-select"
+                multiple
+                value={selectedProfessionalOperators}
+                onChange={(e) => {
+                  const options = Array.from(
+                    e.target.selectedOptions,
+                    (option) => option.value,
+                  );
+                  setSelectedProfessionalOperators(options);
+                }}
+                className="mt-1 block w-full pl-3 pr-10 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                {professionalOperators.map((operator) => (
+                  <option key={operator} value={operator}>
+                    {operator}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {selectedProfessionalOperators.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedProfessionalOperators([])}
+              >
+                Clear
+              </Button>
+            )}
+          </div>
         </div>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>Operator Address</TableHead>
-                <TableHead>
+                <TableHead className="w-[50px] text-center">#</TableHead>
+                <TableHead className="text-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort('operatorName')}
+                    className="font-semibold"
+                  >
+                    Name
+                    <SortIcon column="operatorName" />
+                  </Button>
+                </TableHead>
+                <TableHead className="text-center">Operator Address</TableHead>
+                <TableHead className="text-center">
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('marketShared')}
@@ -203,7 +312,7 @@ const OperatorOverview: React.FC = () => {
                     <SortIcon column="marketShared" />
                   </Button>
                 </TableHead>
-                <TableHead>
+                <TableHead className="text-center">
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('ethRestaked')}
@@ -213,26 +322,27 @@ const OperatorOverview: React.FC = () => {
                     <SortIcon column="ethRestaked" />
                   </Button>
                 </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleSort('numberOfStrategies')}
-                    className="font-semibold"
-                  >
-                    # Strategies
-                    <SortIcon column="numberOfStrategies" />
-                  </Button>
-                </TableHead>
-                <TableHead>
+                <TableHead className="text-center">
                   DVT Status
                   <InfoTooltip content="DVT (Distributed Validator Technology) improves validator security and decentralization. Obol is a leading DVT solution that enables validators to be run by multiple machines and operators, enhancing fault-tolerance and reducing slashing risk." />
+                </TableHead>
+                <TableHead className="text-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSort('majorOperator')}
+                    className="font-semibold"
+                  >
+                    Professional Operator
+                    <SortIcon column="majorOperator" />
+                  </Button>
+                  <InfoTooltip content="The professional operator this operator belongs to. Professional operators are established entities that manage significant amounts of staked ETH across multiple addresses." />
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoadingOperatorData ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
+                  <TableCell colSpan={7} className="text-center">
                     <Skeleton className="w-full h-[20px] rounded-full" />
                   </TableCell>
                 </TableRow>
@@ -242,9 +352,14 @@ const OperatorOverview: React.FC = () => {
                     key={row.operatorAddress || index}
                     className="hover:bg-gray-50"
                   >
-                    <TableCell className="font-semibold">{index + 1}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      <div className="flex items-center">
+                    <TableCell className="font-semibold text-center">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </TableCell>
+                    <TableCell className="font-medium text-center">
+                      {row.operatorName}
+                    </TableCell>
+                    <TableCell className="font-mono text-sm text-center">
+                      <div className="flex items-center justify-center">
                         <span className="mr-2">
                           {truncateAddress(row.operatorAddress)}
                         </span>
@@ -268,37 +383,41 @@ const OperatorOverview: React.FC = () => {
                         )}
                       </div>
                     </TableCell>
-                    <TableCell className="font-semibold">
-                      <div className="flex items-center">
-                        {row.marketShared}%
-                        {parseFloat(row.marketShared) > 10 && (
-                          <span title="High market share concentration">
-                            <AlertTriangle className="ml-2 h-4 w-4 text-yellow-500" />
-                          </span>
+                    <TableCell className="font-semibold text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <span>{row.marketShared}%</span>
+                        {parseFloat(row.marketShared) > 5 && (
+                          <Badge color="red" text="High" />
                         )}
+                        {parseFloat(row.marketShared) >= 1 &&
+                          parseFloat(row.marketShared) <= 5 && (
+                            <Badge color="yellow" text="Medium" />
+                          )}
+                        {/* No badge for below 1% */}
                       </div>
                     </TableCell>
-                    <TableCell>{row.ethRestaked} ETH</TableCell>
                     <TableCell className="text-center">
-                      {row.numberOfStrategies}
+                      {row.ethRestaked} ETH
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-center">
                       {row.dvtTechnology !== 'None' ? (
-                        <div className="flex items-center">
-                          <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                          <span className="text-green-600">
-                            {row.dvtTechnology}
-                          </span>
-                        </div>
+                        <Badge color="green" text={row.dvtTechnology} />
                       ) : (
-                        <span className="text-gray-500">None</span>
+                        <Badge color="gray" text="None" />
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {row.majorOperator ? (
+                        <Badge color="blue" text={row.majorOperator} />
+                      ) : (
+                        <Badge color="gray" text="Independent" />
                       )}
                     </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
+                  <TableCell colSpan={7} className="text-center">
                     No operator data available
                   </TableCell>
                 </TableRow>

@@ -105,6 +105,8 @@ export interface StakerDataResponse {
 
 export interface OperatorDataFormated {
   operatorAddress: string;
+  operatorName: string;
+  majorOperator: string;
   marketShared: string;
   ethRestaked: string;
   numberOfStrategies: number;
