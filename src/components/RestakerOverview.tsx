@@ -3,7 +3,6 @@ import {
   ChevronUp,
   ChevronDown,
   ArrowUpDown,
-  AlertTriangle,
   Copy,
   Check,
   Search,
@@ -31,6 +30,26 @@ interface RestakerData {
   mostUsedStrategies: string;
 }
 
+const Badge: React.FC<{ color: string; text: string }> = ({ color, text }) => {
+  const colorClasses: { [key: string]: string } = {
+    red: 'bg-red-100 text-red-800',
+    yellow: 'bg-yellow-100 text-yellow-800',
+    green: 'bg-green-100 text-green-800',
+    blue: 'bg-blue-100 text-blue-800',
+    gray: 'bg-gray-100 text-gray-800',
+  };
+
+  const classes = colorClasses[color] || colorClasses['gray'];
+
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${classes}`}
+    >
+      {text}
+    </span>
+  );
+};
+
 const RestakerOverview: React.FC = () => {
   const [stakerData, setStakerData] = useState<RestakerData[] | null>(null);
   const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
@@ -48,14 +67,16 @@ const RestakerOverview: React.FC = () => {
       const data = await fetchStakerData();
       const stakerDataResponse =
         data?.stakerData?.map((data: any) => ({
-          restakerAddress: data['Staker Address'],
-          amountRestaked: Number(data['Market Share'] * 100).toFixed(2),
+          restakerAddress: data['Staker Address'] || '',
+          amountRestaked: Number((data['Market Share'] || 0) * 100).toFixed(1),
           ethRestaked: new Intl.NumberFormat('en-US', {
+            notation: 'compact',
+            compactDisplay: 'short',
             minimumFractionDigits: 1,
             maximumFractionDigits: 2,
-          }).format(Number(data['ETH Restaked'].toFixed(2))),
-          numberOfStrategies: data['Number of Strategies'],
-          mostUsedStrategies: data['Most Used Strategy'],
+          }).format(Number(data['ETH Restaked'] || 0)),
+          numberOfStrategies: data['Number of Strategies'] || 0,
+          mostUsedStrategies: data['Most Used Strategy'] || 'N/A',
         })) || [];
       setStakerData(stakerDataResponse);
     } catch (error) {
@@ -137,10 +158,10 @@ const RestakerOverview: React.FC = () => {
       <div className="bg-white p-6 rounded-lg mt-8 shadow-md">
         <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center">
           <span className="mr-2">💰</span>
-          Top 1,000 Restakers by Market Share
+          Top 100 Restakers by Market Share
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          Displaying the distribution of restaked ETH among the top 1,000
+          Displaying the distribution of restaked ETH among the top 100
           restakers in the ecosystem
         </p>
         <div className="mb-4">
@@ -159,9 +180,9 @@ const RestakerOverview: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>Restaker Address</TableHead>
-                <TableHead>
+                <TableHead className="w-[50px] text-center">#</TableHead>
+                <TableHead className="text-center">Restaker Address</TableHead>
+                <TableHead className="text-center">
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('amountRestaked')}
@@ -171,7 +192,7 @@ const RestakerOverview: React.FC = () => {
                     <SortIcon column="amountRestaked" />
                   </Button>
                 </TableHead>
-                <TableHead>
+                <TableHead className="text-center">
                   <Button
                     variant="ghost"
                     onClick={() => handleSort('ethRestaked')}
@@ -181,17 +202,10 @@ const RestakerOverview: React.FC = () => {
                     <SortIcon column="ethRestaked" />
                   </Button>
                 </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleSort('numberOfStrategies')}
-                    className="font-semibold"
-                  >
-                    Strategies
-                    <SortIcon column="numberOfStrategies" />
-                  </Button>
+                <TableHead className="text-center">Strategies</TableHead>
+                <TableHead className="text-center">
+                  Most Used Strategy
                 </TableHead>
-                <TableHead>Most Used Strategy</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -204,50 +218,58 @@ const RestakerOverview: React.FC = () => {
               ) : paginatedData && paginatedData.length > 0 ? (
                 paginatedData.map((row, index) => (
                   <TableRow
-                    key={row.restakerAddress}
+                    key={row.restakerAddress || index}
                     className="hover:bg-gray-50"
                   >
-                    <TableCell className="font-semibold">
+                    <TableCell className="font-semibold text-center">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      <div className="flex items-center">
+                    <TableCell className="font-mono text-sm text-center">
+                      <div className="flex items-center justify-center">
                         <span className="mr-2">
                           {truncateAddress(row.restakerAddress)}
                         </span>
-                        <Button
-                          variant="ghost"
-                          onClick={() => copyToClipboard(row.restakerAddress)}
-                          className="p-1"
-                          title={
-                            copiedAddress === row.restakerAddress
-                              ? 'Copied!'
-                              : 'Copy full address'
-                          }
-                        >
-                          {copiedAddress === row.restakerAddress ? (
-                            <Check className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-semibold">
-                      <div className="flex items-center">
-                        {row.amountRestaked}%
-                        {parseFloat(row.amountRestaked) > 5 && (
-                          <span title="High market share concentration">
-                            <AlertTriangle className="ml-2 h-4 w-4 text-yellow-500" />
-                          </span>
+                        {row.restakerAddress && (
+                          <Button
+                            variant="ghost"
+                            onClick={() => copyToClipboard(row.restakerAddress)}
+                            className="p-1"
+                            title={
+                              copiedAddress === row.restakerAddress
+                                ? 'Copied!'
+                                : 'Copy full address'
+                            }
+                          >
+                            {copiedAddress === row.restakerAddress ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
                         )}
                       </div>
                     </TableCell>
-                    <TableCell>{row.ethRestaked} ETH</TableCell>
+                    <TableCell className="font-semibold text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <span>{row.amountRestaked}%</span>
+                        {parseFloat(row.amountRestaked) > 5 && (
+                          <Badge color="red" text="High" />
+                        )}
+                        {parseFloat(row.amountRestaked) >= 1 &&
+                          parseFloat(row.amountRestaked) <= 5 && (
+                            <Badge color="yellow" text="Medium" />
+                          )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {row.ethRestaked} ETH
+                    </TableCell>
                     <TableCell className="text-center">
                       {row.numberOfStrategies}
                     </TableCell>
-                    <TableCell>{row.mostUsedStrategies}</TableCell>
+                    <TableCell className="text-center">
+                      {row.mostUsedStrategies}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
