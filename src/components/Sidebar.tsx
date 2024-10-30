@@ -17,12 +17,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   children,
 }) => {
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-gray-900 text-white">
+    <div className="flex flex-col h-full bg-[#e6e7ec] text-[#000000] font-bold">
       <div className="p-4">
         <Image
           src="/restake-watch-logo.png"
           alt="Restake Watch Logo"
-          width={150}
+          width={120} // Adjusted width for the logo
           height={40}
           className="h-10 w-auto mb-6"
         />
@@ -36,9 +36,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <Button
             variant="ghost"
-            className="w-full justify-start text-white hover:bg-gray-800"
+            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
           >
-            <BookOpen className="h-4 w-4" />
+            <BookOpen className="h-4 w-4 text-inherit" />
             <span className="ml-2">Blog</span>
           </Button>
         </Link>
@@ -49,9 +49,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <Button
             variant="ghost"
-            className="w-full justify-start text-white hover:bg-gray-800"
+            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
           >
-            <Heart className="h-4 w-4" />
+            <Heart className="h-4 w-4 text-inherit" />
             <span className="ml-2">Donate</span>
           </Button>
         </Link>
@@ -62,13 +62,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex w-64 bg-gray-900 text-white">
+      <div className="hidden md:flex w-48 bg-[#e6e7ec] text-[#000000] font-bold">
         <SidebarContent />
       </div>
 
       {/* Mobile Sidebar */}
       <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="w-48 p-0">
           <SidebarContent />
         </SheetContent>
       </Sheet>
