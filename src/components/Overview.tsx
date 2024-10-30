@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Treemap, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+import {
+  Treemap,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+} from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
@@ -51,7 +55,8 @@ const RiskAssessment = () => {
       </CardHeader>
       <CardContent>
         <p className="mb-2 font-medium">
-          The current operator landscape presents significant centralization risks:
+          The current operator landscape presents significant centralization
+          risks:
         </p>
         <ul className="list-disc pl-5 mb-2 space-y-1">
           <li>
@@ -404,25 +409,32 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     const lightness = 80 - (50 * value) / maxValue; // Lightness from 80% to 30%
     return `hsl(280, 60%, ${lightness}%)`; // Purple hue
   };
-  
-  const CustomizedContent = (props: {
+
+  interface CustomizedContentProps {
+    root?: any;
+    depth?: number;
     x: number;
     y: number;
     width: number;
     height: number;
+    index?: number;
+    payload?: any;
+    rank?: any;
     name: string;
     value: number;
-  }) => {
+  }
+
+  const CustomizedContent: React.FC<CustomizedContentProps> = (props) => {
     const { x, y, width, height, name, value } = props;
     const fillColor = getColor(value, maxValue);
-    
+
     // Calculate font size based on box dimensions
     const minDimension = Math.min(width, height);
     const fontSize = Math.min(minDimension / 6, 14); // Cap at 14px
-    
+
     // Only render text if there's enough space
     const shouldRenderText = width > 30 && height > 20;
-    
+
     // Format name to handle long text
     const formatName = (name: string): string => {
       if (width < 100) {
@@ -431,7 +443,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       }
       return name;
     };
-  
+
     return (
       <g>
         <rect
@@ -488,8 +500,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
             Share of Total Restaked ETH by Major Operators
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            This chart represents operator groups that manage multiple individual
-            operators. The data shown is the aggregated sum for each group.
+            This chart represents operator groups that manage multiple
+            individual operators. The data shown is the aggregated sum for each
+            group.
           </p>
         </CardHeader>
         <CardContent>
@@ -502,7 +515,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={<CustomizedContent />}
+                content={(props) => <CustomizedContent {...props} />}
               >
                 <RechartsTooltip
                   content={({ payload }) => {
@@ -524,7 +537,6 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           )}
         </CardContent>
       </Card>
-
     </div>
   );
 };

@@ -277,7 +277,7 @@ const RestakeWatch: React.FC = () => {
               <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
                 <div className="flex items-center space-x-3">
                   <div className="relative h-6 w-6">
-                    <Image 
+                    <Image
                       src="/ethereum-logo.png"
                       alt="Ethereum Logo"
                       fill
@@ -287,8 +287,12 @@ const RestakeWatch: React.FC = () => {
                     />
                   </div>
                   <p className="text-sm text-gray-600">
-                    A Public Good company supported by a grant from the 
-                    <span className="font-medium"> Ecosystem Support Program</span> run by the 
+                    A Public Good company supported by a grant from the
+                    <span className="font-medium">
+                      {' '}
+                      Ecosystem Support Program
+                    </span>{' '}
+                    run by the
                     <span className="font-medium"> Ethereum Foundation</span>.
                   </p>
                 </div>
