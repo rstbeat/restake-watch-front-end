@@ -400,12 +400,19 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const maxValue = Math.max(...majorOperatorData.map((d) => d.value));
 
   // Function to map values to colors
-  const getColor = (value, maxValue) => {
+  const getColor = (value: number, maxValue: number): string => {
     const lightness = 80 - (50 * value) / maxValue; // Lightness from 80% to 30%
     return `hsl(280, 60%, ${lightness}%)`; // Purple hue
   };
-
-  const CustomizedContent = (props) => {
+  
+  const CustomizedContent = (props: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    name: string;
+    value: number;
+  }) => {
     const { x, y, width, height, name, value } = props;
     const fillColor = getColor(value, maxValue);
     
@@ -417,7 +424,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     const shouldRenderText = width > 30 && height > 20;
     
     // Format name to handle long text
-    const formatName = (name) => {
+    const formatName = (name: string): string => {
       if (width < 100) {
         // For small boxes, show abbreviated text
         return name.split(' ')[0];
