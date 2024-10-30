@@ -515,7 +515,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={(props) => <CustomizedContent {...props} />}
+                content={CustomizedContent} // Changed this line - pass the component directly
               >
                 <RechartsTooltip
                   content={({ payload }) => {
