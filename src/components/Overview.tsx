@@ -404,10 +404,10 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   // Compute the maximum value for color scaling
   const maxValue = Math.max(...majorOperatorData.map((d) => d.value));
 
-  // Function to map values to colors
+  // Function to map values to colors - single definition
   const getColor = (value: number, maxValue: number): string => {
-    const lightness = 80 - (50 * value) / maxValue; // Lightness from 80% to 30%
-    return `hsl(280, 60%, ${lightness}%)`; // Purple hue
+    const lightness = 80 - (50 * value) / maxValue;
+    return `hsl(280, 60%, ${lightness}%)`;
   };
 
   interface CustomizedContentProps {
@@ -423,12 +423,6 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     name: string;
     value: number;
   }
-
-  // Function to map values to colors
-  const getColor = (value: number, maxValue: number): string => {
-    const lightness = 80 - (50 * value) / maxValue;
-    return `hsl(280, 60%, ${lightness}%)`;
-  };
 
   // Changed to a render prop function that returns JSX
   const renderCustomizedContent = (props: CustomizedContentProps) => {
@@ -514,7 +508,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={renderCustomizedContent}  // Changed to use the render prop function
+                content={renderCustomizedContent}
               >
                 <RechartsTooltip
                   content={({ payload }) => {
