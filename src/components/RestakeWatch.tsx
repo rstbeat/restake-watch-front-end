@@ -223,7 +223,7 @@ const RestakeWatch: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-4">
                     <a
-                      href="https://twitter.com/restakewatch"
+                      href="https://twitter.com/TheRestakeWatch"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-white hover:text-blue-400 transition-colors"
