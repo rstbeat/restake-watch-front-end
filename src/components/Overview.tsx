@@ -424,21 +424,23 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     value: number;
   }
 
-  const CustomizedContent: React.FC<CustomizedContentProps> = (props) => {
+  // Function to map values to colors
+  const getColor = (value: number, maxValue: number): string => {
+    const lightness = 80 - (50 * value) / maxValue;
+    return `hsl(280, 60%, ${lightness}%)`;
+  };
+
+  // Changed to a render prop function that returns JSX
+  const renderCustomizedContent = (props: CustomizedContentProps) => {
     const { x, y, width, height, name, value } = props;
     const fillColor = getColor(value, maxValue);
 
-    // Calculate font size based on box dimensions
     const minDimension = Math.min(width, height);
-    const fontSize = Math.min(minDimension / 6, 14); // Cap at 14px
-
-    // Only render text if there's enough space
+    const fontSize = Math.min(minDimension / 6, 14);
     const shouldRenderText = width > 30 && height > 20;
 
-    // Format name to handle long text
     const formatName = (name: string): string => {
       if (width < 100) {
-        // For small boxes, show abbreviated text
         return name.split(' ')[0];
       }
       return name;
@@ -490,10 +492,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   return (
     <div className="space-y-6">
       <RiskAssessment />
-
-      {/* Enhanced Metrics */}
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
-
       <Card>
         <CardHeader>
           <h2 className="text-xl font-semibold text-[#000000]">
@@ -515,7 +514,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={CustomizedContent} // Changed this line - pass the component directly
+                content={renderCustomizedContent}  // Changed to use the render prop function
               >
                 <RechartsTooltip
                   content={({ payload }) => {
