@@ -35,7 +35,8 @@ import { fetchStakerData, fetchOperatorData } from '../app/api/restake/restake';
 type PlatformType = 'eigenlayer' | 'symbiotic' | 'karak';
 
 const RestakeWatch: React.FC = () => {
-  const [activePlatform, setActivePlatform] = useState<PlatformType>('eigenlayer');
+  const [activePlatform, setActivePlatform] =
+    useState<PlatformType>('eigenlayer');
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
@@ -108,18 +109,24 @@ const RestakeWatch: React.FC = () => {
     if (activePlatform !== 'eigenlayer') {
       return (
         <div className="text-center py-8">
-          <h2 className="text-2xl font-bold mb-4 text-[#ab3bd2]">Coming Soon</h2>
+          <h2 className="text-2xl font-bold mb-4 text-[#ab3bd2]">
+            Coming Soon
+          </h2>
           <p>
             Data for{' '}
-            {activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)} is
-            not yet available.
+            {activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)}{' '}
+            is not yet available.
           </p>
         </div>
       );
     }
 
     return (
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="bg-white rounded-lg shadow-md">
           <TabsTrigger
             value="overview"
@@ -190,7 +197,11 @@ const RestakeWatch: React.FC = () => {
                   A Hitchhikers Guide to Restaking and Its Risks
                 </Link>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setShowBanner(false)}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowBanner(false)}
+              >
                 <X className="h-4 w-4 text-amber-900" />
               </Button>
             </div>
@@ -228,7 +239,6 @@ const RestakeWatch: React.FC = () => {
                       <MessageCircle size={20} />
                     </a>
                     <Button
-                      variant="solid"
                       size="sm"
                       className="bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
                       onClick={() => {
@@ -244,9 +254,9 @@ const RestakeWatch: React.FC = () => {
                   </div>
                 </div>
                 <p className="text-sm italic mt-2 self-start">
-                  (We know it&apos;s not the prettiest site, but hey, we&apos;re engineers
-                  and economists, not designers! We promise to make it look better...
-                  eventually.)
+                  (We know it&apos;s not the prettiest site, but hey, we&apos;re
+                  engineers and economists, not designers! We promise to make it
+                  look better... eventually.)
                 </p>
               </div>
             </div>
@@ -261,7 +271,8 @@ const RestakeWatch: React.FC = () => {
                       : 'Loading...'}
                   </p>
                   <p className="mt-1 italic">
-                    Starting from the first week of November, data will be updated daily.
+                    Starting from the first week of November, data will be
+                    updated daily.
                   </p>
                 </div>
               )}
@@ -274,11 +285,12 @@ const RestakeWatch: React.FC = () => {
                   <AlertTriangle className="h-4 w-4 text-[#ab3bd2]" />
                   <AlertTitle>Critical Alert for EigenLayer</AlertTitle>
                   <AlertDescription>
-                    Significant Centralization Risk: P2P.org controls over 28% of restaked
-                    ETH. Combined with other major operators (Luganodes, DSRV, Pier Two,
-                    and Finoa Consensus), these entities control more than 50% of all
-                    restaked ETH. This concentration poses substantial risks to the
-                    network&apos;s decentralization and resilience.
+                    Significant Centralization Risk: P2P.org controls over 28%
+                    of restaked ETH. Combined with other major operators
+                    (Luganodes, DSRV, Pier Two, and Finoa Consensus), these
+                    entities control more than 50% of all restaked ETH. This
+                    concentration poses substantial risks to the network&apos;s
+                    decentralization and resilience.
                   </AlertDescription>
                 </Alert>
               )}

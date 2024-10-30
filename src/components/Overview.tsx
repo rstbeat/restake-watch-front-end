@@ -4,6 +4,13 @@ import {
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
 } from 'recharts';
+import {
+  Treemap,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  Cell,
+} from 'recharts';
+
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import {
