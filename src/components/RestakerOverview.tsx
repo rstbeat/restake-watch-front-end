@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
 import {
   ChevronUp,
   ChevronDown,

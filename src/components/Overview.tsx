@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Treemap,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-} from 'recharts';
-import {
-  Treemap,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-  Cell,
-} from 'recharts';
+import { Treemap, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
@@ -27,15 +17,6 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchOperatorData } from '../app/api/restake/restake';
 import { LucideIcon } from 'lucide-react';
-
-const COLORS = [
-  '#1a202c',
-  '#2d3748',
-  '#4a5568',
-  '#718096',
-  '#a0aec0',
-  '#cbd5e0',
-];
 
 interface OverviewProps {
   restakeData: any | null;
@@ -59,10 +40,10 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
 
 const RiskAssessment = () => {
   return (
-    <Card className="mb-6 border-l-4 border-l-yellow-500">
+    <Card className="mb-6 border-l-4 border-l-purple-500">
       <CardHeader className="pb-2">
         <div className="flex items-center">
-          <AlertTriangle className="h-5 w-5 text-yellow-500 mr-2" />
+          <AlertTriangle className="h-5 w-5 text-purple-500 mr-2" />
           <h3 className="text-lg font-semibold text-gray-800">
             Risk Assessment
           </h3>
@@ -70,8 +51,7 @@ const RiskAssessment = () => {
       </CardHeader>
       <CardContent>
         <p className="mb-2 font-medium">
-          The current operator landscape presents significant centralization
-          risks:
+          The current operator landscape presents significant centralization risks:
         </p>
         <ul className="list-disc pl-5 mb-2 space-y-1">
           <li>
@@ -100,11 +80,11 @@ const CompactNotes = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Card className="mt-4 border-l-4 border-l-blue-500">
+    <Card className="mt-4 border-l-4 border-l-purple-500">
       <CardHeader className="pb-2">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-between w-full text-left text-sm font-bold text-blue-700 hover:text-blue-900 focus:outline-none"
+          className="flex items-center justify-between w-full text-left text-sm font-bold text-purple-700 hover:text-purple-900 focus:outline-none"
         >
           <span>Important Notes and Disclaimers</span>
           {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -416,54 +396,115 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     });
   }
 
+  // Compute the maximum value for color scaling
+  const maxValue = Math.max(...majorOperatorData.map((d) => d.value));
+
+  // Function to map values to colors
+  const getColor = (value, maxValue) => {
+    const lightness = 80 - (50 * value) / maxValue; // Lightness from 80% to 30%
+    return `hsl(280, 60%, ${lightness}%)`; // Purple hue
+  };
+
+  const CustomizedContent = (props) => {
+    const { x, y, width, height, name, value } = props;
+    const fillColor = getColor(value, maxValue);
+    
+    // Calculate font size based on box dimensions
+    const minDimension = Math.min(width, height);
+    const fontSize = Math.min(minDimension / 6, 14); // Cap at 14px
+    
+    // Only render text if there's enough space
+    const shouldRenderText = width > 30 && height > 20;
+    
+    // Format name to handle long text
+    const formatName = (name) => {
+      if (width < 100) {
+        // For small boxes, show abbreviated text
+        return name.split(' ')[0];
+      }
+      return name;
+    };
+  
+    return (
+      <g>
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill={fillColor}
+          stroke="#fff"
+          strokeWidth={1}
+        />
+        {shouldRenderText && (
+          <>
+            <text
+              x={x + width / 2}
+              y={y + height / 2}
+              textAnchor="middle"
+              fill="#fff"
+              fontSize={fontSize}
+              fontWeight="500"
+              dominantBaseline="middle"
+            >
+              {formatName(name)}
+            </text>
+            {height > 50 && width > 80 && (
+              <text
+                x={x + width / 2}
+                y={y + height / 2 + fontSize + 2}
+                textAnchor="middle"
+                fill="#fff"
+                fontSize={fontSize * 0.8}
+                fontWeight="400"
+                dominantBaseline="middle"
+              >
+                {`${value.toLocaleString()} ETH`}
+              </text>
+            )}
+          </>
+        )}
+      </g>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <RiskAssessment />
 
-      {/* Replace the old metrics section with EnhancedMetrics */}
+      {/* Enhanced Metrics */}
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
 
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h2 className="text-xl font-semibold text-[#000000]">
             Share of Total Restaked ETH by Major Operators
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            This chart represents operator groups that manage multiple
-            individual operators. The data shown is the aggregated sum for each
-            group.
+            This chart represents operator groups that manage multiple individual
+            operators. The data shown is the aggregated sum for each group.
           </p>
         </CardHeader>
         <CardContent>
           {majorOperatorData.length > 0 && (
-            <ResponsiveContainer
-              width="100%"
-              height={300}
-              style={{ aspectRatio: '4/3' }}
-            >
+            <ResponsiveContainer width="100%" height={400}>
               <Treemap
                 data={majorOperatorData}
                 dataKey="value"
+                nameKey="name"
                 stroke="#fff"
-                fill="#1a202c"
+                aspectRatio={4 / 3}
+                isAnimationActive={false}
+                content={<CustomizedContent />}
               >
-                {majorOperatorData.map((_entry, index) => (
-                  <Treemap
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
                 <RechartsTooltip
                   content={({ payload }) => {
                     if (payload && payload.length) {
                       const data = payload[0].payload;
                       return (
-                        <div className="bg-white p-2 shadow-md rounded text-gray-800">
+                        <div className="bg-white p-2 shadow-md rounded text-[#000000]">
                           <p className="font-semibold">{data.name}</p>
-                          <p>{`${new Intl.NumberFormat('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          }).format(data.value)} ETH`}</p>
+                          <p>{`${data.value.toLocaleString()} ETH`}</p>
                           <p>{`${data.percentage}% of total`}</p>
                         </div>
                       );
@@ -477,7 +518,6 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         </CardContent>
       </Card>
 
-      <CompactNotes />
     </div>
   );
 };
