@@ -3,7 +3,6 @@ import {
   Treemap,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
-  ContentRenderer, // Import ContentRenderer
 } from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -397,8 +396,8 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     });
   }
 
-  // Define the CustomizedContent component with correct typing
-  const CustomizedContent: ContentRenderer<any> = (props) => {
+  // Define the CustomizedContent component as a React Functional Component
+  const CustomizedContent: React.FC<any> = (props) => {
     const { depth, x, y, width, height, name } = props;
 
     // Only render labels for the first level and if the cell is big enough
@@ -458,7 +457,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={CustomizedContent} // Use the correctly typed customized content
+                content={(props) => <CustomizedContent {...props} />} // Pass as a function
               >
                 <RechartsTooltip
                   content={({ payload }) => {
