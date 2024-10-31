@@ -501,50 +501,31 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         <CardContent>
           {majorOperatorData.length > 0 && (
             <ResponsiveContainer width="100%" height={400}>
-              <Card>
-  <CardHeader>
-    <h2 className="text-xl font-semibold text-[#000000]">
-      Share of Total Restaked ETH by Major Operators
-    </h2>
-    <p className="text-sm text-gray-600 mt-1">
-      This chart represents operator groups that manage multiple
-      individual operators. The data shown is the aggregated sum for each
-      group.
-    </p>
-  </CardHeader>
-  <CardContent>
-    {majorOperatorData.length > 0 && (
-      <ResponsiveContainer width="100%" height={400}>
-        <Treemap
-          data={majorOperatorData}
-          dataKey="value"
-          nameKey="name"
-          stroke="#fff"
-          aspectRatio={4 / 3}
-          isAnimationActive={false}
-          content={CustomizedContent} // Corrected line
-        >
-          <RechartsTooltip
-            content={({ payload }) => {
-              if (payload && payload.length) {
-                const data = payload[0].payload;
-                return (
-                  <div className="bg-white p-2 shadow-md rounded text-[#000000]">
-                    <p className="font-semibold">{data.name}</p>
-                    <p>{`${data.value.toLocaleString()} ETH`}</p>
-                    <p>{`${data.percentage}% of total`}</p>
-                  </div>
-                );
-              }
-              return null;
-            }}
-          />
-        </Treemap>
-      </ResponsiveContainer>
-    )}
-  </CardContent>
-</Card>
-
+              <Treemap
+                data={majorOperatorData}
+                dataKey="value"
+                nameKey="name"
+                stroke="#fff"
+                aspectRatio={4 / 3}
+                isAnimationActive={false}
+                content={<CustomizedContent />}
+              >
+                <RechartsTooltip
+                  content={({ payload }) => {
+                    if (payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white p-2 shadow-md rounded text-[#000000]">
+                          <p className="font-semibold">{data.name}</p>
+                          <p>{`${data.value.toLocaleString()} ETH`}</p>
+                          <p>{`${data.percentage}% of total`}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+              </Treemap>
             </ResponsiveContainer>
           )}
         </CardContent>
