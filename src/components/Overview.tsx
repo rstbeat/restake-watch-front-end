@@ -3,6 +3,7 @@ import {
   Treemap,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
+  TreemapNode,
 } from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -130,8 +131,6 @@ const CompactNotes = () => {
               <li>Presence and distribution of validators (DVT)</li>
               <li>Others!</li>
             </ul>
-
-  
           </div>
         </CardContent>
       )}
@@ -399,6 +398,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   }
 
   // Compute the maximum value for color scaling
+  // Compute the maximum value for color scaling
   const maxValue = Math.max(...majorOperatorData.map((d) => d.value));
 
   // Function to map values to colors
@@ -407,7 +407,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     return `hsl(280, 60%, ${lightness}%)`;
   };
 
-  interface CustomizedContentProps {
+  interface CustomizedContentProps extends TreemapNode {
     root?: any;
     depth?: number;
     x: number;
@@ -421,66 +421,64 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     value: number;
   }
 
-  // Convert to Class Component
-  class CustomizedContent extends React.Component<CustomizedContentProps> {
-    render() {
-      const { x, y, width, height, name, value } = this.props;
-      const fillColor = getColor(value, maxValue);
+  // Convert to Functional Component and pass props directly
+  const CustomizedContent: React.FC<CustomizedContentProps> = (props) => {
+    const { x, y, width, height, name, value } = props;
+    const fillColor = getColor(value as number, maxValue);
 
-      const minDimension = Math.min(width, height);
-      const fontSize = Math.min(minDimension / 6, 14);
-      const shouldRenderText = width > 30 && height > 20;
+    const minDimension = Math.min(width, height);
+    const fontSize = Math.min(minDimension / 6, 14);
+    const shouldRenderText = width > 30 && height > 20;
 
-      const formatName = (name: string): string => {
-        if (width < 100) {
-          return name.split(' ')[0];
-        }
-        return name;
-      };
+    const formatName = (name: string): string => {
+      if (width < 100) {
+        return name.split(' ')[0];
+      }
+      return name;
+    };
 
-      return (
-        <g>
-          <rect
-            x={x}
-            y={y}
-            width={width}
-            height={height}
-            fill={fillColor}
-            stroke="#fff"
-            strokeWidth={1}
-          />
-          {shouldRenderText && (
-            <>
+    return (
+      <g>
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill={fillColor}
+          stroke="#fff"
+          strokeWidth={1}
+        />
+        {shouldRenderText && (
+          <>
+            <text
+              x={x + width / 2}
+              y={y + height / 2}
+              textAnchor="middle"
+              fill="#fff"
+              fontSize={fontSize}
+              fontWeight="500"
+              dominantBaseline="middle"
+            >
+              {formatName(name)}
+            </text>
+            {height > 50 && width > 80 && (
               <text
                 x={x + width / 2}
-                y={y + height / 2}
+                y={y + height / 2 + fontSize + 2}
                 textAnchor="middle"
                 fill="#fff"
-                fontSize={fontSize}
-                fontWeight="500"
+                fontSize={fontSize * 0.8}
+                fontWeight="400"
                 dominantBaseline="middle"
               >
-                {formatName(name)}
+                {`${(value as number).toLocaleString()} ETH`}
               </text>
-              {height > 50 && width > 80 && (
-                <text
-                  x={x + width / 2}
-                  y={y + height / 2 + fontSize + 2}
-                  textAnchor="middle"
-                  fill="#fff"
-                  fontSize={fontSize * 0.8}
-                  fontWeight="400"
-                  dominantBaseline="middle"
-                >
-                  {`${value.toLocaleString()} ETH`}
-                </text>
-              )}
-            </>
-          )}
-        </g>
-      );
-    }
-  }
+            )}
+          </>
+        )}
+      </g>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -488,7 +486,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
       <CompactNotes />
       <Card>
-      <CardHeader>
+        <CardHeader>
           <h2 className="text-xl font-semibold text-[#000000]">
             Share of Total Restaked ETH by Major Operators
           </h2>
@@ -508,7 +506,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={<CustomizedContent />} // Pass the class component instance
+                content={CustomizedContent} // Pass the component directly
               >
                 <RechartsTooltip
                   content={({ payload }) => {
