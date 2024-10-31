@@ -396,90 +396,6 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     });
   }
 
-  // Compute the maximum value for color scaling
-  // Compute the maximum value for color scaling
-  const maxValue = Math.max(...majorOperatorData.map((d) => d.value));
-
-  // Function to map values to colors
-  const getColor = (value: number, maxValue: number): string => {
-    const lightness = 80 - (50 * value) / maxValue;
-    return `hsl(280, 60%, ${lightness}%)`;
-  };
-
-  interface CustomizedContentProps {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    index: number;
-    depth: number;
-    name: string;
-    value: number;
-    root?: any;
-    payload?: any;
-    rank?: any;
-    children?: any;
-  }
-
-  // Convert to Functional Component and pass props directly
-  const CustomizedContent: React.FC<CustomizedContentProps> = (props) => {
-    const { x, y, width, height, name, value } = props;
-    const fillColor = getColor(value, maxValue);
-
-    const minDimension = Math.min(width, height);
-    const fontSize = Math.min(minDimension / 6, 14);
-    const shouldRenderText = width > 30 && height > 20;
-
-    const formatName = (name: string): string => {
-      if (width < 100) {
-        return name.split(' ')[0];
-      }
-      return name;
-    };
-
-    return (
-      <g>
-        <rect
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill={fillColor}
-          stroke="#fff"
-          strokeWidth={1}
-        />
-        {shouldRenderText && (
-          <>
-            <text
-              x={x + width / 2}
-              y={y + height / 2}
-              textAnchor="middle"
-              fill="#fff"
-              fontSize={fontSize}
-              fontWeight="500"
-              dominantBaseline="middle"
-            >
-              {formatName(name)}
-            </text>
-            {height > 50 && width > 80 && (
-              <text
-                x={x + width / 2}
-                y={y + height / 2 + fontSize + 2}
-                textAnchor="middle"
-                fill="#fff"
-                fontSize={fontSize * 0.8}
-                fontWeight="400"
-                dominantBaseline="middle"
-              >
-                {`${value.toLocaleString()} ETH`}
-              </text>
-            )}
-          </>
-        )}
-      </g>
-    );
-  };
-
   return (
     <div className="space-y-6">
       <RiskAssessment />
@@ -504,9 +420,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 dataKey="value"
                 nameKey="name"
                 stroke="#fff"
+                fill="#8884d8" // Set a single color for all nodes
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={CustomizedContent} // Pass the component directly
               >
                 <RechartsTooltip
                   content={({ payload }) => {
