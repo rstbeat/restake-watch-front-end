@@ -186,26 +186,31 @@ const RestakeWatch: React.FC = () => {
         </Sidebar>
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          {showBanner && (
-            <div className="bg-amber-100 text-amber-900 py-2 px-4 flex justify-between items-center">
-              <div className="flex-1 text-center">
-                New release:{' '}
-                <Link
-                  href="https://hackmd.io/@espejelomar/BkgcuG4MR"
-                  className="underline font-medium"
-                >
-                  A Hitchhikers Guide to Restaking and Its Risks
-                </Link>
+        {showBanner && (
+            <div className="bg-gradient-to-r from-[#ab3bd2] to-[#922fb8] text-white py-2 px-4 flex justify-between items-center shadow-md">
+              <div className="flex items-center space-x-2">
+                <AlertTriangle className="h-5 w-5 text-white" />
+                <span>
+                  New release:{' '}
+                  <Link
+                    href="https://hackmd.io/@espejelomar/BkgcuG4MR"
+                    className="underline font-semibold hover:text-gray-200"
+                  >
+                    A Hitchhikers Guide to Restaking and Its Risks
+                  </Link>
+                </span>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowBanner(false)}
+                className="text-white hover:bg-[#922fb8]"
               >
-                <X className="h-4 w-4 text-amber-900" />
+                <X className="h-4 w-4" />
               </Button>
             </div>
           )}
+
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e6e7ec] text-[#000000]">
             <div className="bg-[#e6e7ec] text-[#000000] py-4 px-4 sm:px-6 lg:px-8 shadow-md">
@@ -221,7 +226,7 @@ const RestakeWatch: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-4">
                     <a
-                      href="https://twitter.com/restakewatch"
+                      href="https://twitter.com/therestakewatch"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#000000] hover:text-[#ab3bd2] transition-colors"
