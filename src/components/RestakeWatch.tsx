@@ -186,7 +186,7 @@ const RestakeWatch: React.FC = () => {
         </Sidebar>
 
         <div className="flex-1 flex flex-col overflow-hidden">
-        {showBanner && (
+          {showBanner && (
             <div className="bg-gradient-to-r from-[#ab3bd2] to-[#922fb8] text-white py-2 px-4 flex justify-between items-center shadow-md">
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="h-5 w-5 text-white" />
@@ -210,7 +210,6 @@ const RestakeWatch: React.FC = () => {
               </Button>
             </div>
           )}
-
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e6e7ec] text-[#000000]">
             <div className="bg-[#e6e7ec] text-[#000000] py-4 px-4 sm:px-6 lg:px-8 shadow-md">

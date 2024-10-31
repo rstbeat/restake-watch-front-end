@@ -99,19 +99,30 @@ const CompactNotes = () => {
         <CardContent>
           <div className="text-sm text-gray-700 space-y-3">
             <p>
-              <strong>1. EIGEN Token and Other Strategies:</strong> The value and distribution of the EIGEN token and other strategies are not yet factored into these metrics. This requires further research to understand how their distribution may rebalance the concentration of stake.
+              <strong>1. EIGEN Token and Other Strategies:</strong> The value
+              and distribution of the EIGEN token and other strategies are not
+              yet factored into these metrics. This requires further research to
+              understand how their distribution may rebalance the concentration
+              of stake.
             </p>
 
             <p>
-              <strong>2. ETH Value Conversion:</strong> Tokens from strategies pegged to the ETH value like stETH or swETH are considered 1:1 with the ETH price, which is not the case. In a future iteration, we will account for this discrepancy.
+              <strong>2. ETH Value Conversion:</strong> Tokens from strategies
+              pegged to the ETH value like stETH or swETH are considered 1:1
+              with the ETH price, which is not the case. In a future iteration,
+              we will account for this discrepancy.
             </p>
 
             <p>
-              <strong>3. Data Source:</strong> Currently, the metrics are derived from data in the EigenLayer Delegation Manager smart contract. Future iterations will incorporate data from additional smart contracts for a more comprehensive analysis.
+              <strong>3. Data Source:</strong> Currently, the metrics are
+              derived from data in the EigenLayer Delegation Manager smart
+              contract. Future iterations will incorporate data from additional
+              smart contracts for a more comprehensive analysis.
             </p>
 
             <p>
-              <strong>4. Future Enhancements:</strong> The Restake Watch project is continuously evolving. Upcoming updates will include:
+              <strong>4. Future Enhancements:</strong> The Restake Watch project
+              is continuously evolving. Upcoming updates will include:
             </p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Additional concentration metrics</li>
@@ -120,16 +131,13 @@ const CompactNotes = () => {
               <li>Others!</li>
             </ul>
 
-            <p>
-              <strong>Note:</strong> These enhancements aim to provide a more holistic view of the restaking ecosystem and its associated risks.
-            </p>
+  
           </div>
         </CardContent>
       )}
     </Card>
   );
 };
-
 
 interface MetricCardProps {
   icon: LucideIcon;
@@ -413,64 +421,66 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     value: number;
   }
 
-  // Component-based approach instead of a render function
-  const CustomizedContent: React.FC<CustomizedContentProps> = (props) => {
-    const { x, y, width, height, name, value } = props;
-    const fillColor = getColor(value, maxValue);
+  // Convert to Class Component
+  class CustomizedContent extends React.Component<CustomizedContentProps> {
+    render() {
+      const { x, y, width, height, name, value } = this.props;
+      const fillColor = getColor(value, maxValue);
 
-    const minDimension = Math.min(width, height);
-    const fontSize = Math.min(minDimension / 6, 14);
-    const shouldRenderText = width > 30 && height > 20;
+      const minDimension = Math.min(width, height);
+      const fontSize = Math.min(minDimension / 6, 14);
+      const shouldRenderText = width > 30 && height > 20;
 
-    const formatName = (name: string): string => {
-      if (width < 100) {
-        return name.split(' ')[0];
-      }
-      return name;
-    };
+      const formatName = (name: string): string => {
+        if (width < 100) {
+          return name.split(' ')[0];
+        }
+        return name;
+      };
 
-    return (
-      <g>
-        <rect
-          x={x}
-          y={y}
-          width={width}
-          height={height}
-          fill={fillColor}
-          stroke="#fff"
-          strokeWidth={1}
-        />
-        {shouldRenderText && (
-          <>
-            <text
-              x={x + width / 2}
-              y={y + height / 2}
-              textAnchor="middle"
-              fill="#fff"
-              fontSize={fontSize}
-              fontWeight="500"
-              dominantBaseline="middle"
-            >
-              {formatName(name)}
-            </text>
-            {height > 50 && width > 80 && (
+      return (
+        <g>
+          <rect
+            x={x}
+            y={y}
+            width={width}
+            height={height}
+            fill={fillColor}
+            stroke="#fff"
+            strokeWidth={1}
+          />
+          {shouldRenderText && (
+            <>
               <text
                 x={x + width / 2}
-                y={y + height / 2 + fontSize + 2}
+                y={y + height / 2}
                 textAnchor="middle"
                 fill="#fff"
-                fontSize={fontSize * 0.8}
-                fontWeight="400"
+                fontSize={fontSize}
+                fontWeight="500"
                 dominantBaseline="middle"
               >
-                {`${value.toLocaleString()} ETH`}
+                {formatName(name)}
               </text>
-            )}
-          </>
-        )}
-      </g>
-    );
-  };
+              {height > 50 && width > 80 && (
+                <text
+                  x={x + width / 2}
+                  y={y + height / 2 + fontSize + 2}
+                  textAnchor="middle"
+                  fill="#fff"
+                  fontSize={fontSize * 0.8}
+                  fontWeight="400"
+                  dominantBaseline="middle"
+                >
+                  {`${value.toLocaleString()} ETH`}
+                </text>
+              )}
+            </>
+          )}
+        </g>
+      );
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -478,7 +488,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
       <CompactNotes />
       <Card>
-        <CardHeader>
+      <CardHeader>
           <h2 className="text-xl font-semibold text-[#000000]">
             Share of Total Restaked ETH by Major Operators
           </h2>
@@ -492,31 +502,30 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           {majorOperatorData.length > 0 && (
             <ResponsiveContainer width="100%" height={400}>
               <Treemap
-  data={majorOperatorData}
-  dataKey="value"
-  nameKey="name"
-  stroke="#fff"
-  aspectRatio={4 / 3}
-  isAnimationActive={false}
-  content={CustomizedContent} // Pass the component directly
->
-  <RechartsTooltip
-    content={({ payload }) => {
-      if (payload && payload.length) {
-        const data = payload[0].payload;
-        return (
-          <div className="bg-white p-2 shadow-md rounded text-[#000000]">
-            <p className="font-semibold">{data.name}</p>
-            <p>{`${data.value.toLocaleString()} ETH`}</p>
-            <p>{`${data.percentage}% of total`}</p>
-          </div>
-        );
-      }
-      return null;
-    }}
-  />
-</Treemap>
-
+                data={majorOperatorData}
+                dataKey="value"
+                nameKey="name"
+                stroke="#fff"
+                aspectRatio={4 / 3}
+                isAnimationActive={false}
+                content={<CustomizedContent />} // Pass the class component instance
+              >
+                <RechartsTooltip
+                  content={({ payload }) => {
+                    if (payload && payload.length) {
+                      const data = payload[0].payload;
+                      return (
+                        <div className="bg-white p-2 shadow-md rounded text-[#000000]">
+                          <p className="font-semibold">{data.name}</p>
+                          <p>{`${data.value.toLocaleString()} ETH`}</p>
+                          <p>{`${data.percentage}% of total`}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+              </Treemap>
             </ResponsiveContainer>
           )}
         </CardContent>
