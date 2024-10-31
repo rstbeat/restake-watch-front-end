@@ -3,7 +3,6 @@ import {
   Treemap,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
-  TreemapNode,
 } from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -407,24 +406,25 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     return `hsl(280, 60%, ${lightness}%)`;
   };
 
-  interface CustomizedContentProps extends TreemapNode {
-    root?: any;
-    depth?: number;
+  interface CustomizedContentProps {
     x: number;
     y: number;
     width: number;
     height: number;
-    index?: number;
-    payload?: any;
-    rank?: any;
+    index: number;
+    depth: number;
     name: string;
     value: number;
+    root?: any;
+    payload?: any;
+    rank?: any;
+    children?: any;
   }
 
   // Convert to Functional Component and pass props directly
   const CustomizedContent: React.FC<CustomizedContentProps> = (props) => {
     const { x, y, width, height, name, value } = props;
-    const fillColor = getColor(value as number, maxValue);
+    const fillColor = getColor(value, maxValue);
 
     const minDimension = Math.min(width, height);
     const fontSize = Math.min(minDimension / 6, 14);
@@ -471,7 +471,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 fontWeight="400"
                 dominantBaseline="middle"
               >
-                {`${(value as number).toLocaleString()} ETH`}
+                {`${value.toLocaleString()} ETH`}
               </text>
             )}
           </>
