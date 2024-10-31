@@ -405,52 +405,40 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     return `hsl(280, 60%, ${lightness}%)`;
   };
 
-  interface CustomizedContentProps {
-    depth: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    name: string;
-    value: number;
-  }
+  const CustomizedContent = (props: any): React.ReactElement => {
+    const { depth, x, y, width, height, name, value } = props;
+    const fillColor = getColor(value, maxValue);
 
-  class CustomizedContent extends React.PureComponent<CustomizedContentProps> {
-    render() {
-      const { depth, x, y, width, height, name, value } = this.props;
-      const fillColor = getColor(value, maxValue);
+    // Only render labels for the first level and if the cell is big enough
+    const shouldRenderText = depth === 1 && width > 50 && height > 20;
 
-      // Only render labels for the first level and if the cell is big enough
-      const shouldRenderText = depth === 1 && width > 50 && height > 20;
-
-      return (
-        <g>
-          <rect
-            x={x}
-            y={y}
-            width={width}
-            height={height}
-            fill={fillColor}
-            stroke="#fff"
-            strokeWidth={1}
-          />
-          {shouldRenderText && (
-            <text
-              x={x + width / 2}
-              y={y + height / 2}
-              textAnchor="middle"
-              fill="#fff"
-              fontSize={14}
-              fontWeight="500"
-              dominantBaseline="middle"
-            >
-              {name}
-            </text>
-          )}
-        </g>
-      );
-    }
-  }
+    return (
+      <g>
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill={fillColor}
+          stroke="#fff"
+          strokeWidth={1}
+        />
+        {shouldRenderText && (
+          <text
+            x={x + width / 2}
+            y={y + height / 2}
+            textAnchor="middle"
+            fill="#fff"
+            fontSize={14}
+            fontWeight="500"
+            dominantBaseline="middle"
+          >
+            {name}
+          </text>
+        )}
+      </g>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -478,7 +466,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={<CustomizedContent />} // Pass the component instance
+                content={CustomizedContent} // Pass the function directly
               >
                 <RechartsTooltip
                   content={({ payload }) => {
