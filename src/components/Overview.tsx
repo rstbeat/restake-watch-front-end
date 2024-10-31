@@ -99,30 +99,19 @@ const CompactNotes = () => {
         <CardContent>
           <div className="text-sm text-gray-700 space-y-3">
             <p>
-              <strong>1. EIGEN Token:</strong> The value and distribution of the
-              EIGEN token are not yet factored into these metrics. This requires
-              further research to understand how its distribution may rebalance
-              the concentration of stake.
+              <strong>1. EIGEN Token and Other Strategies:</strong> The value and distribution of the EIGEN token and other strategies are not yet factored into these metrics. This requires further research to understand how their distribution may rebalance the concentration of stake.
             </p>
 
             <p>
-              <strong>2. ETH Value Conversion:</strong> To obtain the ETH value,
-              we perform conversions between assets on different strategies
-              (e.g., Lido, Swell). These conversion rates are variable. The
-              rates used in these calculations were last updated on October 5,
-              2023.
+              <strong>2. ETH Value Conversion:</strong> Tokens from strategies pegged to the ETH value like stETH or swETH are considered 1:1 with the ETH price, which is not the case. In a future iteration, we will account for this discrepancy.
             </p>
 
             <p>
-              <strong>3. Data Source:</strong> Currently, the metrics are
-              derived from data in the EigenLayer Delegation Manager smart
-              contract. Future iterations will incorporate data from additional
-              smart contracts for a more comprehensive analysis.
+              <strong>3. Data Source:</strong> Currently, the metrics are derived from data in the EigenLayer Delegation Manager smart contract. Future iterations will incorporate data from additional smart contracts for a more comprehensive analysis.
             </p>
 
             <p>
-              <strong>4. Future Enhancements:</strong> The Restake Watch project
-              is continuously evolving. Upcoming updates will include:
+              <strong>4. Future Enhancements:</strong> The Restake Watch project is continuously evolving. Upcoming updates will include:
             </p>
             <ul className="list-disc pl-5 space-y-1">
               <li>Additional concentration metrics</li>
@@ -132,8 +121,7 @@ const CompactNotes = () => {
             </ul>
 
             <p>
-              <strong>Note:</strong> These enhancements aim to provide a more
-              holistic view of the restaking ecosystem and its associated risks.
+              <strong>Note:</strong> These enhancements aim to provide a more holistic view of the restaking ecosystem and its associated risks.
             </p>
           </div>
         </CardContent>
@@ -141,6 +129,7 @@ const CompactNotes = () => {
     </Card>
   );
 };
+
 
 interface MetricCardProps {
   icon: LucideIcon;
@@ -487,6 +476,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     <div className="space-y-6">
       <RiskAssessment />
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
+      <CompactNotes />
       <Card>
         <CardHeader>
           <h2 className="text-xl font-semibold text-[#000000]">
@@ -502,30 +492,31 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           {majorOperatorData.length > 0 && (
             <ResponsiveContainer width="100%" height={400}>
               <Treemap
-                data={majorOperatorData}
-                dataKey="value"
-                nameKey="name"
-                stroke="#fff"
-                aspectRatio={4 / 3}
-                isAnimationActive={false}
-                content={CustomizedContent} // Corrected here
-              >
-                <RechartsTooltip
-                  content={({ payload }) => {
-                    if (payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                        <div className="bg-white p-2 shadow-md rounded text-[#000000]">
-                          <p className="font-semibold">{data.name}</p>
-                          <p>{`${data.value.toLocaleString()} ETH`}</p>
-                          <p>{`${data.percentage}% of total`}</p>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-              </Treemap>
+  data={majorOperatorData}
+  dataKey="value"
+  nameKey="name"
+  stroke="#fff"
+  aspectRatio={4 / 3}
+  isAnimationActive={false}
+  content={(props) => <CustomizedContent {...props} />} // Use a render function
+>
+  <RechartsTooltip
+    content={({ payload }) => {
+      if (payload && payload.length) {
+        const data = payload[0].payload;
+        return (
+          <div className="bg-white p-2 shadow-md rounded text-[#000000]">
+            <p className="font-semibold">{data.name}</p>
+            <p>{`${data.value.toLocaleString()} ETH`}</p>
+            <p>{`${data.percentage}% of total`}</p>
+          </div>
+        );
+      }
+      return null;
+    }}
+  />
+</Treemap>
+
             </ResponsiveContainer>
           )}
         </CardContent>
