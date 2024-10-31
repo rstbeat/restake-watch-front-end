@@ -52,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
           >
             <Heart className="h-4 w-4 text-inherit" />
-            <span className="ml-2">Donate</span>
+            <span className="ml-2">Collaborate or Donate</span>
           </Button>
         </Link>
       </nav>

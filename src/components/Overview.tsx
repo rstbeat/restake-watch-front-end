@@ -508,7 +508,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={<CustomizedContent />}
+                content={CustomizedContent} // Corrected here
               >
                 <RechartsTooltip
                   content={({ payload }) => {
