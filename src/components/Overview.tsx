@@ -396,18 +396,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     });
   }
 
-  // Compute the maximum value for color scaling
-  const maxValue = Math.max(...majorOperatorData.map((d) => d.value));
-
-  // Function to map values to colors
-  const getColor = (value: number, maxValue: number): string => {
-    const lightness = 80 - (50 * value) / maxValue;
-    return `hsl(280, 60%, ${lightness}%)`;
-  };
-
-  const CustomizedContent = (props: any): React.ReactElement => {
-    const { depth, x, y, width, height, name, value } = props;
-    const fillColor = getColor(value, maxValue);
+  // Define the CustomizedContent component with correct typing
+  const CustomizedContent: ContentRenderer<any> = (props) => {
+    const { depth, x, y, width, height, name } = props;
 
     // Only render labels for the first level and if the cell is big enough
     const shouldRenderText = depth === 1 && width > 50 && height > 20;
@@ -419,7 +410,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           y={y}
           width={width}
           height={height}
-          fill={fillColor}
+          fill="#7e22ce" // Your preferred color
           stroke="#fff"
           strokeWidth={1}
         />
@@ -466,7 +457,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#fff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={CustomizedContent} // Pass the function directly
+                content={CustomizedContent} // Use the correctly typed customized content
               >
                 <RechartsTooltip
                   content={({ payload }) => {
