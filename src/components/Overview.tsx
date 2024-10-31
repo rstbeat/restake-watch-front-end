@@ -396,6 +396,41 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     });
   }
 
+  // Define the CustomizedContent component to control cell rendering
+  function CustomizedContent(props: any): JSX.Element {
+    const { depth, x, y, width, height, name } = props;
+
+    // Only render labels for the first level and if the cell is big enough
+    const shouldRenderText = depth === 1 && width > 50 && height > 20;
+
+    return (
+      <g>
+        <rect
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          fill="#7e22ce" // Your preferred color
+          stroke="#fff"
+          strokeWidth={1}
+        />
+        {shouldRenderText && (
+          <text
+            x={x + width / 2}
+            y={y + height / 2}
+            textAnchor="middle"
+            fill="#fff"
+            fontSize={14}
+            fontWeight="500"
+            dominantBaseline="middle"
+          >
+            {name}
+          </text>
+        )}
+      </g>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <RiskAssessment />
@@ -420,9 +455,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 dataKey="value"
                 nameKey="name"
                 stroke="#fff"
-                fill="#8884d8" // Set a single color for all nodes
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
+                content={CustomizedContent} // Use the customized content
               >
                 <RechartsTooltip
                   content={({ payload }) => {
