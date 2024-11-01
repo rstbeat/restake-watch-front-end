@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
       <nav className="flex flex-col space-y-4 mt-8 p-4">
         <Link
-          href="https://hackmd.io/@espejelomar/BkgcuG4MR"
+          href="https://drive.proton.me/urls/58SJCC8N3C#luXJeS5zVfAM"
           target="_blank"
           rel="noopener noreferrer"
         >

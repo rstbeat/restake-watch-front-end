@@ -191,12 +191,12 @@ const RestakeWatch: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="h-5 w-5 text-white" />
                 <span>
-                  New release:{' '}
+                  New paper release:{' '}                  
                   <Link
-                    href="https://hackmd.io/@espejelomar/BkgcuG4MR"
+                    href="https://drive.proton.me/urls/58SJCC8N3C#luXJeS5zVfAM"
                     className="underline font-semibold hover:text-gray-200"
                   >
-                    A Hitchhikers Guide to Restaking and Its Risks
+                    Mirroring Risks: Lessons from Mainstream Finance in the Restaking Framework
                   </Link>
                 </span>
               </div>
