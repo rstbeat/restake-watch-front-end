@@ -351,6 +351,50 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
   );
 };
 
+const CustomTreemapContent = (props: any) => {
+  const { x, y, width, height, name, value, percentage, fill } = props;
+
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={fill}
+        stroke="#ffffff"
+        strokeWidth={2}
+      />
+      {width > 50 && height > 30 && (
+        <>
+          <text
+            x={x + width / 2}
+            y={y + height / 2}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="#ffffff"
+            className="font-bold"
+            fontSize={14}
+          >
+            {name}
+          </text>
+          <text
+            x={x + width / 2}
+            y={y + height / 2 + 20}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="#ffffff"
+            className="font-medium"
+            fontSize={12}
+          >
+            {`${percentage}%`}
+          </text>
+        </>
+      )}
+    </g>
+  );
+};
+
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
     null,
@@ -389,7 +433,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
             name: key.replaceAll('_', ' '),
             value: ethAmount,
             percentage: ((ethAmount / totalRestaked) * 100).toFixed(2),
-            fill: purpleColors[index % purpleColors.length], // Assign different purple shades
+            fill: purpleColors[index % purpleColors.length],
           };
         },
       );
@@ -434,58 +478,6 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 stroke="#ffffff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
-                content={({
-                  root,
-                  depth,
-                  x,
-                  y,
-                  width,
-                  height,
-                  name,
-                  value,
-                  percentage,
-                  fill,
-                }) => {
-                  return (
-                    <g>
-                      <rect
-                        x={x}
-                        y={y}
-                        width={width}
-                        height={height}
-                        fill={fill}
-                        stroke="#ffffff"
-                        strokeWidth={2}
-                      />
-                      {width > 50 && height > 30 && (
-                        <>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            fill="#ffffff" // White text for better contrast
-                            className="font-bold"
-                            fontSize={14}
-                          >
-                            {name}
-                          </text>
-                          <text
-                            x={x + width / 2}
-                            y={y + height / 2 + 20}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                            fill="#ffffff"
-                            className="font-medium"
-                            fontSize={12}
-                          >
-                            {`${percentage}%`}
-                          </text>
-                        </>
-                      )}
-                    </g>
-                  );
-                }}
               >
                 <RechartsTooltip
                   content={({ payload }) => {
