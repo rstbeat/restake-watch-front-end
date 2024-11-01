@@ -352,8 +352,8 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
 };
 
 const CustomTreemapContent = (props: any) => {
-  const { x, y, width, height, name, value, percentage, fill } = props;
-
+  const { root, x, y, width, height, name, value, percentage } = props;
+  
   return (
     <g>
       <rect
@@ -361,44 +361,34 @@ const CustomTreemapContent = (props: any) => {
         y={y}
         width={width}
         height={height}
-        fill={fill}
-        stroke="#ffffff"
-        strokeWidth={2}
+        style={{
+          fill: props.fill || '#9C27B0',
+          stroke: '#fff',
+          strokeWidth: 2,
+        }}
       />
       {width > 50 && height > 30 && (
-        <>
-          <text
-            x={x + width / 2}
-            y={y + height / 2}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="#ffffff"
-            className="font-bold"
-            fontSize={14}
-          >
-            {name}
-          </text>
-          <text
-            x={x + width / 2}
-            y={y + height / 2 + 20}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="#ffffff"
-            className="font-medium"
-            fontSize={12}
-          >
-            {`${percentage}%`}
-          </text>
-        </>
+        <text
+          x={x + width / 2}
+          y={y + height / 2}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          style={{
+            fill: '#ffffff',
+            fontSize: '14px',
+            fontFamily: 'sans-serif',
+            fontWeight: 500,
+          }}
+        >
+          {name}
+        </text>
       )}
     </g>
   );
 };
 
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
-  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
-    null,
-  );
+  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -413,42 +403,36 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     fetchData();
   }, []);
 
-  // Color array for different sections
+  // Color array for different sections (maintained from previous version)
   const purpleColors = [
-    '#9C27B0', // Deep purple
-    '#AB47BC',
-    '#BA68C8',
-    '#CE93D8',
-    '#E1BEE7',
-    '#F3E5F5',
+    '#9C27B0', // Base purple
+    '#8E24AA',
+    '#7B1FA2',
+    '#6A1B9A',
+    '#4A148C',
+    '#38006b'
   ];
 
   const totalRestaked = operatorData?.totalETHRestaked || 0;
   const majorOperatorData = !operatorData?.majorOperatorGroupMetrics
     ? []
-    : Object.entries(operatorData.majorOperatorGroupMetrics).map(
-        ([key, value], index) => {
-          const ethAmount = Number(value.total_eth_restaked.toFixed(2));
-          return {
-            name: key.replaceAll('_', ' '),
-            value: ethAmount,
-            percentage: ((ethAmount / totalRestaked) * 100).toFixed(2),
-            fill: purpleColors[index % purpleColors.length],
-          };
-        },
-      );
+    : Object.entries(operatorData.majorOperatorGroupMetrics).map(([key, value], index) => {
+        const ethAmount = Number(value.total_eth_restaked.toFixed(2));
+        return {
+          name: key.replaceAll('_', ' '),
+          value: ethAmount,
+          percentage: ((ethAmount / totalRestaked) * 100).toFixed(2),
+          fill: purpleColors[index % purpleColors.length]
+        };
+      });
 
-  if (
-    totalRestaked > majorOperatorData.reduce((acc, curr) => acc + curr.value, 0)
-  ) {
-    const othersAmount =
-      totalRestaked -
-      majorOperatorData.reduce((acc, curr) => acc + curr.value, 0);
+  if (totalRestaked > majorOperatorData.reduce((acc, curr) => acc + curr.value, 0)) {
+    const othersAmount = totalRestaked - majorOperatorData.reduce((acc, curr) => acc + curr.value, 0);
     majorOperatorData.push({
       name: 'Others',
       value: Number(othersAmount.toFixed(2)),
       percentage: ((othersAmount / totalRestaked) * 100).toFixed(2),
-      fill: purpleColors[majorOperatorData.length % purpleColors.length],
+      fill: purpleColors[majorOperatorData.length % purpleColors.length]
     });
   }
 
@@ -463,9 +447,8 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
             Share of Total Restaked ETH by Major Operators
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            This chart represents operator groups that manage multiple
-            individual operators. The data shown is the aggregated sum for each
-            group.
+            This chart represents operator groups that manage multiple individual operators. 
+            The data shown is the aggregated sum for each group.
           </p>
         </CardHeader>
         <CardContent>
@@ -475,7 +458,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 data={majorOperatorData}
                 dataKey="value"
                 nameKey="name"
-                stroke="#ffffff"
+                content={<CustomTreemapContent />}
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
               >
@@ -485,9 +468,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                       const data = payload[0].payload;
                       return (
                         <div className="bg-white p-3 shadow-lg rounded border border-purple-200">
-                          <p className="font-semibold text-black text-base">
-                            {data.name}
-                          </p>
+                          <p className="font-semibold text-black text-base">{data.name}</p>
                           <p className="text-black">{`${data.value.toLocaleString()} ETH`}</p>
                           <p className="text-black">{`${data.percentage}% of total`}</p>
                         </div>
