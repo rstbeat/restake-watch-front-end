@@ -369,16 +369,27 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     fetchData();
   }, []);
 
+  // Color array for different sections
+  const purpleColors = [
+    '#9C27B0', // Deep purple
+    '#AB47BC',
+    '#BA68C8',
+    '#CE93D8',
+    '#E1BEE7',
+    '#F3E5F5',
+  ];
+
   const totalRestaked = operatorData?.totalETHRestaked || 0;
   const majorOperatorData = !operatorData?.majorOperatorGroupMetrics
     ? []
     : Object.entries(operatorData.majorOperatorGroupMetrics).map(
-        ([key, value]) => {
+        ([key, value], index) => {
           const ethAmount = Number(value.total_eth_restaked.toFixed(2));
           return {
             name: key.replaceAll('_', ' '),
             value: ethAmount,
             percentage: ((ethAmount / totalRestaked) * 100).toFixed(2),
+            fill: purpleColors[index % purpleColors.length], // Assign different purple shades
           };
         },
       );
@@ -393,6 +404,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       name: 'Others',
       value: Number(othersAmount.toFixed(2)),
       percentage: ((othersAmount / totalRestaked) * 100).toFixed(2),
+      fill: purpleColors[majorOperatorData.length % purpleColors.length],
     });
   }
 
@@ -403,7 +415,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       <CompactNotes />
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold text-[#000000]">
+          <h2 className="text-xl font-semibold text-black">
             Share of Total Restaked ETH by Major Operators
           </h2>
           <p className="text-sm text-gray-600 mt-1">
@@ -419,20 +431,73 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 data={majorOperatorData}
                 dataKey="value"
                 nameKey="name"
-                stroke="#fff"
-                fill="#8884d8" // Set a single color for all nodes
+                stroke="#ffffff"
                 aspectRatio={4 / 3}
                 isAnimationActive={false}
+                content={({
+                  root,
+                  depth,
+                  x,
+                  y,
+                  width,
+                  height,
+                  name,
+                  value,
+                  percentage,
+                  fill,
+                }) => {
+                  return (
+                    <g>
+                      <rect
+                        x={x}
+                        y={y}
+                        width={width}
+                        height={height}
+                        fill={fill}
+                        stroke="#ffffff"
+                        strokeWidth={2}
+                      />
+                      {width > 50 && height > 30 && (
+                        <>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fill="#ffffff" // White text for better contrast
+                            className="font-bold"
+                            fontSize={14}
+                          >
+                            {name}
+                          </text>
+                          <text
+                            x={x + width / 2}
+                            y={y + height / 2 + 20}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fill="#ffffff"
+                            className="font-medium"
+                            fontSize={12}
+                          >
+                            {`${percentage}%`}
+                          </text>
+                        </>
+                      )}
+                    </g>
+                  );
+                }}
               >
                 <RechartsTooltip
                   content={({ payload }) => {
                     if (payload && payload.length) {
                       const data = payload[0].payload;
                       return (
-                        <div className="bg-white p-2 shadow-md rounded text-[#000000]">
-                          <p className="font-semibold">{data.name}</p>
-                          <p>{`${data.value.toLocaleString()} ETH`}</p>
-                          <p>{`${data.percentage}% of total`}</p>
+                        <div className="bg-white p-3 shadow-lg rounded border border-purple-200">
+                          <p className="font-semibold text-black text-base">
+                            {data.name}
+                          </p>
+                          <p className="text-black">{`${data.value.toLocaleString()} ETH`}</p>
+                          <p className="text-black">{`${data.percentage}% of total`}</p>
                         </div>
                       );
                     }

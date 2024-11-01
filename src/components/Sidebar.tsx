@@ -19,13 +19,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-[#e6e7ec] text-[#000000] font-bold">
       <div className="p-4">
-      <Image
-  src="/restake-watch-logo.png"
-  alt="Restake Watch Logo"
-  width={180} // Increased from 120 to 180 (50% bigger)
-  height={60} // Adjusted proportionally
-  className="h-15 w-auto mb-6" // Changed from h-10 to h-15 for 50% increase
-/>
+        <Image
+          src="/restake-watch-logo.png"
+          alt="Restake Watch Logo"
+          width={180} // Increased from 120 to 180 (50% bigger)
+          height={60} // Adjusted proportionally
+          className="h-15 w-auto mb-6" // Changed from h-10 to h-15 for 50% increase
+        />
         {children}
       </div>
       <nav className="flex flex-col space-y-4 mt-8 p-4">
