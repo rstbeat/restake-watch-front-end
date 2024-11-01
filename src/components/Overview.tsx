@@ -377,7 +377,8 @@ const CustomTreemapContent = (props: any) => {
             fill: '#ffffff',
             fontSize: '14px',
             fontFamily: 'sans-serif',
-            fontWeight: 500,
+            fontWeight: 700, // Changed from 500 to 700 for bolder text
+            textShadow: '1px 1px 2px rgba(0,0,0,0.3)' // Added subtle shadow for better readability
           }}
         >
           {name}

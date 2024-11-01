@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
           >
             <BookOpen className="h-4 w-4 text-inherit" />
-            <span className="ml-2">Blog</span>
+            <span className="ml-2">White Paper</span>
           </Button>
         </Link>
         <Link
