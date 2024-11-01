@@ -218,11 +218,8 @@ const RestakeWatch: React.FC = () => {
                 <div className="flex items-center space-x-4 w-full justify-between">
                   <div>
                     <h1 className="text-2xl font-bold tracking-tight sm:text-3xl mb-0">
-                      restake.watch
-                    </h1>
-                    <p className="text-sm sm:text-base italic font-light tracking-wide mt-0">
                       The L2Beat of the Restaking Ecosystem
-                    </p>
+                    </h1>                  
                   </div>
                   <div className="flex items-center space-x-4">
                     <a
