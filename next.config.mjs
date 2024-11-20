@@ -21,7 +21,7 @@ const nextConfig = {
             beforeFiles: [
                 {
                     source: "/restake/:path*",
-                    destination: "https://jnt1ylgihi.execute-api.us-east-1.amazonaws.com/prod/:path*",
+                    destination: "https://d2ekevhtqyh8ay.cloudfront.net/:path*",
                 },
             ],
         };
