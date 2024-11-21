@@ -60,17 +60,17 @@ const Roadmap: React.FC = () => {
             className="flex overflow-x-auto py-4 px-6 scrollbar-hide"
           >
             <TimelineItem
-              date="October 2023"
+              date="October 2024"
               title="Paper Launch"
               description="Launch of 'Mirroring Risks' paper and AVS information integration"
             />
             <TimelineItem
-              date="November 2023"
+              date="November 2024"
               title="DVT and Withdraws Risk Metrics"
               description="Adding DVT risk metrics and withdrawal times for operators"
             />
             <TimelineItem
-              date="December 2023"
+              date="December 2024"
               title="Liquidity & Staging"
               description="Liquidity measures metrics and staging system for operators and platforms"
             />

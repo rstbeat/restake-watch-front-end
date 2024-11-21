@@ -154,7 +154,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
     <div className="flex items-start justify-between">
       <div className="flex-1">
         <div className="flex items-center space-x-2">
-          <Icon className="h-5 w-5 text-gray-500" />
+          {/* <Icon className="h-5 w-5 text-gray-500" /> */}
           <h3 className="text-sm font-medium text-gray-600">{label}</h3>
           <Tooltip.Provider>
             <Tooltip.Root>
@@ -261,14 +261,13 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
       <Card>
         <CardContent className="pt-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Risk Metrics
+            Risk Summary
           </h3>
           <div className="space-y-6">
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                <Shield className="h-4 w-4 mr-2" />
+                {/* <Shield className="h-4 w-4 mr-2" /> */}
                 <a
-                  className="hover:underline"
                   href="https://x.com/TheRestakeWatch/status/1858871898051907985"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -298,7 +297,7 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
 
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                <Shield className="h-4 w-4 mr-2" />
+                {/* <Shield className="h-4 w-4 mr-2" /> */}
                 Restakers needed for 1/3 control
                 <Tooltip.Provider>
                   <Tooltip.Root>
@@ -325,7 +324,7 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
 
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                <Shield className="h-4 w-4 mr-2" />
+                {/* <Shield className="h-4 w-4 mr-2" /> */}
                 Operators needed for 1/3 control
                 <Tooltip.Provider>
                   <Tooltip.Root>
@@ -352,7 +351,7 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
 
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                <ServerCog className="h-4 w-4 mr-2" />
+                {/* <ServerCog className="h-4 w-4 mr-2" /> */}
                 DVT Operators (Obol)
                 <Tooltip.Provider>
                   <Tooltip.Root>
