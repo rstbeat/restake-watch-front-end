@@ -267,6 +267,38 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
                 <Shield className="h-4 w-4 mr-2" />
+                <a
+                  className="hover:underline"
+                  href="https://x.com/TheRestakeWatch/status/1858871898051907985"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Funds can be stolen if...
+                </a>
+              </h4>
+              <div>
+                <div className="flex items-center mt-2">
+                  <div className="w-8 flex items-center">
+                    <div className={`w-2 h-2 rounded-full bg-red-500`} />
+                  </div>
+                  <a
+                    className="ml-4 text-sm font-semibold text-gray-900 underline"
+                    href="https://x.com/TheRestakeWatch/status/1858871898051907985"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    1. A malicious actor compromises the governance structure of
+                    EigenLayer. The protocol relies on a 9-of-13 community
+                    multisig that can execute IMMEDIATE upgrades without a
+                    timelock <span className="text-red-500">(CRITICAL)</span>.
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium text-gray-600 flex items-center">
+                <Shield className="h-4 w-4 mr-2" />
                 Restakers needed for 1/3 control
                 <Tooltip.Provider>
                   <Tooltip.Root>
@@ -353,7 +385,7 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
 
 const CustomTreemapContent = (props: any) => {
   const { root, x, y, width, height, name, value, percentage } = props;
-  
+
   return (
     <g>
       <rect
@@ -378,7 +410,7 @@ const CustomTreemapContent = (props: any) => {
             fontSize: '14px',
             fontFamily: 'sans-serif',
             fontWeight: 700, // Changed from 500 to 700 for bolder text
-            textShadow: '1px 1px 2px rgba(0,0,0,0.3)' // Added subtle shadow for better readability
+            textShadow: '1px 1px 2px rgba(0,0,0,0.3)', // Added subtle shadow for better readability
           }}
         >
           {name}
@@ -389,7 +421,9 @@ const CustomTreemapContent = (props: any) => {
 };
 
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
-  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(null);
+  const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchData = async () => {
@@ -411,29 +445,35 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     '#7B1FA2',
     '#6A1B9A',
     '#4A148C',
-    '#38006b'
+    '#38006b',
   ];
 
   const totalRestaked = operatorData?.totalETHRestaked || 0;
   const majorOperatorData = !operatorData?.majorOperatorGroupMetrics
     ? []
-    : Object.entries(operatorData.majorOperatorGroupMetrics).map(([key, value], index) => {
-        const ethAmount = Number(value.total_eth_restaked.toFixed(2));
-        return {
-          name: key.replaceAll('_', ' '),
-          value: ethAmount,
-          percentage: ((ethAmount / totalRestaked) * 100).toFixed(2),
-          fill: purpleColors[index % purpleColors.length]
-        };
-      });
+    : Object.entries(operatorData.majorOperatorGroupMetrics).map(
+        ([key, value], index) => {
+          const ethAmount = Number(value.total_eth_restaked.toFixed(2));
+          return {
+            name: key.replaceAll('_', ' '),
+            value: ethAmount,
+            percentage: ((ethAmount / totalRestaked) * 100).toFixed(2),
+            fill: purpleColors[index % purpleColors.length],
+          };
+        },
+      );
 
-  if (totalRestaked > majorOperatorData.reduce((acc, curr) => acc + curr.value, 0)) {
-    const othersAmount = totalRestaked - majorOperatorData.reduce((acc, curr) => acc + curr.value, 0);
+  if (
+    totalRestaked > majorOperatorData.reduce((acc, curr) => acc + curr.value, 0)
+  ) {
+    const othersAmount =
+      totalRestaked -
+      majorOperatorData.reduce((acc, curr) => acc + curr.value, 0);
     majorOperatorData.push({
       name: 'Others',
       value: Number(othersAmount.toFixed(2)),
       percentage: ((othersAmount / totalRestaked) * 100).toFixed(2),
-      fill: purpleColors[majorOperatorData.length % purpleColors.length]
+      fill: purpleColors[majorOperatorData.length % purpleColors.length],
     });
   }
 
@@ -448,8 +488,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
             Share of Total Restaked ETH by Major Operators
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            This chart represents operator groups that manage multiple individual operators. 
-            The data shown is the aggregated sum for each group.
+            This chart represents operator groups that manage multiple
+            individual operators. The data shown is the aggregated sum for each
+            group.
           </p>
         </CardHeader>
         <CardContent>
@@ -469,7 +510,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                       const data = payload[0].payload;
                       return (
                         <div className="bg-white p-3 shadow-lg rounded border border-purple-200">
-                          <p className="font-semibold text-black text-base">{data.name}</p>
+                          <p className="font-semibold text-black text-base">
+                            {data.name}
+                          </p>
                           <p className="text-black">{`${data.value.toLocaleString()} ETH`}</p>
                           <p className="text-black">{`${data.percentage}% of total`}</p>
                         </div>
