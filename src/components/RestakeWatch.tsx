@@ -219,7 +219,7 @@ const RestakeWatch: React.FC = () => {
                   <div>
                     <h1 className="text-2xl font-bold tracking-tight sm:text-3xl mb-0">
                       The L2Beat of the Restaking Ecosystem
-                    </h1>                  
+                    </h1>
                   </div>
                   <div className="flex items-center space-x-4">
                     <a
@@ -291,6 +291,7 @@ const RestakeWatch: React.FC = () => {
                     </span>{' '}
                     run by the
                     <span className="font-medium"> Ethereum Foundation</span>.
+                    Any mistake is the fault of the Restake.Watch team.
                   </p>
                 </div>
               </div>

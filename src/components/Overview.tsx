@@ -216,6 +216,12 @@ interface EnhancedMetricsProps {
     concentrationMetrics?: {
       top33PercentCount?: number;
     };
+    majorOperatorGroupMetrics?: {
+      [operatorName: string]: {
+        total_eth_restaked: number;
+        total_market_share: number;
+      };
+    };
   } | null;
 }
 
@@ -223,41 +229,8 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
   restakeData,
   operatorData,
 }) => {
-  const restakerThresholds = { green: 20, yellow: 10 };
-  const operatorThresholds = { green: 15, yellow: 8 };
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card>
-        <CardContent className="pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Key Metrics
-          </h3>
-          <div className="grid grid-cols-1 gap-4">
-            <MetricCard
-              icon={Wallet}
-              label="Total Restaked ETH"
-              value={new Intl.NumberFormat('en-US').format(
-                operatorData?.totalETHRestaked || 0,
-              )}
-              tooltip="The total amount of ETH that has been restaked across all operators and strategies."
-            />
-            <MetricCard
-              icon={Users}
-              label="Active Operators"
-              value={operatorData?.activeEntities || 'N/A'}
-              tooltip="The number of operators currently active in the restaking ecosystem."
-            />
-            <MetricCard
-              icon={Network}
-              label="Active Restakers"
-              value={restakeData?.activeRestakers || 'N/A'}
-              tooltip="The total number of unique addresses that have restaked ETH."
-            />
-          </div>
-        </CardContent>
-      </Card>
-
+    <div className="flex flex-col gap-6">
       <Card>
         <CardContent className="pt-6">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
@@ -286,7 +259,7 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    1. A malicious actor compromises the governance structure of
+                    A malicious actor compromises the governance structure of
                     EigenLayer. The protocol relies on a 9-of-13 community
                     multisig that can execute IMMEDIATE upgrades without a
                     timelock <span className="text-red-500">(CRITICAL)</span>.
@@ -297,84 +270,118 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
 
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                {/* <Shield className="h-4 w-4 mr-2" /> */}
-                Restakers needed for 1/3 control
-                <Tooltip.Provider>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <InfoCircledIcon className="ml-2 h-4 w-4 text-gray-400 cursor-help" />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
-                        The minimum number of restakers required to control 1/3
-                        of total restaked ETH. Higher is better.
-                        <Tooltip.Arrow className="fill-gray-800" />
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
+                <div>AVSs security can be compromised if...</div>
               </h4>
-              <SemaphoreIndicator
-                value={
-                  restakeData?.concentrationMetrics?.top33PercentCount || 0
-                }
-                thresholds={restakerThresholds}
-              />
+              <div>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex flex-col mt-2 relative">
+                    <div
+                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
+                    />
+                    <div className="ml-6 text-sm font-semibold text-gray-900">
+                      1. P2P, which controls{' '}
+                      <span className="text-red-500">
+                        {operatorData?.majorOperatorGroupMetrics
+                          ? (
+                              operatorData?.majorOperatorGroupMetrics?.['P2P'][
+                                'total_market_share'
+                              ] * 100
+                            ).toFixed(2)
+                          : 0}
+                        %
+                      </span>{' '}
+                      of total restaked assets along its operators, becomes
+                      compromised. With this concentrated stake, P2P could
+                      simultaneously attack multiple AVSs, compromising the
+                      network's security{' '}
+                      <span className="text-red-500">(CRITICAL)</span>.
+                    </div>
+                  </div>
+                  <div className="flex flex-col relative">
+                    <div
+                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
+                    />
+                    <div className="ml-6 text-sm font-semibold text-gray-900">
+                      2.
+                      <span className="text-red-500">
+                        The top{' '}
+                        {operatorData?.concentrationMetrics
+                          ?.top33PercentCount || 0}{' '}
+                        operators
+                      </span>
+                      , who collectively control 33% of all restaked assets, get
+                      compromised or collude. Even a single operator getting
+                      compromised, slashed, or experiencing operational problems
+                      could trigger a cascading effect across multiple AVSs.
+                    </div>
+                  </div>
+                  <div className="flex flex-col relative">
+                    <div
+                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
+                    />
+                    <div className="ml-6 text-sm font-semibold text-gray-900">
+                      3.{' '}
+                      <span className="text-red-500">
+                        The top{' '}
+                        {restakeData?.concentrationMetrics?.top33PercentCount ||
+                          0}{' '}
+                        individual restakers
+                      </span>
+                      , who collectively control 33% of all restaked assets, get
+                      compromised, collude, slashed or experience operational
+                      problems could trigger a cascading effect across multiple
+                      AVSs.
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                {/* <Shield className="h-4 w-4 mr-2" /> */}
-                Operators needed for 1/3 control
-                <Tooltip.Provider>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <InfoCircledIcon className="ml-2 h-4 w-4 text-gray-400 cursor-help" />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
-                        The minimum number of operators required to control 1/3
-                        of total restaked ETH. Higher is better.
-                        <Tooltip.Arrow className="fill-gray-800" />
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
-              </h4>
-              <SemaphoreIndicator
-                value={
-                  operatorData?.concentrationMetrics?.top33PercentCount || 0
-                }
-                thresholds={operatorThresholds}
-              />
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                {/* <ServerCog className="h-4 w-4 mr-2" /> */}
-                DVT Operators (Obol)
-                <Tooltip.Provider>
-                  <Tooltip.Root>
-                    <Tooltip.Trigger asChild>
-                      <InfoCircledIcon className="ml-2 h-4 w-4 text-gray-400 cursor-help" />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
-                        DVT enables validators to be run by multiple machines,
-                        enhancing security and reducing slashing risk.
-                        <Tooltip.Arrow className="fill-gray-800" />
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </Tooltip.Provider>
+                AVSs security is improved by...
               </h4>
               <div className="mt-2 flex items-center">
-                <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                <span className="ml-2 text-2xl font-semibold text-gray-900">
-                  7
+                <div className="w-8">
+                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                </div>
+                <span className="ml-2 text-sm font-semibold text-gray-900">
+                  <span className="text-red-500">7</span> validator operators
+                  are running distributed validator technology by Obol
+                  Collective, providing higher validator uptime through
+                  fault-tolerance and reduced slashing risk via key sharing.
                 </span>
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardContent className="pt-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            Key Metrics
+          </h3>
+          <div className="grid grid-cols-1 gap-4">
+            <MetricCard
+              icon={Wallet}
+              label="Total Restaked ETH"
+              value={new Intl.NumberFormat('en-US').format(
+                operatorData?.totalETHRestaked || 0,
+              )}
+              tooltip="The total amount of ETH that has been restaked across all operators and strategies."
+            />
+            <MetricCard
+              icon={Users}
+              label="Active Operators"
+              value={operatorData?.activeEntities || 'N/A'}
+              tooltip="The number of operators currently active in the restaking ecosystem."
+            />
+            <MetricCard
+              icon={Network}
+              label="Active Restakers"
+              value={restakeData?.activeRestakers || 'N/A'}
+              tooltip="The total number of unique addresses that have restaked ETH."
+            />
           </div>
         </CardContent>
       </Card>
@@ -478,7 +485,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
 
   return (
     <div className="space-y-6">
-      <RiskAssessment />
+      {/* <RiskAssessment /> */}
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
       <CompactNotes />
       <Card>
