@@ -5,8 +5,8 @@ import {
   Twitter,
   ChevronRight,
   MessageCircle,
+  Menu,
 } from 'lucide-react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -26,11 +26,9 @@ import Overview from './Overview';
 import Footer from './Footer';
 import Roadmap from './Roadmap';
 import About from './About';
-import {
-  StakerData,
-  OperatorDataResponse,
-} from '../app/interface/operatorData.interface';
+import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchStakerData, fetchOperatorData } from '../app/api/restake/restake';
+import { Dialog, DialogClose, DialogContent } from '@radix-ui/react-dialog';
 
 type PlatformType = 'eigenlayer' | 'symbiotic' | 'karak';
 
@@ -48,6 +46,8 @@ const RestakeWatch: React.FC = () => {
   );
   const [isLoadingStakerData, setIsLoadingStakerData] = useState(false);
   const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
+
+  const [isSetModalOpen, setOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -221,7 +221,7 @@ const RestakeWatch: React.FC = () => {
                       The L2Beat of the Restaking Ecosystem
                     </h1>
                   </div>
-                  <div className="flex items-center space-x-4">
+                  <div className="hidden lg:flex items-center space-x-4">
                     <a
                       href="https://twitter.com/therestakewatch"
                       target="_blank"
@@ -252,6 +252,16 @@ const RestakeWatch: React.FC = () => {
                     >
                       Learn More
                       <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="block md:hidden">
+                    <Button
+                      size="sm"
+                      className="bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
+                      onClick={() => setIsMobileSidebarOpen(true)}
+                    >
+                      <Menu className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
