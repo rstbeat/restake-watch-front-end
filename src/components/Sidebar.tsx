@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Heart } from 'lucide-react';
+import { BookOpen, Heart, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -17,7 +17,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   children,
 }) => {
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-[#e6e7ec] text-[#000000] font-bold">
+    <div className="flex flex-col h-full bg-[#e6e7ec] text-[#000000] font-bold relative pb-14">
       <div className="p-4">
         <Image
           src="/restake-watch-logo.png"
@@ -56,6 +56,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           </Button>
         </Link>
       </nav>
+
+      <Button
+        size="sm"
+        className="md:hidden w-24 self-center absolute bottom-2  bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
+        onClick={() => setIsMobileOpen(false)}
+      >
+        Close
+        <X className="ml-2 h-4 w-4" />
+      </Button>
     </div>
   );
 
