@@ -51,13 +51,6 @@ const About: React.FC = () => {
           the broader ecosystem, providing critical insights needed to navigate
           the evolving world of restaking.
         </p>
-
-        <div className="flex items-center justify-end mt-4 text-gray-500 italic">
-          <Coffee className="w-4 h-4 mr-2" />
-          <p className="text-xs">
-            Powered by coffee and a burning desire to understand restaking.
-          </p>
-        </div>
       </CardContent>
     </Card>
   );

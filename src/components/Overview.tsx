@@ -339,6 +339,28 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
 
             <div>
               <h4 className="text-sm font-medium text-gray-600 flex items-center">
+                He system becomes more fragile when...
+              </h4>
+              <div className="mt-2 flex items-center">
+                <div className="w-8">
+                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                </div>
+                <span className="ml-2 text-sm font-semibold text-gray-900">
+                  Only a few AVSs are permissionless regarding operator
+                  participation. Currently, only{' '}
+                  <span className="text-red-500">
+                    2 (out of 19) AVSs allow operators to secure them without
+                    whitelisting
+                  </span>{' '}
+                  or imposing stringent requirements. This limited
+                  permissionless participation makes the ecosystem more
+                  fragile.
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium text-gray-600 flex items-center">
                 AVSs security is improved by...
               </h4>
               <div className="mt-2 flex items-center">
@@ -347,9 +369,9 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
                 </div>
                 <span className="ml-2 text-sm font-semibold text-gray-900">
                   <span className="text-red-500">7</span> validator operators
-                  are running distributed validator technology by Obol
-                  Collective, providing higher validator uptime through
-                  fault-tolerance and reduced slashing risk via key sharing.
+                  running distributed validator technology by Obol Collective,
+                  providing higher validator uptime through fault-tolerance and
+                  reduced slashing risk via key sharing.
                 </span>
               </div>
             </div>
