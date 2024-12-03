@@ -11,16 +11,15 @@ import {
   AlertTriangle,
   ChevronDown,
   ChevronUp,
-  Shield,
   Users,
   Wallet,
   Network,
-  ServerCog,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchOperatorData } from '../app/api/restake/restake';
 import { LucideIcon } from 'lucide-react';
+import { Skeleton } from '@mui/material';
 
 interface OverviewProps {
   restakeData: any | null;
@@ -237,144 +236,160 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
             Risk Summary
           </h3>
           <div className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                {/* <Shield className="h-4 w-4 mr-2" /> */}
-                <a
-                  href="https://x.com/TheRestakeWatch/status/1858871898051907985"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Funds can be stolen if...
-                </a>
-              </h4>
+            {!operatorData?.concentrationMetrics ? (
+              <Skeleton variant="rounded" width="100%" height={60} />
+            ) : (
               <div>
-                <div className="flex items-center mt-2">
-                  <div className="w-8 flex items-center">
-                    <div className={`w-2 h-2 rounded-full bg-red-500`} />
-                  </div>
+                <h4 className="text-sm font-medium text-gray-600 flex items-center">
                   <a
-                    className="ml-4 text-sm font-semibold text-gray-900 underline"
                     href="https://x.com/TheRestakeWatch/status/1858871898051907985"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    A malicious actor compromises the governance structure of
-                    EigenLayer. The protocol relies on a 9-of-13 community
-                    multisig that can execute IMMEDIATE upgrades without a
-                    timelock <span className="text-red-500">(CRITICAL)</span>.
+                    Funds can be stolen if...
                   </a>
+                </h4>
+                <div>
+                  <div className="flex items-center mt-2">
+                    <div className="w-8 flex items-center">
+                      <div className={`w-2 h-2 rounded-full bg-red-500`} />
+                    </div>
+                    <a
+                      className="ml-4 text-sm font-semibold text-gray-900 underline"
+                      href="https://x.com/TheRestakeWatch/status/1858871898051907985"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      A malicious actor compromises the governance structure of
+                      EigenLayer. The protocol relies on a 9-of-13 community
+                      multisig that can execute IMMEDIATE upgrades without a
+                      timelock <span className="text-red-500">(CRITICAL)</span>.
+                    </a>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                <div>AVSs security can be compromised if...</div>
-              </h4>
+            {!operatorData?.concentrationMetrics ? (
+              <Skeleton variant="rounded" width="100%" height={60} />
+            ) : (
               <div>
-                <div className="flex flex-col items-center gap-4">
-                  <div className="flex flex-col mt-2 relative">
-                    <div
-                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
-                    />
-                    <div className="ml-6 text-sm font-semibold text-gray-900">
-                      1. P2P, which controls{' '}
-                      <span className="text-red-500">
-                        {operatorData?.majorOperatorGroupMetrics
-                          ? (
-                              operatorData?.majorOperatorGroupMetrics?.['P2P'][
-                                'total_market_share'
-                              ] * 100
-                            ).toFixed(2)
-                          : 0}
-                        %
-                      </span>{' '}
-                      of total restaked assets along its operators, becomes
-                      compromised. With this concentrated stake, P2P could
-                      simultaneously attack multiple AVSs, compromising the
-                      network's security{' '}
-                      <span className="text-red-500">(CRITICAL)</span>.
+                <h4 className="text-sm font-medium text-gray-600 flex items-center">
+                  <div>AVSs security can be compromised if...</div>
+                </h4>
+                <div>
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="flex flex-col mt-2 relative">
+                      <div
+                        className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
+                      />
+                      <div className="ml-6 text-sm font-semibold text-gray-900">
+                        1. P2P, which controls{' '}
+                        <span className="text-red-500">
+                          {operatorData?.majorOperatorGroupMetrics
+                            ? (
+                                operatorData?.majorOperatorGroupMetrics?.[
+                                  'P2P'
+                                ]['total_market_share'] * 100
+                              ).toFixed(2)
+                            : 0}
+                          %
+                        </span>{' '}
+                        of total restaked assets along its operators, becomes
+                        compromised. With this concentrated stake, P2P could
+                        simultaneously attack multiple AVSs, compromising the
+                        network's security{' '}
+                        <span className="text-red-500">(CRITICAL)</span>.
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col relative">
-                    <div
-                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
-                    />
-                    <div className="ml-6 text-sm font-semibold text-gray-900">
-                      2.
-                      <span className="text-red-500">
-                        The top{' '}
-                        {operatorData?.concentrationMetrics
-                          ?.top33PercentCount || 0}{' '}
-                        operators
-                      </span>
-                      , who collectively control 33% of all restaked assets, get
-                      compromised or collude. Even a single operator getting
-                      compromised, slashed, or experiencing operational problems
-                      could trigger a cascading effect across multiple AVSs.
+                    <div className="flex flex-col relative">
+                      <div
+                        className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
+                      />
+                      <div className="ml-6 text-sm font-semibold text-gray-900">
+                        2.
+                        <span className="text-red-500">
+                          The top{' '}
+                          {operatorData?.concentrationMetrics
+                            ?.top33PercentCount || 0}{' '}
+                          operators
+                        </span>
+                        , who collectively control 33% of all restaked assets,
+                        get compromised or collude. Even a single operator
+                        getting compromised, slashed, or experiencing
+                        operational problems could trigger a cascading effect
+                        across multiple AVSs.
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col relative">
-                    <div
-                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
-                    />
-                    <div className="ml-6 text-sm font-semibold text-gray-900">
-                      3.{' '}
-                      <span className="text-red-500">
-                        The top{' '}
-                        {restakeData?.concentrationMetrics?.top33PercentCount ||
-                          0}{' '}
-                        individual restakers
-                      </span>
-                      , who collectively control 33% of all restaked assets, get
-                      compromised, collude, slashed or experience operational
-                      problems could trigger a cascading effect across multiple
-                      AVSs.
+                    <div className="flex flex-col relative">
+                      <div
+                        className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
+                      />
+                      <div className="ml-6 text-sm font-semibold text-gray-900">
+                        3.{' '}
+                        <span className="text-red-500">
+                          The top{' '}
+                          {restakeData?.concentrationMetrics
+                            ?.top33PercentCount || 0}{' '}
+                          individual restakers
+                        </span>
+                        , who collectively control 33% of all restaked assets,
+                        get compromised, collude, slashed or experience
+                        operational problems could trigger a cascading effect
+                        across multiple AVSs.
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                He system becomes more fragile when...
-              </h4>
-              <div className="mt-2 flex items-center">
-                <div className="w-8">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
+            {!operatorData?.concentrationMetrics ? (
+              <Skeleton variant="rounded" width="100%" height={60} />
+            ) : (
+              <div>
+                <h4 className="text-sm font-medium text-gray-600 flex items-center">
+                  He system becomes more fragile when...
+                </h4>
+                <div className="mt-2 flex items-center">
+                  <div className="w-8">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                  </div>
+                  <span className="ml-2 text-sm font-semibold text-gray-900">
+                    Only a few AVSs are permissionless regarding operator
+                    participation. Currently, only{' '}
+                    <span className="text-red-500">
+                      2 (out of 19) AVSs allow operators to secure them without
+                      whitelisting
+                    </span>{' '}
+                    or imposing stringent requirements. This limited
+                    permissionless participation makes the ecosystem more
+                    fragile.
+                  </span>
                 </div>
-                <span className="ml-2 text-sm font-semibold text-gray-900">
-                  Only a few AVSs are permissionless regarding operator
-                  participation. Currently, only{' '}
-                  <span className="text-red-500">
-                    2 (out of 19) AVSs allow operators to secure them without
-                    whitelisting
-                  </span>{' '}
-                  or imposing stringent requirements. This limited
-                  permissionless participation makes the ecosystem more
-                  fragile.
-                </span>
               </div>
-            </div>
+            )}
 
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                AVSs security is improved by...
-              </h4>
-              <div className="mt-2 flex items-center">
-                <div className="w-8">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
+            {!operatorData?.concentrationMetrics ? (
+              <Skeleton variant="rounded" width="100%" height={60} />
+            ) : (
+              <div>
+                <h4 className="text-sm font-medium text-gray-600 flex items-center">
+                  AVSs security is improved by...
+                </h4>
+                <div className="mt-2 flex items-center">
+                  <div className="w-8">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500" />
+                  </div>
+                  <span className="ml-2 text-sm font-semibold text-gray-900">
+                    <span className="text-red-500">7</span> validator operators
+                    running distributed validator technology by Obol Collective,
+                    providing higher validator uptime through fault-tolerance
+                    and reduced slashing risk via key sharing.
+                  </span>
                 </div>
-                <span className="ml-2 text-sm font-semibold text-gray-900">
-                  <span className="text-red-500">7</span> validator operators
-                  running distributed validator technology by Obol Collective,
-                  providing higher validator uptime through fault-tolerance and
-                  reduced slashing risk via key sharing.
-                </span>
               </div>
-            </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -384,26 +399,38 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
             Key Metrics
           </h3>
           <div className="grid grid-cols-1 gap-4">
-            <MetricCard
-              icon={Wallet}
-              label="Total Restaked ETH"
-              value={new Intl.NumberFormat('en-US').format(
-                operatorData?.totalETHRestaked || 0,
-              )}
-              tooltip="The total amount of ETH that has been restaked across all operators and strategies."
-            />
-            <MetricCard
-              icon={Users}
-              label="Active Operators"
-              value={operatorData?.activeEntities || 'N/A'}
-              tooltip="The number of operators currently active in the restaking ecosystem."
-            />
-            <MetricCard
-              icon={Network}
-              label="Active Restakers"
-              value={restakeData?.activeRestakers || 'N/A'}
-              tooltip="The total number of unique addresses that have restaked ETH."
-            />
+            {!operatorData ? (
+              <Skeleton variant="rounded" width="100%" height={60} />
+            ) : (
+              <MetricCard
+                icon={Wallet}
+                label="Total Restaked ETH"
+                value={new Intl.NumberFormat('en-US').format(
+                  operatorData?.totalETHRestaked || 0,
+                )}
+                tooltip="The total amount of ETH that has been restaked across all operators and strategies."
+              />
+            )}
+            {!operatorData ? (
+              <Skeleton variant="rounded" width="100%" height={60} />
+            ) : (
+              <MetricCard
+                icon={Users}
+                label="Active Operators"
+                value={operatorData?.activeEntities || 'N/A'}
+                tooltip="The number of operators currently active in the restaking ecosystem."
+              />
+            )}
+            {!operatorData ? (
+              <Skeleton variant="rounded" width="100%" height={60} />
+            ) : (
+              <MetricCard
+                icon={Network}
+                label="Active Restakers"
+                value={restakeData?.activeRestakers || 'N/A'}
+                tooltip="The total number of unique addresses that have restaked ETH."
+              />
+            )}
           </div>
         </CardContent>
       </Card>
@@ -522,7 +549,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           </p>
         </CardHeader>
         <CardContent>
-          {majorOperatorData.length > 0 && (
+          {!majorOperatorData.length ? (
+            <Skeleton variant="rounded" width="100%" height={400} />
+          ) : (
             <ResponsiveContainer width="100%" height={400}>
               <Treemap
                 data={majorOperatorData}
