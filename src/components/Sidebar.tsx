@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       </div>
       <nav className="flex flex-col space-y-4 mt-8 p-4">
         <Link
-          href="https://drive.proton.me/urls/58SJCC8N3C#luXJeS5zVfAM"
+          href="https://hackmd.io/@espejelomar/H14XiPt51g"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
           >
             <BookOpen className="h-4 w-4 text-inherit" />
-            <span className="ml-2">White Paper</span>
+            <span className="ml-2">Metrics Paper</span>
           </Button>
         </Link>
         <Link

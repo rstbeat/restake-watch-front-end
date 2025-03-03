@@ -192,11 +192,10 @@ const RestakeWatch: React.FC = () => {
                 <span>
                   New paper release:{' '}
                   <Link
-                    href="https://drive.proton.me/urls/58SJCC8N3C#luXJeS5zVfAM"
+                    href="https://hackmd.io/@espejelomar/H14XiPt51g"
                     className="underline font-semibold hover:text-gray-200"
                   >
-                    Mirroring Risks: Lessons from Mainstream Finance in the
-                    Restaking Framework
+                    Fortify or Falter: A Comprehensive Restaking Risk Assessment
                   </Link>
                 </span>
               </div>
@@ -279,32 +278,43 @@ const RestakeWatch: React.FC = () => {
                 </div>
               )}
 
-              {/* Ethereum Foundation Support Section */}
+              {/* Ethereum Foundation and Obol Support Section */}
               <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
                 <div className="flex items-center space-x-3">
-                  <div className="relative h-6 w-6">
-                    <Image
-                      src="/ethereum-logo.png"
-                      alt="Ethereum Logo"
-                      fill
-                      className="object-contain"
-                      sizes="24px"
-                      priority
-                    />
+                  <div className="flex space-x-2">
+                    <div className="relative h-6 w-6">
+                      <Image
+                        src="/ethereum-logo.png"
+                        alt="Ethereum Logo"
+                        fill
+                        className="object-contain"
+                        sizes="24px"
+                        priority
+                      />
+                    </div>
+                    <div className="relative h-6 w-6">
+                      <Image
+                        src="/obol-logo.png"
+                        alt="Obol Logo"
+                        fill
+                        className="object-contain"
+                        sizes="24px"
+                        priority
+                      />
+                    </div>
                   </div>
                   <p className="text-sm text-gray-600">
-                    A Public Good company supported by a grant from the
+                    A company supported by grants from the
                     <span className="font-medium">
                       {' '}
-                      Ecosystem Support Program
+                      Ethereum Foundation (ESP)
                     </span>{' '}
-                    run by the
-                    <span className="font-medium"> Ethereum Foundation</span>.
+                    
+                    <span className="font-medium"> and Obol Collective</span>.
                     Any mistake is the fault of the Restake.Watch team.
                   </p>
                 </div>
               </div>
-
               {renderContent()}
 
               <Roadmap />

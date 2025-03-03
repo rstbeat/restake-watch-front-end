@@ -1,25 +1,47 @@
 import React, { useRef, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, CheckCircle, ExternalLink } from 'lucide-react';
 
 interface TimelineItemProps {
   date: string;
   title: string;
   description: string;
+  completed?: boolean;
+  link?: string;
+  highlighted?: boolean;
 }
 
 const TimelineItem: React.FC<TimelineItemProps> = ({
   date,
   title,
   description,
+  completed = false,
+  link,
+  highlighted = false
 }) => (
   <div className="flex-shrink-0 w-64 mr-8">
-    <div className="bg-white p-4 rounded-lg shadow-md h-full border-t-4 border-[#1a202c]">
-      <time className="text-sm font-medium text-[#1a202c] mb-2 block">
-        {date}
-      </time>
+    <div className={`bg-white p-4 rounded-lg shadow-md h-full border-t-4 ${
+      completed ? 'border-green-600' : 
+      highlighted ? 'border-purple-600' : 'border-[#1a202c]'
+    }`}>
+      <div className="flex justify-between items-start mb-2">
+        <time className="text-sm font-medium text-[#1a202c] block">
+          {date}
+        </time>
+        {completed && <CheckCircle className="h-5 w-5 text-green-600" />}
+      </div>
       <h3 className="text-lg font-semibold text-[#1a202c] mb-2">{title}</h3>
       <p className="text-sm text-gray-600">{description}</p>
+      {link && (
+        <a 
+          href={link} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
+        >
+          View Paper <ExternalLink className="ml-1 h-3 w-3" />
+        </a>
+      )}
     </div>
   </div>
 );
@@ -48,9 +70,9 @@ const Roadmap: React.FC = () => {
   return (
     <Card className="mt-8 overflow-hidden">
       <CardHeader>
-        <h2 className="text-2xl font-bold text-[#1a202c]">Roadmap</h2>
+        <h2 className="text-2xl font-bold text-[#1a202c]">EigenLayer Metrics Roadmap</h2>
         <p className="text-sm text-gray-600">
-          Our upcoming milestones and features
+          Our upcoming milestones and metrics implementation for the EigenLayer ecosystem
         </p>
       </CardHeader>
       <CardContent className="p-0">
@@ -60,24 +82,42 @@ const Roadmap: React.FC = () => {
             className="flex overflow-x-auto py-4 px-6 scrollbar-hide"
           >
             <TimelineItem
-              date="October 2024"
-              title="Paper Launch"
-              description="Launch of 'Mirroring Risks' paper and AVS information integration"
+              date="March 2025"
+              title="Fortify or Falter Paper"
+              description="Release of research paper with metrics design for the restaking ecosystem"
+              completed={true}
+              link="https://hackmd.io/eYiQLgHhS428QQD28_ObaQ"
             />
             <TimelineItem
-              date="November 2024"
-              title="DVT and Withdraws Risk Metrics"
-              description="Adding DVT risk metrics and withdrawal times for operators"
+              date="March 2025"
+              title="ECI Implementation"
+              description="Launch of Exposure Concentration Index (ECI) metric for EigenLayer"
             />
             <TimelineItem
-              date="December 2024"
-              title="Liquidity & Staging"
-              description="Liquidity measures metrics and staging system for operators and platforms"
+              date="March 2025"
+              title="WCI Implementation"
+              description="Launch of Whitelisting Concentration Index (WCI) metric for EigenLayer"
             />
             <TimelineItem
-              date="January 2024"
-              title="Symbiotic Integration"
-              description="Adding Symbiotic data to our platform"
+              date="April 2025"
+              title="GBP Implementation"
+              description="Launch of Governance Bribery Potential (GBP) metric for EigenLayer"
+            />
+            <TimelineItem
+              date="April 2025"
+              title="CAPVAR Implementation"
+              description="Launch of Cross-Asset Price & Volatile Asset Risk (CAPVAR) metric for EigenLayer"
+            />
+            <TimelineItem
+              date="April 2025"
+              title="CF Implementation"
+              description="Launch of Contagion Factor (CF) metric for EigenLayer"
+            />
+            <TimelineItem
+              date="May 2025"
+              title="Symbiotic Data"
+              description="Integration of symbiotic operator, restakers, and network concentration data - a particularly interesting expansion"
+              highlighted={true}
             />
           </div>
           <div className="absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-white pointer-events-none"></div>
