@@ -17,25 +17,28 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
   description,
   completed = false,
   link,
-  highlighted = false
+  highlighted = false,
 }) => (
   <div className="flex-shrink-0 w-64 mr-8">
-    <div className={`bg-white p-4 rounded-lg shadow-md h-full border-t-4 ${
-      completed ? 'border-green-600' : 
-      highlighted ? 'border-purple-600' : 'border-[#1a202c]'
-    }`}>
+    <div
+      className={`bg-white p-4 rounded-lg shadow-md h-full border-t-4 ${
+        completed
+          ? 'border-green-600'
+          : highlighted
+            ? 'border-purple-600'
+            : 'border-[#1a202c]'
+      }`}
+    >
       <div className="flex justify-between items-start mb-2">
-        <time className="text-sm font-medium text-[#1a202c] block">
-          {date}
-        </time>
+        <time className="text-sm font-medium text-[#1a202c] block">{date}</time>
         {completed && <CheckCircle className="h-5 w-5 text-green-600" />}
       </div>
       <h3 className="text-lg font-semibold text-[#1a202c] mb-2">{title}</h3>
       <p className="text-sm text-gray-600">{description}</p>
       {link && (
-        <a 
-          href={link} 
-          target="_blank" 
+        <a
+          href={link}
+          target="_blank"
           rel="noopener noreferrer"
           className="mt-2 inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
         >
@@ -70,9 +73,12 @@ const Roadmap: React.FC = () => {
   return (
     <Card className="mt-8 overflow-hidden">
       <CardHeader>
-        <h2 className="text-2xl font-bold text-[#1a202c]">EigenLayer Metrics Roadmap</h2>
+        <h2 className="text-2xl font-bold text-[#1a202c]">
+          EigenLayer Metrics Roadmap
+        </h2>
         <p className="text-sm text-gray-600">
-          Our upcoming milestones and metrics implementation for the EigenLayer ecosystem
+          Our upcoming milestones and metrics implementation for the EigenLayer
+          ecosystem
         </p>
       </CardHeader>
       <CardContent className="p-0">

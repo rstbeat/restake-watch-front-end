@@ -309,7 +309,6 @@ const RestakeWatch: React.FC = () => {
                       {' '}
                       Ethereum Foundation (ESP)
                     </span>{' '}
-                    
                     <span className="font-medium"> and Obol Collective</span>.
                     Any mistake is the fault of the Restake.Watch team.
                   </p>

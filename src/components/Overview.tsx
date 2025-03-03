@@ -353,8 +353,7 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
                     whitelisting
                   </span>{' '}
                   or imposing stringent requirements. This limited
-                  permissionless participation makes the ecosystem more
-                  fragile.
+                  permissionless participation makes the ecosystem more fragile.
                 </span>
               </div>
             </div>
