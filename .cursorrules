@@ -1,0 +1,102 @@
+{
+  "language": "typescript",
+  "framework": "nextjs",
+  "api": {
+    "docs": [
+      "https://nextjs.org/docs",
+      "https://react.dev/learn",
+      "https://tailwindcss.com/docs",
+      "https://ui.shadcn.com/docs"
+    ],
+    "refresh": "daily"
+  },
+  "strict": true,
+  "include": [
+    "src/**/*.{ts,tsx,js,jsx,css,mjs,md}",
+    ".github/**/*",
+    "!.next/**/*",
+    "!node_modules/**/*",
+    "!dist/**/*",
+    "!build/**/*",
+    "!out/**/*",
+    "!coverage/**/*",
+    "!tmp/**/*",
+    "!.vscode/*",
+    "!.cursorignore",
+    "!.prettierrc",
+    "!.eslintrc.json",
+    "!.gitignore",
+    "!bun.lockb",
+    "!*.log",
+    "!*.sw?",
+    "!*.DS_Store",
+    "!*.pem",
+    "!*.tsbuildinfo",
+    "!next-env.d.ts",
+        ".gitignore"
+  ],
+  "exclude": [
+      ".next/**/*",
+      "node_modules/**/*",
+      "dist/**/*",
+      "build/**/*",
+      "out/**/*",
+      "coverage/**/*",
+      "tmp/**/*",
+      ".vscode/*",
+      "bun.lockb",
+      "*.log",
+      "*.sw?",
+      "*.DS_Store",
+      "*.pem",
+      "*.tsbuildinfo",
+       "next-env.d.ts"
+  ],
+    "allow_patterns_in_gitignore": true,
+  "patterns": {
+    "useClientDirective": {
+      "pattern": "src/components/(?!.*\\.client\\.tsx$).*\\.tsx$",
+      "message": "Consider using the 'use client' directive in your component files for client-side rendering.  If this is a server component, rename the file to have a .server.tsx extension."
+    },
+      "avoidClassComponents": {
+      "pattern": "class\\s+\\w+\\s+extends\\s+(React\\.Component|Component)",
+      "message": "Use functional components with hooks instead of class components."
+    },
+    "noAny": {
+      "pattern": ":\\s*any",
+      "message": "Avoid using 'any' type.  Use a more specific type or create an interface/type."
+    },
+        "absoluteImports": {
+        "pattern": "import\\s+.*\\s+from\\s+['\"]\\.\\.?\\/",
+        "message": "Use absolute imports (e.g., 'import { ... } from '@/components/...' instead of relative imports (e.g., 'import { ... } from '../../components/...')."
+    },
+        "noConsoleLog":{
+          "pattern": "console\\.log",
+          "message" : "Remove console.log statements before committing."
+        },
+        "correctCSSImport": {
+          "pattern": "import\\s+.*\\s+from\\s+['\"](.+\\.module\\.css)['\"];?",
+          "replacement": "import styles from '$1';",
+          "message": "Use named imports for CSS modules (e.g., import styles from './MyComponent.module.css')."
+      },
+    "serverComponentNaming":{
+        "pattern": "src/app/.*[^(\\.server)]\\.tsx$",
+        "message": "Files directly inside src/app/ should be named with .server.tsx extension if server component, or moved into appropriate client folder if client component"
+    }
+  },
+  "guidelines": [
+    "Use TypeScript for all code; prefer interfaces over types when describing object shapes.",
+    "Avoid enums; use union types or object literals as const instead.",
+    "Use functional components with hooks.  Only use class components if absolutely necessary (and document why).",
+    "Enable strict mode in tsconfig.json and resolve all compiler errors.",
+    "Use consistent naming conventions (PascalCase for components, camelCase for variables and functions).",
+    "Write clear and concise commit messages following the Conventional Commits specification.",
+    "Keep components small and focused on a single responsibility.",
+    "Use absolute imports for better readability and maintainability.",
+    "Use Tailwind CSS for styling and follow its utility-first approach.",
+    "Use Shadcn/ui for pre-built components and follow its documentation for customization.",
+    "Use server components when possible for improved performance, client components where necessary for interactive behaviour.",
+    "Use server actions for handling forms and mutations.",
+    "Keep code well-documented with JSDoc comments where necessary."
+  ]
+}
