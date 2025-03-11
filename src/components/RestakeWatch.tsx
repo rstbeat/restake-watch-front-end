@@ -196,7 +196,8 @@ const RestakeWatch: React.FC = () => {
                       href="https://hackmd.io/@espejelomar/H14XiPt51g"
                       className="underline font-semibold hover:text-[#ab3bd2]"
                     >
-                      Fortify or Falter: A Comprehensive Restaking Risk Assessment
+                      Fortify or Falter: A Comprehensive Restaking Risk
+                      Assessment
                     </Link>
                   </span>
                 </div>

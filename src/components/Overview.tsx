@@ -572,6 +572,13 @@ const RiskIndicator: React.FC<{
       bg: 'bg-green-50',
       title: 'text-green-800 font-bold',
     },
+    neutral: {
+      icon: <Info className="h-3 w-3" />,
+      colors: ['#3b82f6', '#60a5fa'],
+      border: 'border-blue-200',
+      bg: 'bg-blue-50',
+      title: 'text-blue-800 font-bold',
+    },
   };
 
   return (
