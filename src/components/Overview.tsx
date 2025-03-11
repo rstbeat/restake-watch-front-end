@@ -16,6 +16,7 @@ import {
   Wallet,
   Network,
   ServerCog,
+  Share2,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
@@ -203,6 +204,176 @@ const SemaphoreIndicator: React.FC<SemaphoreIndicatorProps> = ({
   );
 };
 
+// Concentration Summary Box Component
+interface ConcentrationSummaryProps {
+  entityType: 'operators' | 'restakers';
+  concentrationMetrics?: {
+    top33PercentCount?: number;
+    bottom33PercentCount?: number;
+    herfindahlIndex?: number;
+  };
+}
+
+const ConcentrationSummary: React.FC<ConcentrationSummaryProps> = ({
+  entityType,
+  concentrationMetrics,
+}) => {
+  if (!concentrationMetrics) return null;
+
+  const { top33PercentCount = 0, bottom33PercentCount = 0, herfindahlIndex = 0 } = concentrationMetrics;
+  const isHealthy = herfindahlIndex < 0.15;
+  
+  // Different border color based on entity type for visual distinction
+  const borderColor = entityType === 'operators' 
+    ? 'border-purple-400' 
+    : 'border-blue-400';
+    
+  // Create tweetable text
+  const tweetText = encodeURIComponent(
+    `Just ${top33PercentCount} ${entityType} control 33% of restaked ETH on EigenLayer, while ${bottom33PercentCount} smaller ones secure another 33%. Concentration index: ${herfindahlIndex.toFixed(4)}. ${isHealthy ? 'Overall healthy' : 'Concerning concentration'}. @TheRestakeWatch @eigenlayer`
+  );
+  const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+  
+  return (
+    <div className={`mb-4 border-2 ${borderColor} rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow`}>
+      {/* Header */}
+      <div className={`${entityType === 'operators' ? 'bg-purple-50' : 'bg-blue-50'} border-b ${borderColor} px-4 py-2 flex items-center justify-between`}>
+        <h4 className="text-sm font-semibold text-gray-800">
+          Exposure Concentration Summary ({entityType === 'operators' ? 'Operators' : 'Restakers'})
+        </h4>
+        <div className="flex items-center space-x-2">
+          <div className={`text-xs font-medium rounded-full px-2 py-0.5 ${isHealthy ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+            {isHealthy ? 'Healthy Overall' : 'Concerning'}
+          </div>
+          <a 
+            href={tweetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 transition-colors"
+            title="Share on Twitter"
+          >
+            <Share2 size={14} className="mr-1" />
+            Tweet
+          </a>
+        </div>
+      </div>
+      
+      {/* Content */}
+      <div className="p-4 bg-white">
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-start">
+            <div className="shrink-0 text-red-600 mr-2">⚠️</div>
+            <div>
+              <span className="font-bold text-red-600">Risk Alert:</span>{' '}
+              <span>Just <span className="font-bold text-red-600">{top33PercentCount}</span> {entityType} control 33% of restaked ETH.</span>
+            </div>
+          </div>
+          
+          <div className="flex items-start">
+            <div className="shrink-0 text-green-600 mr-2">✓</div>
+            <div>
+              <span className="font-bold text-green-600">Positive Factor:</span>{' '}
+              <span><span className="font-bold text-green-600">{bottom33PercentCount}</span> smaller {entityType} secure another 33%.</span>
+            </div>
+          </div>
+          
+          <div className="pt-1 border-t border-gray-100">
+            <span className="text-sm">
+              Overall decentralization remains {isHealthy ? 
+                <span className="font-semibold text-green-600">healthy</span> : 
+                <span className="font-semibold text-orange-600">concerning</span>}{' '}
+              <span className="text-gray-600">(concentration index: <span className="font-semibold">{herfindahlIndex.toFixed(4)}</span>)</span>
+            </span>
+            <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+              <strong>About the index:</strong> The Herfindahl index measures market concentration from 0 to 1.
+              Values below 0.15 indicate healthy decentralization, while higher values suggest concerning concentration.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// General Metrics Summary component
+interface GeneralMetricsSummaryProps {
+  totalETHRestaked?: number;
+  activeOperators?: number;
+  activeRestakers?: number;
+}
+
+const GeneralMetricsSummary: React.FC<GeneralMetricsSummaryProps> = ({
+  totalETHRestaked = 0,
+  activeOperators = 0,
+  activeRestakers = 0,
+}) => {
+  // Format values for display
+  const formattedETH = new Intl.NumberFormat('en-US').format(totalETHRestaked);
+  const formattedOperators = new Intl.NumberFormat('en-US').format(activeOperators);
+  const formattedRestakers = new Intl.NumberFormat('en-US').format(activeRestakers);
+  
+  // Create tweetable text
+  const tweetText = encodeURIComponent(
+    `${formattedETH} ETH currently restaked on EigenLayer across ${formattedOperators} active operators and ${formattedRestakers} restakers. @TheRestakeWatch @eigenlayer`
+  );
+  const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
+  
+  return (
+    <div className="mb-4 border-2 border-blue-300 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+      {/* Header */}
+      <div className="bg-blue-50 border-b border-blue-300 px-4 py-2 flex items-center justify-between">
+        <h4 className="text-sm font-semibold text-gray-800">
+          EigenLayer Network Overview
+        </h4>
+        <div className="flex items-center space-x-2">
+          <div className="text-xs font-medium rounded-full px-2 py-0.5 bg-blue-100 text-blue-800">
+            Current Stats
+          </div>
+          <a 
+            href={tweetUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800 transition-colors"
+            title="Share on Twitter"
+          >
+            <Share2 size={14} className="mr-1" />
+            Tweet
+          </a>
+        </div>
+      </div>
+      
+      {/* Content */}
+      <div className="p-4 bg-white">
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-start">
+            <div className="shrink-0 text-blue-600 mr-2">💰</div>
+            <div>
+              <span className="font-bold text-blue-600">Total Restaked:</span>{' '}
+              <span><span className="font-bold text-blue-600">{formattedETH}</span> ETH</span>
+            </div>
+          </div>
+          
+          <div className="flex items-start">
+            <div className="shrink-0 text-purple-600 mr-2">🏢</div>
+            <div>
+              <span className="font-bold text-purple-600">Active Operators:</span>{' '}
+              <span><span className="font-bold text-purple-600">{formattedOperators}</span> entities securing the network</span>
+            </div>
+          </div>
+          
+          <div className="flex items-start">
+            <div className="shrink-0 text-green-600 mr-2">👥</div>
+            <div>
+              <span className="font-bold text-green-600">Active Restakers:</span>{' '}
+              <span><span className="font-bold text-green-600">{formattedRestakers}</span> unique addresses</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 interface EnhancedMetricsProps {
   restakeData: {
     activeRestakers?: number;
@@ -382,26 +553,25 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             Key Metrics
           </h3>
-          <div className="grid grid-cols-1 gap-4">
-            <MetricCard
-              icon={Wallet}
-              label="Total Restaked ETH"
-              value={new Intl.NumberFormat('en-US').format(
-                operatorData?.totalETHRestaked || 0,
-              )}
-              tooltip="The total amount of ETH that has been restaked across all operators and strategies."
+          
+          <div className="space-y-4 mb-6">
+            {/* General Metrics Summary - Now first as requested */}
+            <GeneralMetricsSummary
+              totalETHRestaked={operatorData?.totalETHRestaked}
+              activeOperators={operatorData?.activeEntities}
+              activeRestakers={restakeData?.activeRestakers}
             />
-            <MetricCard
-              icon={Users}
-              label="Active Operators"
-              value={operatorData?.activeEntities || 'N/A'}
-              tooltip="The number of operators currently active in the restaking ecosystem."
+            
+            {/* Concentration Summary for Operators */}
+            <ConcentrationSummary 
+              entityType="operators" 
+              concentrationMetrics={operatorData?.concentrationMetrics}
             />
-            <MetricCard
-              icon={Network}
-              label="Active Restakers"
-              value={restakeData?.activeRestakers || 'N/A'}
-              tooltip="The total number of unique addresses that have restaked ETH."
+            
+            {/* Concentration Summary for Restakers */}
+            <ConcentrationSummary 
+              entityType="restakers" 
+              concentrationMetrics={restakeData?.concentrationMetrics}
             />
           </div>
         </CardContent>
