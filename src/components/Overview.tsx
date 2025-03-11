@@ -224,32 +224,42 @@ const ConcentrationSummary: React.FC<ConcentrationSummaryProps> = ({
 }) => {
   if (!concentrationMetrics) return null;
 
-  const { top33PercentCount = 0, bottom33PercentCount = 0, herfindahlIndex = 0 } = concentrationMetrics;
+  const {
+    top33PercentCount = 0,
+    bottom33PercentCount = 0,
+    herfindahlIndex = 0,
+  } = concentrationMetrics;
   const isHealthy = herfindahlIndex < 0.15;
-  
+
   // Different border color based on entity type for visual distinction
-  const borderColor = entityType === 'operators' 
-    ? 'border-purple-400' 
-    : 'border-blue-400';
-    
+  const borderColor =
+    entityType === 'operators' ? 'border-purple-400' : 'border-blue-400';
+
   // Create tweetable text
   const tweetText = encodeURIComponent(
-    `Just ${top33PercentCount} ${entityType} control 33% of restaked ETH on EigenLayer, while ${bottom33PercentCount} smaller ones secure another 33%. Concentration index: ${herfindahlIndex.toFixed(4)}. ${isHealthy ? 'Overall healthy' : 'Concerning concentration'}. @TheRestakeWatch @eigenlayer`
+    `Just ${top33PercentCount} ${entityType} control 33% of restaked ETH on EigenLayer, while ${bottom33PercentCount} smaller ones secure another 33%. Concentration index: ${herfindahlIndex.toFixed(4)}. ${isHealthy ? 'Overall healthy' : 'Concerning concentration'}. @TheRestakeWatch @eigenlayer`,
   );
   const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
-  
+
   return (
-    <div className={`mb-4 border-2 ${borderColor} rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow`}>
+    <div
+      className={`mb-4 border-2 ${borderColor} rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow`}
+    >
       {/* Header */}
-      <div className={`${entityType === 'operators' ? 'bg-purple-50' : 'bg-blue-50'} border-b ${borderColor} px-4 py-2 flex items-center justify-between`}>
+      <div
+        className={`${entityType === 'operators' ? 'bg-purple-50' : 'bg-blue-50'} border-b ${borderColor} px-4 py-2 flex items-center justify-between`}
+      >
         <h4 className="text-sm font-semibold text-gray-800">
-          Exposure Concentration Summary ({entityType === 'operators' ? 'Operators' : 'Restakers'})
+          Exposure Concentration Summary (
+          {entityType === 'operators' ? 'Operators' : 'Restakers'})
         </h4>
         <div className="flex items-center space-x-2">
-          <div className={`text-xs font-medium rounded-full px-2 py-0.5 ${isHealthy ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}>
+          <div
+            className={`text-xs font-medium rounded-full px-2 py-0.5 ${isHealthy ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}`}
+          >
             {isHealthy ? 'Healthy Overall' : 'Concerning'}
           </div>
-          <a 
+          <a
             href={tweetUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -261,7 +271,7 @@ const ConcentrationSummary: React.FC<ConcentrationSummaryProps> = ({
           </a>
         </div>
       </div>
-      
+
       {/* Content */}
       <div className="p-4 bg-white">
         <div className="flex flex-col space-y-2">
@@ -269,28 +279,52 @@ const ConcentrationSummary: React.FC<ConcentrationSummaryProps> = ({
             <div className="shrink-0 text-red-600 mr-2">⚠️</div>
             <div>
               <span className="font-bold text-red-600">Risk Alert:</span>{' '}
-              <span>Just <span className="font-bold text-red-600">{top33PercentCount}</span> {entityType} control 33% of restaked ETH.</span>
+              <span>
+                Just{' '}
+                <span className="font-bold text-red-600">
+                  {top33PercentCount}
+                </span>{' '}
+                {entityType} control 33% of restaked ETH.
+              </span>
             </div>
           </div>
-          
+
           <div className="flex items-start">
             <div className="shrink-0 text-green-600 mr-2">✓</div>
             <div>
               <span className="font-bold text-green-600">Positive Factor:</span>{' '}
-              <span><span className="font-bold text-green-600">{bottom33PercentCount}</span> smaller {entityType} secure another 33%.</span>
+              <span>
+                <span className="font-bold text-green-600">
+                  {bottom33PercentCount}
+                </span>{' '}
+                smaller {entityType} secure another 33%.
+              </span>
             </div>
           </div>
-          
+
           <div className="pt-1 border-t border-gray-100">
             <span className="text-sm">
-              Overall decentralization remains {isHealthy ? 
-                <span className="font-semibold text-green-600">healthy</span> : 
-                <span className="font-semibold text-orange-600">concerning</span>}{' '}
-              <span className="text-gray-600">(concentration index: <span className="font-semibold">{herfindahlIndex.toFixed(4)}</span>)</span>
+              Overall decentralization remains{' '}
+              {isHealthy ? (
+                <span className="font-semibold text-green-600">healthy</span>
+              ) : (
+                <span className="font-semibold text-orange-600">
+                  concerning
+                </span>
+              )}{' '}
+              <span className="text-gray-600">
+                (concentration index:{' '}
+                <span className="font-semibold">
+                  {herfindahlIndex.toFixed(4)}
+                </span>
+                )
+              </span>
             </span>
             <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
-              <strong>About the index:</strong> The Herfindahl index measures market concentration from 0 to 1.
-              Values below 0.15 indicate healthy decentralization, while higher values suggest concerning concentration.
+              <strong>About the index:</strong> The Herfindahl index measures
+              market concentration from 0 to 1. Values below 0.15 indicate
+              healthy decentralization, while higher values suggest concerning
+              concentration.
             </div>
           </div>
         </div>
@@ -313,15 +347,19 @@ const GeneralMetricsSummary: React.FC<GeneralMetricsSummaryProps> = ({
 }) => {
   // Format values for display
   const formattedETH = new Intl.NumberFormat('en-US').format(totalETHRestaked);
-  const formattedOperators = new Intl.NumberFormat('en-US').format(activeOperators);
-  const formattedRestakers = new Intl.NumberFormat('en-US').format(activeRestakers);
-  
+  const formattedOperators = new Intl.NumberFormat('en-US').format(
+    activeOperators,
+  );
+  const formattedRestakers = new Intl.NumberFormat('en-US').format(
+    activeRestakers,
+  );
+
   // Create tweetable text
   const tweetText = encodeURIComponent(
-    `${formattedETH} ETH currently restaked on EigenLayer across ${formattedOperators} active operators and ${formattedRestakers} restakers. @TheRestakeWatch @eigenlayer`
+    `${formattedETH} ETH currently restaked on EigenLayer across ${formattedOperators} active operators and ${formattedRestakers} restakers. @TheRestakeWatch @eigenlayer`,
   );
   const tweetUrl = `https://twitter.com/intent/tweet?text=${tweetText}`;
-  
+
   return (
     <div className="mb-4 border-2 border-blue-300 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       {/* Header */}
@@ -333,7 +371,7 @@ const GeneralMetricsSummary: React.FC<GeneralMetricsSummaryProps> = ({
           <div className="text-xs font-medium rounded-full px-2 py-0.5 bg-blue-100 text-blue-800">
             Current Stats
           </div>
-          <a 
+          <a
             href={tweetUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -345,7 +383,7 @@ const GeneralMetricsSummary: React.FC<GeneralMetricsSummaryProps> = ({
           </a>
         </div>
       </div>
-      
+
       {/* Content */}
       <div className="p-4 bg-white">
         <div className="flex flex-col space-y-2">
@@ -353,23 +391,40 @@ const GeneralMetricsSummary: React.FC<GeneralMetricsSummaryProps> = ({
             <div className="shrink-0 text-blue-600 mr-2">💰</div>
             <div>
               <span className="font-bold text-blue-600">Total Restaked:</span>{' '}
-              <span><span className="font-bold text-blue-600">{formattedETH}</span> ETH</span>
+              <span>
+                <span className="font-bold text-blue-600">{formattedETH}</span>{' '}
+                ETH
+              </span>
             </div>
           </div>
-          
+
           <div className="flex items-start">
             <div className="shrink-0 text-purple-600 mr-2">🏢</div>
             <div>
-              <span className="font-bold text-purple-600">Active Operators:</span>{' '}
-              <span><span className="font-bold text-purple-600">{formattedOperators}</span> entities securing the network</span>
+              <span className="font-bold text-purple-600">
+                Active Operators:
+              </span>{' '}
+              <span>
+                <span className="font-bold text-purple-600">
+                  {formattedOperators}
+                </span>{' '}
+                entities securing the network
+              </span>
             </div>
           </div>
-          
+
           <div className="flex items-start">
             <div className="shrink-0 text-green-600 mr-2">👥</div>
             <div>
-              <span className="font-bold text-green-600">Active Restakers:</span>{' '}
-              <span><span className="font-bold text-green-600">{formattedRestakers}</span> unique addresses</span>
+              <span className="font-bold text-green-600">
+                Active Restakers:
+              </span>{' '}
+              <span>
+                <span className="font-bold text-green-600">
+                  {formattedRestakers}
+                </span>{' '}
+                unique addresses
+              </span>
             </div>
           </div>
         </div>
@@ -428,11 +483,16 @@ interface UnifiedRiskMetricsOverviewProps {
 }
 
 // Tooltip with term definition
-const TermTooltip: React.FC<{ term: string; definition: string }> = ({ term, definition }) => (
+const TermTooltip: React.FC<{ term: string; definition: string }> = ({
+  term,
+  definition,
+}) => (
   <Tooltip.Provider>
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
-        <span className="border-b border-dotted border-gray-500 cursor-help">{term}</span>
+        <span className="border-b border-dotted border-gray-500 cursor-help">
+          {term}
+        </span>
       </Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
@@ -449,31 +509,36 @@ const ExpandableSection: React.FC<{
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
-  severity?: "critical" | "warning" | "positive" | "neutral";
-}> = ({ title, children, defaultOpen = false, severity = "neutral" }) => {
+  severity?: 'critical' | 'warning' | 'positive' | 'neutral';
+}> = ({ title, children, defaultOpen = false, severity = 'neutral' }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  
+
   const severityClasses = {
-    critical: "text-red-700 bg-red-50 border-red-300",
-    warning: "text-orange-700 bg-orange-50 border-orange-300",
-    positive: "text-green-700 bg-green-50 border-green-300",
-    neutral: "text-blue-700 bg-blue-50 border-blue-300"
+    critical: 'text-red-700 bg-red-50 border-red-300',
+    warning: 'text-orange-700 bg-orange-50 border-orange-300',
+    positive: 'text-green-700 bg-green-50 border-green-300',
+    neutral: 'text-blue-700 bg-blue-50 border-blue-300',
   };
-  
+
   const severityIcons = {
     critical: <AlertCircle className="h-5 w-5 text-red-600" />,
     warning: <AlertTriangle className="h-5 w-5 text-orange-600" />,
     positive: <CheckCircle className="h-5 w-5 text-green-600" />,
-    neutral: <Info className="h-5 w-5 text-blue-600" />
+    neutral: <Info className="h-5 w-5 text-blue-600" />,
   };
-  
+
   return (
-    <div className={`rounded-lg border ${severity !== "neutral" ? "border-l-4" : ""} ${
-      severity === "critical" ? "border-l-red-500" : 
-      severity === "warning" ? "border-l-orange-500" : 
-      severity === "positive" ? "border-l-green-500" : 
-      "border-gray-200"
-    }`}>
+    <div
+      className={`rounded-lg border ${severity !== 'neutral' ? 'border-l-4' : ''} ${
+        severity === 'critical'
+          ? 'border-l-red-500'
+          : severity === 'warning'
+            ? 'border-l-orange-500'
+            : severity === 'positive'
+              ? 'border-l-green-500'
+              : 'border-gray-200'
+      }`}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center justify-between w-full p-4 text-left font-medium ${severityClasses[severity]} rounded-t-lg hover:bg-opacity-80 transition-colors`}
@@ -484,47 +549,43 @@ const ExpandableSection: React.FC<{
         </div>
         {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
-      {isOpen && (
-        <div className="p-4 bg-white">
-          {children}
-        </div>
-      )}
+      {isOpen && <div className="p-4 bg-white">{children}</div>}
     </div>
   );
 };
 
 // Risk indicator component
 const RiskIndicator: React.FC<{
-  level: "critical" | "warning" | "positive";
+  level: 'critical' | 'warning' | 'positive';
   title: string;
   description: React.ReactNode;
 }> = ({ level, title, description }) => {
   const levelStyles = {
     critical: {
       icon: <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />,
-      border: "border-red-200",
-      bg: "bg-red-50",
-      title: "text-red-800 font-bold"
+      border: 'border-red-200',
+      bg: 'bg-red-50',
+      title: 'text-red-800 font-bold',
     },
     warning: {
       icon: <AlertTriangle className="h-5 w-5 text-orange-600 shrink-0" />,
-      border: "border-orange-200",
-      bg: "bg-orange-50",
-      title: "text-orange-800 font-bold"
+      border: 'border-orange-200',
+      bg: 'bg-orange-50',
+      title: 'text-orange-800 font-bold',
     },
     positive: {
       icon: <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />,
-      border: "border-green-200",
-      bg: "bg-green-50",
-      title: "text-green-800 font-bold"
-    }
+      border: 'border-green-200',
+      bg: 'bg-green-50',
+      title: 'text-green-800 font-bold',
+    },
   };
-  
+
   return (
-    <div className={`flex p-3 rounded-lg border ${levelStyles[level].border} ${levelStyles[level].bg}`}>
-      <div className="mr-3">
-        {levelStyles[level].icon}
-      </div>
+    <div
+      className={`flex p-3 rounded-lg border ${levelStyles[level].border} ${levelStyles[level].bg}`}
+    >
+      <div className="mr-3">{levelStyles[level].icon}</div>
       <div>
         <h4 className={`text-sm ${levelStyles[level].title} mb-1`}>{title}</h4>
         <div className="text-sm">{description}</div>
@@ -542,9 +603,7 @@ const MetricSummaryCard: React.FC<{
 }> = ({ title, value, icon, description }) => (
   <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
     <div className="flex items-center space-x-3 mb-2">
-      <div className="bg-blue-50 p-2 rounded-full">
-        {icon}
-      </div>
+      <div className="bg-blue-50 p-2 rounded-full">{icon}</div>
       <h3 className="text-gray-700 font-medium">{title}</h3>
     </div>
     <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
@@ -557,27 +616,50 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
   operatorData,
 }) => {
   // Format values for display
-  const formattedETH = new Intl.NumberFormat('en-US').format(operatorData?.totalETHRestaked || 0);
-  const formattedOperators = new Intl.NumberFormat('en-US').format(operatorData?.activeEntities || 0);
-  const formattedRestakers = new Intl.NumberFormat('en-US').format(restakeData?.activeRestakers || 0);
-  
+  const formattedETH = new Intl.NumberFormat('en-US').format(
+    operatorData?.totalETHRestaked || 0,
+  );
+  const formattedOperators = new Intl.NumberFormat('en-US').format(
+    operatorData?.activeEntities || 0,
+  );
+  const formattedRestakers = new Intl.NumberFormat('en-US').format(
+    restakeData?.activeRestakers || 0,
+  );
+
   // Get the P2P market share if available
-  const p2pMarketShare = operatorData?.majorOperatorGroupMetrics?.['P2P']?.total_market_share || 0;
+  const p2pMarketShare =
+    operatorData?.majorOperatorGroupMetrics?.['P2P']?.total_market_share || 0;
   const formattedP2PShare = (p2pMarketShare * 100).toFixed(2);
-  
+
   // Get the concentration metrics
-  const operatorTopCount = operatorData?.concentrationMetrics?.top33PercentCount || 0;
-  const operatorBottomCount = operatorData?.concentrationMetrics?.bottom33PercentCount || 0;
-  const operatorHerfindahl = operatorData?.concentrationMetrics?.herfindahlIndex || 0;
-  
-  const restakerTopCount = restakeData?.concentrationMetrics?.top33PercentCount || 0;
-  const restakerBottomCount = restakeData?.concentrationMetrics?.bottom33PercentCount || 0;
-  const restakerHerfindahl = restakeData?.concentrationMetrics?.herfindahlIndex || 0;
-  
+  const operatorTopCount =
+    operatorData?.concentrationMetrics?.top33PercentCount || 0;
+  const operatorBottomCount =
+    operatorData?.concentrationMetrics?.bottom33PercentCount || 0;
+  const operatorHerfindahl =
+    operatorData?.concentrationMetrics?.herfindahlIndex || 0;
+
+  const restakerTopCount =
+    restakeData?.concentrationMetrics?.top33PercentCount || 0;
+  const restakerBottomCount =
+    restakeData?.concentrationMetrics?.bottom33PercentCount || 0;
+  const restakerHerfindahl =
+    restakeData?.concentrationMetrics?.herfindahlIndex || 0;
+
   // Determine risk status for different categories
-  const operatorConcentrationRisk = operatorHerfindahl > 0.15 ? "critical" : operatorHerfindahl > 0.1 ? "warning" : "positive";
-  const restakerConcentrationRisk = restakerHerfindahl > 0.15 ? "critical" : restakerHerfindahl > 0.1 ? "warning" : "positive";
-  
+  const operatorConcentrationRisk =
+    operatorHerfindahl > 0.15
+      ? 'critical'
+      : operatorHerfindahl > 0.1
+        ? 'warning'
+        : 'positive';
+  const restakerConcentrationRisk =
+    restakerHerfindahl > 0.15
+      ? 'critical'
+      : restakerHerfindahl > 0.1
+        ? 'warning'
+        : 'positive';
+
   return (
     <Card className="mb-6">
       <CardHeader>
@@ -586,47 +668,54 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           Risks Overview
         </h2>
         <p className="text-sm text-gray-600">
-          A comprehensive view of key metrics and associated risks in the EigenLayer ecosystem
+          A comprehensive view of key metrics and associated risks in the
+          EigenLayer ecosystem
         </p>
       </CardHeader>
       <CardContent>
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <MetricSummaryCard 
-            title="Total Restaked ETH" 
-            value={formattedETH} 
+          <MetricSummaryCard
+            title="Total Restaked ETH"
+            value={formattedETH}
             icon={<Wallet className="h-5 w-5 text-blue-600" />}
             description="Total amount of ETH restaked on EigenLayer"
           />
-          <MetricSummaryCard 
-            title="Active Operators" 
-            value={formattedOperators} 
+          <MetricSummaryCard
+            title="Active Operators"
+            value={formattedOperators}
             icon={<Users className="h-5 w-5 text-purple-600" />}
             description="Number of active operators securing the network"
           />
-          <MetricSummaryCard 
-            title="Active Restakers" 
-            value={formattedRestakers} 
+          <MetricSummaryCard
+            title="Active Restakers"
+            value={formattedRestakers}
             icon={<Network className="h-5 w-5 text-green-600" />}
             description="Number of unique addresses restaking ETH"
           />
         </div>
-        
+
         {/* Risk Categories */}
         <div className="space-y-4">
           {/* Governance Risk */}
-          <ExpandableSection title="Governance Risk" severity="critical" defaultOpen>
-            <RiskIndicator 
+          <ExpandableSection
+            title="Governance Risk"
+            severity="critical"
+            defaultOpen
+          >
+            <RiskIndicator
               level="critical"
               title="Malicious Governance Attack Vector"
               description={
                 <div>
                   <p className="mb-2">
-                    A malicious actor could compromise the governance structure of EigenLayer. The protocol relies on a 
-                    <TermTooltip 
-                      term=" 9-of-13 community multisig" 
+                    A malicious actor could compromise the governance structure
+                    of EigenLayer. The protocol relies on a
+                    <TermTooltip
+                      term=" 9-of-13 community multisig"
                       definition="A multisignature wallet that requires 9 out of 13 signers to approve any transaction. This presents a centralized point of failure if compromised."
-                    /> that can execute IMMEDIATE upgrades without a timelock.
+                    />{' '}
+                    that can execute IMMEDIATE upgrades without a timelock.
                   </p>
                   <a
                     href="https://x.com/TheRestakeWatch/status/1858871898051907985"
@@ -641,123 +730,172 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               }
             />
           </ExpandableSection>
-          
+
           {/* Operator Risk */}
-          <ExpandableSection title="Operator Concentration Risk" severity={operatorConcentrationRisk} defaultOpen>
+          <ExpandableSection
+            title="Operator Concentration Risk"
+            severity={operatorConcentrationRisk}
+            defaultOpen
+          >
             <div className="space-y-3">
-              <RiskIndicator 
+              <RiskIndicator
                 level="critical"
                 title="Single Professional Operator Risk"
                 description={
                   <p>
-                    P2P controls <span className="font-bold text-red-600">{formattedP2PShare}%</span> of total restaked assets across its operators. 
-                    If compromised, P2P could simultaneously attack multiple <TermTooltip term="AVSs" definition="Actively Validated Services - applications that use EigenLayer's security for validation purposes." />, 
-                    compromising the network's security.
+                    P2P controls{' '}
+                    <span className="font-bold text-red-600">
+                      {formattedP2PShare}%
+                    </span>{' '}
+                    of total restaked assets across its operators. If
+                    compromised, P2P could simultaneously attack multiple{' '}
+                    <TermTooltip
+                      term="AVSs"
+                      definition="Actively Validated Services - applications that use EigenLayer's security for validation purposes."
+                    />
+                    , compromising the network's security.
                   </p>
                 }
               />
-              
-              <RiskIndicator 
+
+              <RiskIndicator
                 level={operatorConcentrationRisk}
                 title="Top Operator Concentration"
                 description={
                   <div>
                     <p className="mb-2">
-                      Just <span className="font-bold text-red-600">{operatorTopCount}</span> operators control 33% of restaked ETH.
-                      Their compromise or collusion could trigger a cascading effect across multiple AVSs.
+                      Just{' '}
+                      <span className="font-bold text-red-600">
+                        {operatorTopCount}
+                      </span>{' '}
+                      operators control 33% of restaked ETH. Their compromise or
+                      collusion could trigger a cascading effect across multiple
+                      AVSs.
                     </p>
                     <p className="text-sm">
-                      <TermTooltip 
-                        term="Herfindahl concentration index:" 
+                      <TermTooltip
+                        term="Herfindahl concentration index:"
                         definition="A measure of market concentration. Values under 0.15 are considered relatively healthy, while higher values indicate concerning concentration."
-                      /> <span className="font-semibold">{operatorHerfindahl.toFixed(4)}</span>
+                      />{' '}
+                      <span className="font-semibold">
+                        {operatorHerfindahl.toFixed(4)}
+                      </span>
                     </p>
                   </div>
                 }
               />
-              
-              <RiskIndicator 
+
+              <RiskIndicator
                 level="positive"
                 title="Long Tail Distribution"
                 description={
                   <p>
-                    <span className="font-bold text-green-600">{operatorBottomCount}</span> smaller operators secure another 33% of restaked ETH,
-                    providing better decentralization at the lower end of the distribution curve.
+                    <span className="font-bold text-green-600">
+                      {operatorBottomCount}
+                    </span>{' '}
+                    smaller operators secure another 33% of restaked ETH,
+                    providing better decentralization at the lower end of the
+                    distribution curve.
                   </p>
                 }
               />
-              
-              <RiskIndicator 
+
+              <RiskIndicator
                 level="warning"
                 title="Limited Permissionless Participation"
                 description={
                   <p>
-                    Only <span className="font-bold text-orange-600">2 out of 19 AVSs</span> allow operators to secure them without whitelisting
-                    or imposing stringent requirements. This limited permissionless participation makes the ecosystem more fragile.
+                    Only{' '}
+                    <span className="font-bold text-orange-600">
+                      2 out of 19 AVSs
+                    </span>{' '}
+                    allow operators to secure them without whitelisting or
+                    imposing stringent requirements. This limited permissionless
+                    participation makes the ecosystem more fragile.
                   </p>
                 }
               />
             </div>
           </ExpandableSection>
-          
+
           {/* Restaker Risk */}
-          <ExpandableSection title="Restaker Concentration Risk" severity={restakerConcentrationRisk}>
+          <ExpandableSection
+            title="Restaker Concentration Risk"
+            severity={restakerConcentrationRisk}
+          >
             <div className="space-y-3">
-              <RiskIndicator 
+              <RiskIndicator
                 level={restakerConcentrationRisk}
                 title="Top Restaker Concentration"
                 description={
                   <div>
                     <p className="mb-2">
-                      The top <span className="font-bold text-red-600">{restakerTopCount}</span> individual restakers control 33% of all restaked assets.
-                      Their compromise could affect multiple AVSs simultaneously.
+                      The top{' '}
+                      <span className="font-bold text-red-600">
+                        {restakerTopCount}
+                      </span>{' '}
+                      individual restakers control 33% of all restaked assets.
+                      Their compromise could affect multiple AVSs
+                      simultaneously.
                     </p>
                     <p className="text-sm">
-                      <TermTooltip 
-                        term="Herfindahl concentration index:" 
+                      <TermTooltip
+                        term="Herfindahl concentration index:"
                         definition="A measure of market concentration. Values under 0.15 are considered relatively healthy, while higher values indicate concerning concentration."
-                      /> <span className="font-semibold">{restakerHerfindahl.toFixed(4)}</span>
+                      />{' '}
+                      <span className="font-semibold">
+                        {restakerHerfindahl.toFixed(4)}
+                      </span>
                     </p>
                   </div>
                 }
               />
-              
-              <RiskIndicator 
+
+              <RiskIndicator
                 level="positive"
                 title="Long Tail Distribution"
                 description={
                   <p>
-                    <span className="font-bold text-green-600">{restakerBottomCount}</span> smaller restakers secure another 33% of restaked ETH,
-                    providing better decentralization at the lower end of the distribution curve.
+                    <span className="font-bold text-green-600">
+                      {restakerBottomCount}
+                    </span>{' '}
+                    smaller restakers secure another 33% of restaked ETH,
+                    providing better decentralization at the lower end of the
+                    distribution curve.
                   </p>
                 }
               />
             </div>
           </ExpandableSection>
-          
+
           {/* Positive Factors */}
           <ExpandableSection title="Security Improvements" severity="positive">
-            <RiskIndicator 
+            <RiskIndicator
               level="positive"
               title="Distributed Validator Technology"
               description={
                 <p>
-                  <span className="font-bold text-green-600">7</span> validator operators are running 
-                  <TermTooltip 
-                    term=" distributed validator technology" 
+                  <span className="font-bold text-green-600">7</span> validator
+                  operators are running
+                  <TermTooltip
+                    term=" distributed validator technology"
                     definition="A technology that allows validators to be run by multiple machines and operators, enhancing fault-tolerance and reducing slashing risk."
-                  /> by Obol Collective, providing higher validator uptime through fault-tolerance and reduced slashing risk via key sharing.
+                  />{' '}
+                  by Obol Collective, providing higher validator uptime through
+                  fault-tolerance and reduced slashing risk via key sharing.
                 </p>
               }
             />
           </ExpandableSection>
         </div>
-        
+
         {/* Tweet Summary */}
         <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-800">Share This Analysis</h3>
-            <a 
+            <h3 className="text-sm font-medium text-gray-800">
+              Share This Analysis
+            </h3>
+            <a
               href={`https://twitter.com/intent/tweet?text=EigenLayer ecosystem analysis by @TheRestakeWatch and @eigenlayer: ${formattedETH} ETH restaked across ${formattedOperators} operators. Key risks: Governance multisig vulnerability, ${operatorTopCount} operators control 33% of stake, ${formattedP2PShare}% controlled by P2P entity. Check the full analysis at restakewatch.com`}
               target="_blank"
               rel="noopener noreferrer"
@@ -780,9 +918,9 @@ const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
   return (
     <div className="flex flex-col gap-6">
       {/* Replacing the two separate sections with the unified overview */}
-      <UnifiedRiskMetricsOverview 
-        restakeData={restakeData} 
-        operatorData={operatorData} 
+      <UnifiedRiskMetricsOverview
+        restakeData={restakeData}
+        operatorData={operatorData}
       />
     </div>
   );
