@@ -186,34 +186,36 @@ const RestakeWatch: React.FC = () => {
 
         <div className="flex-1 flex flex-col overflow-hidden md:ml-48">
           {showBanner && (
-            <div className="bg-[#e6e7ec] text-gray-500 py-2 px-4 flex justify-between items-center border-b border-gray-200">
-              <div className="flex items-center space-x-2">
-                <AlertTriangle className="h-5 w-5 text-gray-500" />
-                <span>
-                  New paper release:{' '}
-                  <Link
-                    href="https://hackmd.io/@espejelomar/H14XiPt51g"
-                    className="underline font-semibold hover:text-[#ab3bd2]"
-                  >
-                    Fortify or Falter: A Comprehensive Restaking Risk Assessment
-                  </Link>
-                </span>
+            <div className="bg-[#e6e7ec] text-gray-500 py-2 border-b border-gray-200">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <AlertTriangle className="h-5 w-5 text-gray-500" />
+                  <span>
+                    New paper release:{' '}
+                    <Link
+                      href="https://hackmd.io/@espejelomar/H14XiPt51g"
+                      className="underline font-semibold hover:text-[#ab3bd2]"
+                    >
+                      Fortify or Falter: A Comprehensive Restaking Risk Assessment
+                    </Link>
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowBanner(false)}
+                  className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowBanner(false)}
-                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </div>
           )}
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e6e7ec] text-[#000000]">
-            <div className="bg-[#e6e7ec] text-[#000000] py-4 px-4 sm:px-6 lg:px-8">
-              <div className="max-w-7xl mx-auto flex flex-col justify-between items-center">
-                <div className="flex items-center space-x-4 w-full justify-between">
+            <div className="bg-[#e6e7ec] text-[#000000] py-4 border-b border-gray-200">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center w-full justify-between">
                   <div>
                     <h1 className="text-2xl font-bold tracking-tight sm:text-3xl mb-0">
                       The L2Beat of the Restaking Ecosystem

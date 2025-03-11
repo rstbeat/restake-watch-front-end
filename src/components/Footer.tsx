@@ -4,7 +4,7 @@ import { Twitter, MessageCircle } from 'lucide-react';
 const Footer: React.FC = () => {
   return (
     <footer className="bg-[#e6e7ec] text-gray-500 py-6">
-      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
         <p className="text-center md:text-left mb-4 md:mb-0">
           Made with un chingo de{' '}
           <span role="img" aria-label="heart">
