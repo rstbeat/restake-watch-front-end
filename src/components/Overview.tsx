@@ -21,6 +21,7 @@ import {
   CheckCircle,
   Info,
   ExternalLink,
+  PieChart,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
@@ -408,7 +409,7 @@ const GeneralMetricsSummary: React.FC<GeneralMetricsSummaryProps> = ({
                 <span className="font-bold text-purple-600">
                   {formattedOperators}
                 </span>{' '}
-                entities securing the network
+                entities securing the network (with more than 0 restaked assets)
               </span>
             </div>
           </div>
@@ -504,6 +505,91 @@ const TermTooltip: React.FC<{ term: string; definition: string }> = ({
   </Tooltip.Provider>
 );
 
+// Styled Icon component for better visual appeal
+const StyledIcon: React.FC<{
+  icon: React.ReactNode;
+  gradientColors: string[];
+  size?: string;
+}> = ({ icon, gradientColors, size = 'h-6 w-6' }) => {
+  return (
+    <div
+      className={`flex items-center justify-center rounded-full p-3 ${size}`}
+      style={{
+        background: `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 100%)`,
+        boxShadow: `0 4px 10px rgba(0, 0, 0, 0.08)`,
+      }}
+    >
+      <div className="text-white">{icon}</div>
+    </div>
+  );
+};
+
+// Small styled icon for inline usage in alerts and expandable sections
+const SmallStyledIcon: React.FC<{
+  icon: React.ReactNode;
+  gradientColors: string[];
+}> = ({ icon, gradientColors }) => {
+  return (
+    <div
+      className="flex items-center justify-center rounded-full p-1.5 h-6 w-6 shrink-0"
+      style={{
+        background: `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 100%)`,
+        boxShadow: `0 2px 4px rgba(0, 0, 0, 0.1)`,
+      }}
+    >
+      <div className="text-white">{icon}</div>
+    </div>
+  );
+};
+
+// Risk indicator component
+const RiskIndicator: React.FC<{
+  level: 'critical' | 'warning' | 'positive';
+  title: string;
+  description: React.ReactNode;
+}> = ({ level, title, description }) => {
+  const levelStyles = {
+    critical: {
+      icon: <AlertCircle className="h-3 w-3" />,
+      colors: ['#ef4444', '#f97316'],
+      border: 'border-red-200',
+      bg: 'bg-red-50',
+      title: 'text-red-800 font-bold',
+    },
+    warning: {
+      icon: <AlertTriangle className="h-3 w-3" />,
+      colors: ['#f97316', '#eab308'],
+      border: 'border-orange-200',
+      bg: 'bg-orange-50',
+      title: 'text-orange-800 font-bold',
+    },
+    positive: {
+      icon: <CheckCircle className="h-3 w-3" />,
+      colors: ['#10b981', '#22c55e'],
+      border: 'border-green-200',
+      bg: 'bg-green-50',
+      title: 'text-green-800 font-bold',
+    },
+  };
+
+  return (
+    <div
+      className={`flex p-3 rounded-lg border ${levelStyles[level].border} ${levelStyles[level].bg}`}
+    >
+      <div className="mr-3">
+        <SmallStyledIcon
+          icon={levelStyles[level].icon}
+          gradientColors={levelStyles[level].colors}
+        />
+      </div>
+      <div>
+        <h4 className={`text-sm ${levelStyles[level].title} mb-1`}>{title}</h4>
+        <div className="text-sm">{description}</div>
+      </div>
+    </div>
+  );
+};
+
 // Expandable section component
 const ExpandableSection: React.FC<{
   title: string;
@@ -521,10 +607,22 @@ const ExpandableSection: React.FC<{
   };
 
   const severityIcons = {
-    critical: <AlertCircle className="h-5 w-5 text-red-600" />,
-    warning: <AlertTriangle className="h-5 w-5 text-orange-600" />,
-    positive: <CheckCircle className="h-5 w-5 text-green-600" />,
-    neutral: <Info className="h-5 w-5 text-blue-600" />,
+    critical: {
+      icon: <AlertCircle className="h-3 w-3" />,
+      colors: ['#ef4444', '#f97316'],
+    },
+    warning: {
+      icon: <AlertTriangle className="h-3 w-3" />,
+      colors: ['#f97316', '#eab308'],
+    },
+    positive: {
+      icon: <CheckCircle className="h-3 w-3" />,
+      colors: ['#10b981', '#22c55e'],
+    },
+    neutral: {
+      icon: <Info className="h-3 w-3" />,
+      colors: ['#3b82f6', '#60a5fa'],
+    },
   };
 
   return (
@@ -544,52 +642,17 @@ const ExpandableSection: React.FC<{
         className={`flex items-center justify-between w-full p-4 text-left font-medium ${severityClasses[severity]} rounded-t-lg hover:bg-opacity-80 transition-colors`}
       >
         <div className="flex items-center">
-          {severityIcons[severity]}
+          <SmallStyledIcon
+            icon={severityIcons[severity].icon}
+            gradientColors={severityIcons[severity].colors}
+          />
           <span className="ml-2">{title}</span>
         </div>
-        {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+        <div className="flex items-center justify-center rounded-full p-1 h-6 w-6 bg-white bg-opacity-30">
+          {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </div>
       </button>
       {isOpen && <div className="p-4 bg-white">{children}</div>}
-    </div>
-  );
-};
-
-// Risk indicator component
-const RiskIndicator: React.FC<{
-  level: 'critical' | 'warning' | 'positive';
-  title: string;
-  description: React.ReactNode;
-}> = ({ level, title, description }) => {
-  const levelStyles = {
-    critical: {
-      icon: <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />,
-      border: 'border-red-200',
-      bg: 'bg-red-50',
-      title: 'text-red-800 font-bold',
-    },
-    warning: {
-      icon: <AlertTriangle className="h-5 w-5 text-orange-600 shrink-0" />,
-      border: 'border-orange-200',
-      bg: 'bg-orange-50',
-      title: 'text-orange-800 font-bold',
-    },
-    positive: {
-      icon: <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />,
-      border: 'border-green-200',
-      bg: 'bg-green-50',
-      title: 'text-green-800 font-bold',
-    },
-  };
-
-  return (
-    <div
-      className={`flex p-3 rounded-lg border ${levelStyles[level].border} ${levelStyles[level].bg}`}
-    >
-      <div className="mr-3">{levelStyles[level].icon}</div>
-      <div>
-        <h4 className={`text-sm ${levelStyles[level].title} mb-1`}>{title}</h4>
-        <div className="text-sm">{description}</div>
-      </div>
     </div>
   );
 };
@@ -601,13 +664,15 @@ const MetricSummaryCard: React.FC<{
   icon: React.ReactNode;
   description?: string;
 }> = ({ title, value, icon, description }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-    <div className="flex items-center space-x-3 mb-2">
-      <div className="bg-blue-50 p-2 rounded-full">{icon}</div>
-      <h3 className="text-gray-700 font-medium">{title}</h3>
+  <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+    <div className="flex items-center mb-3">
+      {icon}
+      <h3 className="text-gray-700 font-medium ml-3">{title}</h3>
     </div>
     <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
-    {description && <p className="text-xs text-gray-500">{description}</p>}
+    {description && (
+      <p className="text-xs text-gray-500 mt-auto">{description}</p>
+    )}
   </div>
 );
 
@@ -646,58 +711,160 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
   const restakerHerfindahl =
     restakeData?.concentrationMetrics?.herfindahlIndex || 0;
 
-  // Determine risk status for different categories
-  const operatorConcentrationRisk =
-    operatorHerfindahl > 0.15
-      ? 'critical'
-      : operatorHerfindahl > 0.1
-        ? 'warning'
-        : 'positive';
-  const restakerConcentrationRisk =
-    restakerHerfindahl > 0.15
-      ? 'critical'
-      : restakerHerfindahl > 0.1
-        ? 'warning'
-        : 'positive';
+  // Update severity levels - change concentration issues to warning
+  const operatorConcentrationRisk = 'warning'; // Change to warning (yellow)
+  const restakerConcentrationRisk = 'warning'; // Change to warning (yellow)
 
   return (
     <Card className="mb-6">
       <CardHeader>
         <h2 className="text-xl font-bold text-gray-900 flex items-center">
-          <Shield className="mr-2 h-5 w-5 text-purple-600" />
-          Risks Overview
+          <div className="mr-3">
+            <StyledIcon
+              icon={<Shield className="h-5 w-5" />}
+              gradientColors={['#8b5cf6', '#d946ef']}
+              size="h-10 w-10"
+            />
+          </div>
+          Risk Overview
         </h2>
         <p className="text-sm text-gray-600">
-          A comprehensive view of key metrics and associated risks in the EigenLayer ecosystem
+          A comprehensive view of key metrics and associated risks in the
+          EigenLayer ecosystem
         </p>
       </CardHeader>
       <CardContent>
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <MetricSummaryCard 
-            title="Total Restaked ETH" 
-            value={formattedETH} 
-            icon={<Wallet className="h-5 w-5 text-blue-600" />}
+          <MetricSummaryCard
+            title="Total Restaked ETH"
+            value={formattedETH}
+            icon={
+              <StyledIcon
+                icon={<Wallet className="h-4 w-4" />}
+                gradientColors={['#3b82f6', '#06b6d4']}
+                size="h-9 w-9"
+              />
+            }
             description="Total amount of ETH restaked on EigenLayer"
           />
-          <MetricSummaryCard 
-            title="Active Operators" 
-            value={formattedOperators} 
-            icon={<Users className="h-5 w-5 text-purple-600" />}
-            description="Number of active operators securing the network"
+          <MetricSummaryCard
+            title="Active Operators"
+            value={formattedOperators}
+            icon={
+              <StyledIcon
+                icon={<Users className="h-4 w-4" />}
+                gradientColors={['#8b5cf6', '#d946ef']}
+                size="h-9 w-9"
+              />
+            }
+            description="Number of active operators securing the network (with more than 0 restaked assets)"
           />
-          <MetricSummaryCard 
-            title="Active Restakers" 
-            value={formattedRestakers} 
-            icon={<Network className="h-5 w-5 text-green-600" />}
-            description="Number of unique addresses restaking ETH"
+          <MetricSummaryCard
+            title="Active Restakers"
+            value={formattedRestakers}
+            icon={
+              <StyledIcon
+                icon={<Network className="h-4 w-4" />}
+                gradientColors={['#10b981', '#06b6d4']}
+                size="h-9 w-9"
+              />
+            }
+            description="Number of unique addresses restaking ETH (with more than 0 restaked assets)"
           />
         </div>
-        
-        {/* Risk Categories */}
+
+        {/* Critical Risk Metrics Alert */}
+        <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+          <h3 className="text-base font-bold text-red-800 mb-3 flex items-center">
+            <SmallStyledIcon
+              icon={<AlertCircle className="h-3 w-3" />}
+              gradientColors={['#ef4444', '#f97316']}
+            />
+            <span className="ml-2">Critical Risk Metrics</span>
+          </h3>
+          <div className="space-y-3">
+            <div className="flex items-start">
+              <div className="shrink-0 mr-2">
+                <SmallStyledIcon
+                  icon={<AlertCircle className="h-3 w-3" />}
+                  gradientColors={['#ef4444', '#f97316']}
+                />
+              </div>
+              <p className="text-sm text-red-800">
+                <span className="font-bold">Governance Risk:</span> EigenLayer
+                relies on a 9-of-13 community multisig that can execute
+                IMMEDIATE upgrades without a timelock.
+              </p>
+            </div>
+            <div className="flex items-start">
+              <div className="shrink-0 mr-2">
+                <SmallStyledIcon
+                  icon={<AlertCircle className="h-3 w-3" />}
+                  gradientColors={['#ef4444', '#f97316']}
+                />
+              </div>
+              <p className="text-sm text-red-800">
+                <span className="font-bold">Operator Concentration:</span> Just{' '}
+                {operatorTopCount} operators control 33% of restaked ETH. Their
+                compromise or collusion could trigger a cascading effect.
+              </p>
+            </div>
+            <div className="flex items-start">
+              <div className="shrink-0 mr-2">
+                <SmallStyledIcon
+                  icon={<AlertCircle className="h-3 w-3" />}
+                  gradientColors={['#ef4444', '#f97316']}
+                />
+              </div>
+              <p className="text-sm text-red-800">
+                <span className="font-bold">Major Operator Risk:</span> P2P
+                controls <span className="font-bold">{formattedP2PShare}%</span>{' '}
+                of total restaked assets across its operators.
+              </p>
+            </div>
+            <div className="flex items-start">
+              <div className="shrink-0 mr-2">
+                <SmallStyledIcon
+                  icon={<AlertCircle className="h-3 w-3" />}
+                  gradientColors={['#ef4444', '#f97316']}
+                />
+              </div>
+              <p className="text-sm text-red-800">
+                <span className="font-bold">Restaker Concentration:</span> The
+                top {restakerTopCount} individual restakers control 33% of all
+                restaked assets.
+              </p>
+            </div>
+            <div className="flex items-start">
+              <div className="shrink-0 mr-2">
+                <SmallStyledIcon
+                  icon={<AlertCircle className="h-3 w-3" />}
+                  gradientColors={['#ef4444', '#f97316']}
+                />
+              </div>
+              <p className="text-sm text-red-800">
+                <span className="font-bold">
+                  Limited Permissionless Participation:
+                </span>{' '}
+                Only 2 out of 19 AVSs allow operators to secure them without
+                whitelisting.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Risk Categories - Detailed Explanations */}
+        <h3 className="text-sm font-medium text-gray-700 mb-3">
+          Detailed Risk Analysis
+        </h3>
         <div className="space-y-4">
-          {/* Governance Risk */}
-          <ExpandableSection title="Governance Risk" severity="critical" defaultOpen>
+          {/* Governance Risk - now also closed by default */}
+          <ExpandableSection
+            title="Governance Risk"
+            severity="critical"
+            defaultOpen={false}
+          >
             <RiskIndicator
               level="critical"
               title="Malicious Governance Attack Vector"
@@ -725,9 +892,12 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               }
             />
           </ExpandableSection>
-          
-          {/* Operator Risk */}
-          <ExpandableSection title="Operator Concentration Risk" severity={operatorConcentrationRisk} defaultOpen>
+
+          {/* Operator Risk - now yellow and closed by default */}
+          <ExpandableSection
+            title="Operator Concentration Risk"
+            severity={operatorConcentrationRisk}
+          >
             <div className="space-y-3">
               <RiskIndicator
                 level="critical"
@@ -750,7 +920,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               />
 
               <RiskIndicator
-                level={operatorConcentrationRisk}
+                level="critical"
                 title="Top Operator Concentration"
                 description={
                   <div>
@@ -792,12 +962,12 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               />
 
               <RiskIndicator
-                level="warning"
+                level="critical"
                 title="Limited Permissionless Participation"
                 description={
                   <p>
                     Only{' '}
-                    <span className="font-bold text-orange-600">
+                    <span className="font-bold text-red-600">
                       2 out of 19 AVSs
                     </span>{' '}
                     allow operators to secure them without whitelisting or
@@ -808,12 +978,15 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               />
             </div>
           </ExpandableSection>
-          
-          {/* Restaker Risk */}
-          <ExpandableSection title="Restaker Concentration Risk" severity={restakerConcentrationRisk}>
+
+          {/* Restaker Risk - now yellow and closed by default */}
+          <ExpandableSection
+            title="Restaker Concentration Risk"
+            severity={restakerConcentrationRisk}
+          >
             <div className="space-y-3">
               <RiskIndicator
-                level={restakerConcentrationRisk}
+                level="critical"
                 title="Top Restaker Concentration"
                 description={
                   <div>
@@ -855,8 +1028,8 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               />
             </div>
           </ExpandableSection>
-          
-          {/* Positive Factors */}
+
+          {/* Positive Factors - closed by default */}
           <ExpandableSection title="Security Improvements" severity="positive">
             <RiskIndicator
               level="positive"
@@ -997,7 +1170,14 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       <CompactNotes />
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold text-black">
+          <h2 className="text-xl font-semibold text-black flex items-center">
+            <div className="mr-3">
+              <StyledIcon
+                icon={<PieChart className="h-4 w-4" />}
+                gradientColors={['#9C27B0', '#d946ef']}
+                size="h-9 w-9"
+              />
+            </div>
             Share of Total Restaked ETH by Major Operators
           </h2>
           <p className="text-sm text-gray-600 mt-1">

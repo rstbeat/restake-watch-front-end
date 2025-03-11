@@ -10,6 +10,8 @@ import {
   Info,
   ChevronLeft,
   ChevronRight,
+  ChevronsUpDown,
+  BarChart3,
 } from 'lucide-react';
 import {
   Table,
@@ -61,6 +63,25 @@ const Badge: React.FC<{ color: string; text: string }> = ({ color, text }) => {
     >
       {text}
     </span>
+  );
+};
+
+// Add the StyledIcon component
+const StyledIcon: React.FC<{
+  icon: React.ReactNode;
+  gradientColors: string[];
+  size?: string;
+}> = ({ icon, gradientColors, size = 'h-6 w-6' }) => {
+  return (
+    <div
+      className={`flex items-center justify-center rounded-full p-3 ${size}`}
+      style={{
+        background: `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 100%)`,
+        boxShadow: `0 4px 10px rgba(0, 0, 0, 0.08)`,
+      }}
+    >
+      <div className="text-white">{icon}</div>
+    </div>
   );
 };
 
@@ -216,7 +237,13 @@ const OperatorOverview: React.FC = () => {
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg mt-8 shadow-md">
         <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center">
-          <span className="mr-2">🏢</span>
+          <div className="mr-3">
+            <StyledIcon
+              icon={<BarChart3 className="h-4 w-4" />}
+              gradientColors={['#3b82f6', '#06b6d4']}
+              size="h-9 w-9"
+            />
+          </div>
           All Operators by Market Share
         </h2>
         <p className="text-sm text-gray-600 mb-4">

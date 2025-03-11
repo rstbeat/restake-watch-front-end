@@ -2,6 +2,24 @@ import React, { useRef, useEffect } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { ChevronRight, CheckCircle, ExternalLink } from 'lucide-react';
 
+// Add the StyledIcon component
+const SmallStyledIcon: React.FC<{
+  icon: React.ReactNode;
+  gradientColors: string[];
+}> = ({ icon, gradientColors }) => {
+  return (
+    <div
+      className="flex items-center justify-center rounded-full p-1.5 h-6 w-6 shrink-0"
+      style={{
+        background: `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 100%)`,
+        boxShadow: `0 2px 4px rgba(0, 0, 0, 0.1)`,
+      }}
+    >
+      <div className="text-white">{icon}</div>
+    </div>
+  );
+};
+
 interface TimelineItemProps {
   date: string;
   title: string;
@@ -31,7 +49,12 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
     >
       <div className="flex justify-between items-start mb-2">
         <time className="text-sm font-medium text-[#1a202c] block">{date}</time>
-        {completed && <CheckCircle className="h-5 w-5 text-green-600" />}
+        {completed && (
+          <SmallStyledIcon
+            icon={<CheckCircle className="h-3 w-3" />}
+            gradientColors={['#10b981', '#22c55e']}
+          />
+        )}
       </div>
       <h3 className="text-lg font-semibold text-[#1a202c] mb-2">{title}</h3>
       <p className="text-sm text-gray-600">{description}</p>

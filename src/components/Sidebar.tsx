@@ -5,6 +5,24 @@ import { BookOpen, Heart, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Add the StyledIcon component
+const SmallStyledIcon: React.FC<{
+  icon: React.ReactNode;
+  gradientColors: string[];
+}> = ({ icon, gradientColors }) => {
+  return (
+    <div
+      className="flex items-center justify-center rounded-full p-1.5 h-5 w-5 shrink-0"
+      style={{
+        background: `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 100%)`,
+        boxShadow: `0 2px 4px rgba(0, 0, 0, 0.1)`,
+      }}
+    >
+      <div className="text-white">{icon}</div>
+    </div>
+  );
+};
+
 interface SidebarProps {
   isMobileOpen: boolean;
   setIsMobileOpen: (isOpen: boolean) => void;
@@ -38,7 +56,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             variant="ghost"
             className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
           >
-            <BookOpen className="h-4 w-4 text-inherit" />
+            <SmallStyledIcon
+              icon={<BookOpen className="h-2 w-2" />}
+              gradientColors={['#8b5cf6', '#d946ef']}
+            />
             <span className="ml-2">Metrics Paper</span>
           </Button>
         </Link>
@@ -51,7 +72,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             variant="ghost"
             className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
           >
-            <Heart className="h-4 w-4 text-inherit" />
+            <SmallStyledIcon
+              icon={<Heart className="h-2 w-2" />}
+              gradientColors={['#ec4899', '#f43f5e']}
+            />
             <span className="ml-2">Collaborate</span>
           </Button>
         </Link>
@@ -71,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex w-48 bg-[#e6e7ec] text-[#000000] font-bold">
+      <div className="hidden md:flex fixed h-screen w-48 bg-[#e6e7ec] text-[#000000] font-bold">
         <SidebarContent />
       </div>
 

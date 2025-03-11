@@ -184,7 +184,7 @@ const RestakeWatch: React.FC = () => {
           </Select>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden md:ml-48">
           {showBanner && (
             <div className="bg-gradient-to-r from-[#ab3bd2] to-[#922fb8] text-white py-2 px-4 flex justify-between items-center shadow-md">
               <div className="flex items-center space-x-2">
@@ -211,7 +211,7 @@ const RestakeWatch: React.FC = () => {
           )}
 
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e6e7ec] text-[#000000]">
-            <div className="bg-[#e6e7ec] text-[#000000] py-4 px-4 sm:px-6 lg:px-8 shadow-md">
+            <div className="bg-[#e6e7ec] text-[#000000] py-4 px-4 sm:px-6 lg:px-8">
               <div className="max-w-7xl mx-auto flex flex-col justify-between items-center">
                 <div className="flex items-center space-x-4 w-full justify-between">
                   <div>
