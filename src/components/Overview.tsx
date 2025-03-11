@@ -668,41 +668,36 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           Risks Overview
         </h2>
         <p className="text-sm text-gray-600">
-          A comprehensive view of key metrics and associated risks in the
-          EigenLayer ecosystem
+          A comprehensive view of key metrics and associated risks in the EigenLayer ecosystem
         </p>
       </CardHeader>
       <CardContent>
         {/* Key Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <MetricSummaryCard
-            title="Total Restaked ETH"
-            value={formattedETH}
+          <MetricSummaryCard 
+            title="Total Restaked ETH" 
+            value={formattedETH} 
             icon={<Wallet className="h-5 w-5 text-blue-600" />}
             description="Total amount of ETH restaked on EigenLayer"
           />
-          <MetricSummaryCard
-            title="Active Operators"
-            value={formattedOperators}
+          <MetricSummaryCard 
+            title="Active Operators" 
+            value={formattedOperators} 
             icon={<Users className="h-5 w-5 text-purple-600" />}
             description="Number of active operators securing the network"
           />
-          <MetricSummaryCard
-            title="Active Restakers"
-            value={formattedRestakers}
+          <MetricSummaryCard 
+            title="Active Restakers" 
+            value={formattedRestakers} 
             icon={<Network className="h-5 w-5 text-green-600" />}
             description="Number of unique addresses restaking ETH"
           />
         </div>
-
+        
         {/* Risk Categories */}
         <div className="space-y-4">
           {/* Governance Risk */}
-          <ExpandableSection
-            title="Governance Risk"
-            severity="critical"
-            defaultOpen
-          >
+          <ExpandableSection title="Governance Risk" severity="critical" defaultOpen>
             <RiskIndicator
               level="critical"
               title="Malicious Governance Attack Vector"
@@ -730,13 +725,9 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               }
             />
           </ExpandableSection>
-
+          
           {/* Operator Risk */}
-          <ExpandableSection
-            title="Operator Concentration Risk"
-            severity={operatorConcentrationRisk}
-            defaultOpen
-          >
+          <ExpandableSection title="Operator Concentration Risk" severity={operatorConcentrationRisk} defaultOpen>
             <div className="space-y-3">
               <RiskIndicator
                 level="critical"
@@ -817,12 +808,9 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               />
             </div>
           </ExpandableSection>
-
+          
           {/* Restaker Risk */}
-          <ExpandableSection
-            title="Restaker Concentration Risk"
-            severity={restakerConcentrationRisk}
-          >
+          <ExpandableSection title="Restaker Concentration Risk" severity={restakerConcentrationRisk}>
             <div className="space-y-3">
               <RiskIndicator
                 level={restakerConcentrationRisk}
@@ -867,7 +855,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               />
             </div>
           </ExpandableSection>
-
+          
           {/* Positive Factors */}
           <ExpandableSection title="Security Improvements" severity="positive">
             <RiskIndicator
@@ -887,24 +875,6 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               }
             />
           </ExpandableSection>
-        </div>
-
-        {/* Tweet Summary */}
-        <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-800">
-              Share This Analysis
-            </h3>
-            <a
-              href={`https://twitter.com/intent/tweet?text=EigenLayer ecosystem analysis by @TheRestakeWatch and @eigenlayer: ${formattedETH} ETH restaked across ${formattedOperators} operators. Key risks: Governance multisig vulnerability, ${operatorTopCount} operators control 33% of stake, ${formattedP2PShare}% controlled by P2P entity. Check the full analysis at restakewatch.com`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-xs px-3 py-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-            >
-              <Share2 size={12} className="mr-1" />
-              Tweet This Analysis
-            </a>
-          </div>
         </div>
       </CardContent>
     </Card>
