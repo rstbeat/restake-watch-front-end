@@ -17,6 +17,10 @@ import {
   Network,
   ServerCog,
   Share2,
+  AlertCircle,
+  CheckCircle,
+  Info,
+  ExternalLink,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
@@ -396,186 +400,390 @@ interface EnhancedMetricsProps {
   } | null;
 }
 
+// UnifiedRiskMetricsOverview component
+interface UnifiedRiskMetricsOverviewProps {
+  restakeData: {
+    activeRestakers?: number;
+    concentrationMetrics?: {
+      top33PercentCount?: number;
+      bottom33PercentCount?: number;
+      herfindahlIndex?: number;
+    };
+  } | null;
+  operatorData: {
+    totalETHRestaked?: number;
+    activeEntities?: number;
+    concentrationMetrics?: {
+      top33PercentCount?: number;
+      bottom33PercentCount?: number;
+      herfindahlIndex?: number;
+    };
+    majorOperatorGroupMetrics?: {
+      [operatorName: string]: {
+        total_eth_restaked: number;
+        total_market_share: number;
+      };
+    };
+  } | null;
+}
+
+// Tooltip with term definition
+const TermTooltip: React.FC<{ term: string; definition: string }> = ({ term, definition }) => (
+  <Tooltip.Provider>
+    <Tooltip.Root>
+      <Tooltip.Trigger asChild>
+        <span className="border-b border-dotted border-gray-500 cursor-help">{term}</span>
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
+          <p>{definition}</p>
+          <Tooltip.Arrow className="fill-gray-800" />
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
+  </Tooltip.Provider>
+);
+
+// Expandable section component
+const ExpandableSection: React.FC<{
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  severity?: "critical" | "warning" | "positive" | "neutral";
+}> = ({ title, children, defaultOpen = false, severity = "neutral" }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  
+  const severityClasses = {
+    critical: "text-red-700 bg-red-50 border-red-300",
+    warning: "text-orange-700 bg-orange-50 border-orange-300",
+    positive: "text-green-700 bg-green-50 border-green-300",
+    neutral: "text-blue-700 bg-blue-50 border-blue-300"
+  };
+  
+  const severityIcons = {
+    critical: <AlertCircle className="h-5 w-5 text-red-600" />,
+    warning: <AlertTriangle className="h-5 w-5 text-orange-600" />,
+    positive: <CheckCircle className="h-5 w-5 text-green-600" />,
+    neutral: <Info className="h-5 w-5 text-blue-600" />
+  };
+  
+  return (
+    <div className={`rounded-lg border ${severity !== "neutral" ? "border-l-4" : ""} ${
+      severity === "critical" ? "border-l-red-500" : 
+      severity === "warning" ? "border-l-orange-500" : 
+      severity === "positive" ? "border-l-green-500" : 
+      "border-gray-200"
+    }`}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center justify-between w-full p-4 text-left font-medium ${severityClasses[severity]} rounded-t-lg hover:bg-opacity-80 transition-colors`}
+      >
+        <div className="flex items-center">
+          {severityIcons[severity]}
+          <span className="ml-2">{title}</span>
+        </div>
+        {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+      </button>
+      {isOpen && (
+        <div className="p-4 bg-white">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Risk indicator component
+const RiskIndicator: React.FC<{
+  level: "critical" | "warning" | "positive";
+  title: string;
+  description: React.ReactNode;
+}> = ({ level, title, description }) => {
+  const levelStyles = {
+    critical: {
+      icon: <AlertCircle className="h-5 w-5 text-red-600 shrink-0" />,
+      border: "border-red-200",
+      bg: "bg-red-50",
+      title: "text-red-800 font-bold"
+    },
+    warning: {
+      icon: <AlertTriangle className="h-5 w-5 text-orange-600 shrink-0" />,
+      border: "border-orange-200",
+      bg: "bg-orange-50",
+      title: "text-orange-800 font-bold"
+    },
+    positive: {
+      icon: <CheckCircle className="h-5 w-5 text-green-600 shrink-0" />,
+      border: "border-green-200",
+      bg: "bg-green-50",
+      title: "text-green-800 font-bold"
+    }
+  };
+  
+  return (
+    <div className={`flex p-3 rounded-lg border ${levelStyles[level].border} ${levelStyles[level].bg}`}>
+      <div className="mr-3">
+        {levelStyles[level].icon}
+      </div>
+      <div>
+        <h4 className={`text-sm ${levelStyles[level].title} mb-1`}>{title}</h4>
+        <div className="text-sm">{description}</div>
+      </div>
+    </div>
+  );
+};
+
+// Key metrics summary card
+const MetricSummaryCard: React.FC<{
+  title: string;
+  value: string | number;
+  icon: React.ReactNode;
+  description?: string;
+}> = ({ title, value, icon, description }) => (
+  <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+    <div className="flex items-center space-x-3 mb-2">
+      <div className="bg-blue-50 p-2 rounded-full">
+        {icon}
+      </div>
+      <h3 className="text-gray-700 font-medium">{title}</h3>
+    </div>
+    <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
+    {description && <p className="text-xs text-gray-500">{description}</p>}
+  </div>
+);
+
+const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
+  restakeData,
+  operatorData,
+}) => {
+  // Format values for display
+  const formattedETH = new Intl.NumberFormat('en-US').format(operatorData?.totalETHRestaked || 0);
+  const formattedOperators = new Intl.NumberFormat('en-US').format(operatorData?.activeEntities || 0);
+  const formattedRestakers = new Intl.NumberFormat('en-US').format(restakeData?.activeRestakers || 0);
+  
+  // Get the P2P market share if available
+  const p2pMarketShare = operatorData?.majorOperatorGroupMetrics?.['P2P']?.total_market_share || 0;
+  const formattedP2PShare = (p2pMarketShare * 100).toFixed(2);
+  
+  // Get the concentration metrics
+  const operatorTopCount = operatorData?.concentrationMetrics?.top33PercentCount || 0;
+  const operatorBottomCount = operatorData?.concentrationMetrics?.bottom33PercentCount || 0;
+  const operatorHerfindahl = operatorData?.concentrationMetrics?.herfindahlIndex || 0;
+  
+  const restakerTopCount = restakeData?.concentrationMetrics?.top33PercentCount || 0;
+  const restakerBottomCount = restakeData?.concentrationMetrics?.bottom33PercentCount || 0;
+  const restakerHerfindahl = restakeData?.concentrationMetrics?.herfindahlIndex || 0;
+  
+  // Determine risk status for different categories
+  const operatorConcentrationRisk = operatorHerfindahl > 0.15 ? "critical" : operatorHerfindahl > 0.1 ? "warning" : "positive";
+  const restakerConcentrationRisk = restakerHerfindahl > 0.15 ? "critical" : restakerHerfindahl > 0.1 ? "warning" : "positive";
+  
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <h2 className="text-xl font-bold text-gray-900 flex items-center">
+          <Shield className="mr-2 h-5 w-5 text-purple-600" />
+          Risks Overview
+        </h2>
+        <p className="text-sm text-gray-600">
+          A comprehensive view of key metrics and associated risks in the EigenLayer ecosystem
+        </p>
+      </CardHeader>
+      <CardContent>
+        {/* Key Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <MetricSummaryCard 
+            title="Total Restaked ETH" 
+            value={formattedETH} 
+            icon={<Wallet className="h-5 w-5 text-blue-600" />}
+            description="Total amount of ETH restaked on EigenLayer"
+          />
+          <MetricSummaryCard 
+            title="Active Operators" 
+            value={formattedOperators} 
+            icon={<Users className="h-5 w-5 text-purple-600" />}
+            description="Number of active operators securing the network"
+          />
+          <MetricSummaryCard 
+            title="Active Restakers" 
+            value={formattedRestakers} 
+            icon={<Network className="h-5 w-5 text-green-600" />}
+            description="Number of unique addresses restaking ETH"
+          />
+        </div>
+        
+        {/* Risk Categories */}
+        <div className="space-y-4">
+          {/* Governance Risk */}
+          <ExpandableSection title="Governance Risk" severity="critical" defaultOpen>
+            <RiskIndicator 
+              level="critical"
+              title="Malicious Governance Attack Vector"
+              description={
+                <div>
+                  <p className="mb-2">
+                    A malicious actor could compromise the governance structure of EigenLayer. The protocol relies on a 
+                    <TermTooltip 
+                      term=" 9-of-13 community multisig" 
+                      definition="A multisignature wallet that requires 9 out of 13 signers to approve any transaction. This presents a centralized point of failure if compromised."
+                    /> that can execute IMMEDIATE upgrades without a timelock.
+                  </p>
+                  <a
+                    href="https://x.com/TheRestakeWatch/status/1858871898051907985"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 flex items-center text-xs mt-1"
+                  >
+                    <span>Read more about this risk</span>
+                    <ExternalLink size={12} className="ml-1" />
+                  </a>
+                </div>
+              }
+            />
+          </ExpandableSection>
+          
+          {/* Operator Risk */}
+          <ExpandableSection title="Operator Concentration Risk" severity={operatorConcentrationRisk} defaultOpen>
+            <div className="space-y-3">
+              <RiskIndicator 
+                level="critical"
+                title="Single Professional Operator Risk"
+                description={
+                  <p>
+                    P2P controls <span className="font-bold text-red-600">{formattedP2PShare}%</span> of total restaked assets across its operators. 
+                    If compromised, P2P could simultaneously attack multiple <TermTooltip term="AVSs" definition="Actively Validated Services - applications that use EigenLayer's security for validation purposes." />, 
+                    compromising the network's security.
+                  </p>
+                }
+              />
+              
+              <RiskIndicator 
+                level={operatorConcentrationRisk}
+                title="Top Operator Concentration"
+                description={
+                  <div>
+                    <p className="mb-2">
+                      Just <span className="font-bold text-red-600">{operatorTopCount}</span> operators control 33% of restaked ETH.
+                      Their compromise or collusion could trigger a cascading effect across multiple AVSs.
+                    </p>
+                    <p className="text-sm">
+                      <TermTooltip 
+                        term="Herfindahl concentration index:" 
+                        definition="A measure of market concentration. Values under 0.15 are considered relatively healthy, while higher values indicate concerning concentration."
+                      /> <span className="font-semibold">{operatorHerfindahl.toFixed(4)}</span>
+                    </p>
+                  </div>
+                }
+              />
+              
+              <RiskIndicator 
+                level="positive"
+                title="Long Tail Distribution"
+                description={
+                  <p>
+                    <span className="font-bold text-green-600">{operatorBottomCount}</span> smaller operators secure another 33% of restaked ETH,
+                    providing better decentralization at the lower end of the distribution curve.
+                  </p>
+                }
+              />
+              
+              <RiskIndicator 
+                level="warning"
+                title="Limited Permissionless Participation"
+                description={
+                  <p>
+                    Only <span className="font-bold text-orange-600">2 out of 19 AVSs</span> allow operators to secure them without whitelisting
+                    or imposing stringent requirements. This limited permissionless participation makes the ecosystem more fragile.
+                  </p>
+                }
+              />
+            </div>
+          </ExpandableSection>
+          
+          {/* Restaker Risk */}
+          <ExpandableSection title="Restaker Concentration Risk" severity={restakerConcentrationRisk}>
+            <div className="space-y-3">
+              <RiskIndicator 
+                level={restakerConcentrationRisk}
+                title="Top Restaker Concentration"
+                description={
+                  <div>
+                    <p className="mb-2">
+                      The top <span className="font-bold text-red-600">{restakerTopCount}</span> individual restakers control 33% of all restaked assets.
+                      Their compromise could affect multiple AVSs simultaneously.
+                    </p>
+                    <p className="text-sm">
+                      <TermTooltip 
+                        term="Herfindahl concentration index:" 
+                        definition="A measure of market concentration. Values under 0.15 are considered relatively healthy, while higher values indicate concerning concentration."
+                      /> <span className="font-semibold">{restakerHerfindahl.toFixed(4)}</span>
+                    </p>
+                  </div>
+                }
+              />
+              
+              <RiskIndicator 
+                level="positive"
+                title="Long Tail Distribution"
+                description={
+                  <p>
+                    <span className="font-bold text-green-600">{restakerBottomCount}</span> smaller restakers secure another 33% of restaked ETH,
+                    providing better decentralization at the lower end of the distribution curve.
+                  </p>
+                }
+              />
+            </div>
+          </ExpandableSection>
+          
+          {/* Positive Factors */}
+          <ExpandableSection title="Security Improvements" severity="positive">
+            <RiskIndicator 
+              level="positive"
+              title="Distributed Validator Technology"
+              description={
+                <p>
+                  <span className="font-bold text-green-600">7</span> validator operators are running 
+                  <TermTooltip 
+                    term=" distributed validator technology" 
+                    definition="A technology that allows validators to be run by multiple machines and operators, enhancing fault-tolerance and reducing slashing risk."
+                  /> by Obol Collective, providing higher validator uptime through fault-tolerance and reduced slashing risk via key sharing.
+                </p>
+              }
+            />
+          </ExpandableSection>
+        </div>
+        
+        {/* Tweet Summary */}
+        <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-800">Share This Analysis</h3>
+            <a 
+              href={`https://twitter.com/intent/tweet?text=EigenLayer ecosystem analysis by @TheRestakeWatch and @eigenlayer: ${formattedETH} ETH restaked across ${formattedOperators} operators. Key risks: Governance multisig vulnerability, ${operatorTopCount} operators control 33% of stake, ${formattedP2PShare}% controlled by P2P entity. Check the full analysis at restakewatch.com`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center text-xs px-3 py-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+            >
+              <Share2 size={12} className="mr-1" />
+              Tweet This Analysis
+            </a>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const EnhancedMetrics: React.FC<EnhancedMetricsProps> = ({
   restakeData,
   operatorData,
 }) => {
   return (
     <div className="flex flex-col gap-6">
-      <Card>
-        <CardContent className="pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Risk Summary
-          </h3>
-          <div className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                {/* <Shield className="h-4 w-4 mr-2" /> */}
-                <a
-                  href="https://x.com/TheRestakeWatch/status/1858871898051907985"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Funds can be stolen if...
-                </a>
-              </h4>
-              <div>
-                <div className="flex items-center mt-2">
-                  <div className="w-8 flex items-center">
-                    <div className={`w-2 h-2 rounded-full bg-red-500`} />
-                  </div>
-                  <a
-                    className="ml-4 text-sm font-semibold text-gray-900 underline"
-                    href="https://x.com/TheRestakeWatch/status/1858871898051907985"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    A malicious actor compromises the governance structure of
-                    EigenLayer. The protocol relies on a 9-of-13 community
-                    multisig that can execute IMMEDIATE upgrades without a
-                    timelock <span className="text-red-500">(CRITICAL)</span>.
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                <div>AVSs security can be compromised if...</div>
-              </h4>
-              <div>
-                <div className="flex flex-col items-center gap-4">
-                  <div className="flex flex-col mt-2 relative">
-                    <div
-                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
-                    />
-                    <div className="ml-6 text-sm font-semibold text-gray-900">
-                      1. P2P, which controls{' '}
-                      <span className="text-red-500">
-                        {operatorData?.majorOperatorGroupMetrics
-                          ? (
-                              operatorData?.majorOperatorGroupMetrics?.['P2P'][
-                                'total_market_share'
-                              ] * 100
-                            ).toFixed(2)
-                          : 0}
-                        %
-                      </span>{' '}
-                      of total restaked assets along its operators, becomes
-                      compromised. With this concentrated stake, P2P could
-                      simultaneously attack multiple AVSs, compromising the
-                      network's security{' '}
-                      <span className="text-red-500">(CRITICAL)</span>.
-                    </div>
-                  </div>
-                  <div className="flex flex-col relative">
-                    <div
-                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
-                    />
-                    <div className="ml-6 text-sm font-semibold text-gray-900">
-                      2.
-                      <span className="text-red-500">
-                        The top{' '}
-                        {operatorData?.concentrationMetrics
-                          ?.top33PercentCount || 0}{' '}
-                        operators
-                      </span>
-                      , who collectively control 33% of all restaked assets, get
-                      compromised or collude. Even a single operator getting
-                      compromised, slashed, or experiencing operational problems
-                      could trigger a cascading effect across multiple AVSs.
-                    </div>
-                  </div>
-                  <div className="flex flex-col relative">
-                    <div
-                      className={`w-2 h-2 absolute top-1 rounded-full bg-red-500`}
-                    />
-                    <div className="ml-6 text-sm font-semibold text-gray-900">
-                      3.{' '}
-                      <span className="text-red-500">
-                        The top{' '}
-                        {restakeData?.concentrationMetrics?.top33PercentCount ||
-                          0}{' '}
-                        individual restakers
-                      </span>
-                      , who collectively control 33% of all restaked assets, get
-                      compromised, collude, slashed or experience operational
-                      problems could trigger a cascading effect across multiple
-                      AVSs.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                He system becomes more fragile when...
-              </h4>
-              <div className="mt-2 flex items-center">
-                <div className="w-8">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                </div>
-                <span className="ml-2 text-sm font-semibold text-gray-900">
-                  Only a few AVSs are permissionless regarding operator
-                  participation. Currently, only{' '}
-                  <span className="text-red-500">
-                    2 (out of 19) AVSs allow operators to secure them without
-                    whitelisting
-                  </span>{' '}
-                  or imposing stringent requirements. This limited
-                  permissionless participation makes the ecosystem more fragile.
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-sm font-medium text-gray-600 flex items-center">
-                AVSs security is improved by...
-              </h4>
-              <div className="mt-2 flex items-center">
-                <div className="w-8">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500" />
-                </div>
-                <span className="ml-2 text-sm font-semibold text-gray-900">
-                  <span className="text-red-500">7</span> validator operators
-                  running distributed validator technology by Obol Collective,
-                  providing higher validator uptime through fault-tolerance and
-                  reduced slashing risk via key sharing.
-                </span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardContent className="pt-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            Key Metrics
-          </h3>
-          
-          <div className="space-y-4 mb-6">
-            {/* General Metrics Summary - Now first as requested */}
-            <GeneralMetricsSummary
-              totalETHRestaked={operatorData?.totalETHRestaked}
-              activeOperators={operatorData?.activeEntities}
-              activeRestakers={restakeData?.activeRestakers}
-            />
-            
-            {/* Concentration Summary for Operators */}
-            <ConcentrationSummary 
-              entityType="operators" 
-              concentrationMetrics={operatorData?.concentrationMetrics}
-            />
-            
-            {/* Concentration Summary for Restakers */}
-            <ConcentrationSummary 
-              entityType="restakers" 
-              concentrationMetrics={restakeData?.concentrationMetrics}
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Replacing the two separate sections with the unified overview */}
+      <UnifiedRiskMetricsOverview 
+        restakeData={restakeData} 
+        operatorData={operatorData} 
+      />
     </div>
   );
 };
