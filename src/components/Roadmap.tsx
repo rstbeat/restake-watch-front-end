@@ -98,6 +98,7 @@ const Roadmap: React.FC = () => {
               date="March 2025"
               title="ECI Implementation"
               description="Launch of Exposure Concentration Index (ECI) metric for EigenLayer"
+              completed={true}
             />
             <TimelineItem
               date="March 2025"
