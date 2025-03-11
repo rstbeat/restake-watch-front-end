@@ -3,7 +3,7 @@ import { Twitter, MessageCircle } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#ab3bd2] text-white py-6">
+    <footer className="bg-[#e6e7ec] text-gray-500 py-6">
       <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
         <p className="text-center md:text-left mb-4 md:mb-0">
           Made with un chingo de{' '}
@@ -16,7 +16,7 @@ const Footer: React.FC = () => {
             href="https://twitter.com/therestakewatch"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-gray-200 transition-colors"
+            className="hover:text-[#ab3bd2] transition-colors"
             aria-label="Twitter"
           >
             <Twitter size={24} />
@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
             href="https://t.me/espejelomar"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-gray-200 transition-colors"
+            className="hover:text-[#ab3bd2] transition-colors"
             aria-label="Telegram"
           >
             <MessageCircle size={24} />

@@ -186,14 +186,14 @@ const RestakeWatch: React.FC = () => {
 
         <div className="flex-1 flex flex-col overflow-hidden md:ml-48">
           {showBanner && (
-            <div className="bg-gradient-to-r from-[#ab3bd2] to-[#922fb8] text-white py-2 px-4 flex justify-between items-center shadow-md">
+            <div className="bg-[#e6e7ec] text-gray-500 py-2 px-4 flex justify-between items-center border-b border-gray-200">
               <div className="flex items-center space-x-2">
-                <AlertTriangle className="h-5 w-5 text-white" />
+                <AlertTriangle className="h-5 w-5 text-gray-500" />
                 <span>
                   New paper release:{' '}
                   <Link
                     href="https://hackmd.io/@espejelomar/H14XiPt51g"
-                    className="underline font-semibold hover:text-gray-200"
+                    className="underline font-semibold hover:text-[#ab3bd2]"
                   >
                     Fortify or Falter: A Comprehensive Restaking Risk Assessment
                   </Link>
@@ -203,7 +203,7 @@ const RestakeWatch: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowBanner(false)}
-                className="text-white hover:bg-[#922fb8]"
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
               >
                 <X className="h-4 w-4" />
               </Button>
