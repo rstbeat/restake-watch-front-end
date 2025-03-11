@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Treemap,
   ResponsiveContainer,
@@ -23,10 +23,11 @@ import {
   ExternalLink,
   PieChart,
   FileSpreadsheet,
+  DollarSign,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
-import { fetchOperatorData } from '../app/api/restake/restake';
+import { fetchOperatorData, fetchETHPrice } from '../app/api/restake/restake';
 import { LucideIcon } from 'lucide-react';
 
 interface OverviewProps {
@@ -664,13 +665,21 @@ const MetricSummaryCard: React.FC<{
   value: string | number;
   icon: React.ReactNode;
   description?: string;
-}> = ({ title, value, icon, description }) => (
+  usdValue?: string;
+}> = ({ title, value, icon, description, usdValue }) => (
   <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
     <div className="flex items-center mb-3">
       {icon}
       <h3 className="text-gray-700 font-medium ml-3">{title}</h3>
     </div>
-    <p className="text-2xl font-bold text-gray-900 mb-1">{value}</p>
+    <p className="text-2xl font-bold text-gray-900 mb-1">
+      {value}
+      {usdValue && (
+        <span className="text-lg font-normal text-gray-600 ml-2">
+          (${usdValue})
+        </span>
+      )}
+    </p>
     {description && (
       <p className="text-xs text-gray-500 mt-auto">{description}</p>
     )}
@@ -681,16 +690,42 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
   restakeData,
   operatorData,
 }) => {
+  const [ethPrice, setEthPrice] = useState<number>(0);
+
   // Format values for display
-  const formattedETH = new Intl.NumberFormat('en-US').format(
-    operatorData?.totalETHRestaked || 0,
-  );
+  const totalETHValue = operatorData?.totalETHRestaked || 0;
+  const formattedETH = new Intl.NumberFormat('en-US').format(totalETHValue);
   const formattedOperators = new Intl.NumberFormat('en-US').format(
     operatorData?.activeEntities || 0,
   );
   const formattedRestakers = new Intl.NumberFormat('en-US').format(
     restakeData?.activeRestakers || 0,
   );
+
+  // Calculate USD value
+  const usdValue = totalETHValue * ethPrice;
+  const formattedUSD =
+    usdValue > 0
+      ? new Intl.NumberFormat('en-US').format(Math.round(usdValue))
+      : '';
+
+  // Fetch ETH price
+  useEffect(() => {
+    const getEthPrice = async () => {
+      try {
+        const price = await fetchETHPrice();
+        setEthPrice(price);
+      } catch (error) {
+        console.error('Error fetching ETH price:', error);
+      }
+    };
+
+    getEthPrice();
+
+    // Refresh price every 5 minutes
+    const interval = setInterval(getEthPrice, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Get concentration data
   const operatorTopCount =
@@ -727,8 +762,9 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           {/* Key Metrics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <MetricSummaryCard
-              title="Total Restaked Value (in ETH)"
+              title="Total Restaked Value (ETH)"
               value={formattedETH}
+              usdValue={formattedUSD}
               icon={
                 <StyledIcon
                   icon={<Wallet className="h-4 w-4" />}

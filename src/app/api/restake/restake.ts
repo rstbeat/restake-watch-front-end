@@ -3,6 +3,26 @@ import axios from 'axios';
 import { OperatorDataResponse } from '../../interface/operatorData.interface';
 
 /**
+ * Fetches the current ETH price in USD from CoinGecko API
+ * 
+ * @return A Promise that resolves to the current ETH price in USD
+ */
+const fetchETHPrice = async (): Promise<number> => {
+  try {
+    const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
+      params: {
+        ids: 'ethereum',
+        vs_currencies: 'usd',
+      },
+    });
+    return response.data.ethereum.usd;
+  } catch (err: unknown) {
+    console.error('Error fetching ETH price data');
+    return 0;
+  }
+};
+
+/**
  * Fetches operator data from the "/restake/operator-data" endpoint.
  *
  * @param params - The parameters for the fetch request.
@@ -58,4 +78,4 @@ const fetchStakerData = async () => {
   }
 };
 
-export { fetchOperatorData, fetchStakerData };
+export { fetchOperatorData, fetchStakerData, fetchETHPrice };
