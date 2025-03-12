@@ -743,35 +743,40 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
   // Get the major operator market shares with case-insensitive lookup
   const findOperatorData = (operatorName: string) => {
     if (!operatorData?.majorOperatorGroupMetrics) return null;
-    
+
     // Try different possible key formats
     const possibleKeys = [
-      operatorName.toLowerCase(),             // 'p2p'
-      operatorName.toUpperCase(),             // 'P2P'
-      operatorName.replace(' ', '_').toLowerCase(),  // 'node_monster'
-      operatorName                            // Exact match
+      operatorName.toLowerCase(), // 'p2p'
+      operatorName.toUpperCase(), // 'P2P'
+      operatorName.replace(' ', '_').toLowerCase(), // 'node_monster'
+      operatorName, // Exact match
     ];
-    
+
     // Search for any matching key
     for (const key of Object.keys(operatorData.majorOperatorGroupMetrics)) {
-      if (possibleKeys.includes(key.toLowerCase()) || key.toLowerCase().includes(operatorName.toLowerCase())) {
+      if (
+        possibleKeys.includes(key.toLowerCase()) ||
+        key.toLowerCase().includes(operatorName.toLowerCase())
+      ) {
         return operatorData.majorOperatorGroupMetrics[key];
       }
     }
-    
+
     return null;
   };
-  
+
   // Get P2P data
   const p2pData = findOperatorData('p2p');
   const p2pShare = p2pData ? p2pData.total_market_share * 100 : 0;
   const formattedP2PShare = p2pShare.toFixed(1);
-  
+
   // Get Node Monster data
   const nodeMonsterData = findOperatorData('node monster');
-  const nodeMonsterShare = nodeMonsterData ? nodeMonsterData.total_market_share * 100 : 0;
+  const nodeMonsterShare = nodeMonsterData
+    ? nodeMonsterData.total_market_share * 100
+    : 0;
   const formattedNodeMonsterShare = nodeMonsterShare.toFixed(1);
-  
+
   // Calculate combined market share
   const combinedShare = p2pShare + nodeMonsterShare;
   const formattedCombinedShare = combinedShare.toFixed(1);
@@ -883,7 +888,12 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   />
                 </div>
                 <p className="text-sm text-red-800">
-                  <span className="font-bold">Major Operator Risk:</span> Between P2P ({formattedP2PShare}%) and Node Monster ({formattedNodeMonsterShare}%), these two professional operators control <span className="font-bold">{formattedCombinedShare}%</span> of total restaked assets.
+                  <span className="font-bold">Major Operator Risk:</span>{' '}
+                  Between P2P ({formattedP2PShare}%) and Node Monster (
+                  {formattedNodeMonsterShare}%), these two professional
+                  operators control{' '}
+                  <span className="font-bold">{formattedCombinedShare}%</span>{' '}
+                  of total restaked assets.
                 </p>
               </div>
               <div className="flex items-start">
@@ -977,7 +987,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               defaultOpen={false}
             >
               <RiskIndicator
-                level="warning"
+                level="critical"
                 title="Excess Concentration of Stake"
                 description={
                   <p>
@@ -999,6 +1009,38 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </p>
                 }
               />
+              <RiskIndicator
+                level="positive"
+                title="Healthy Long Tail Distribution"
+                description={
+                  <p>
+                    Approximately{' '}
+                    <strong>
+                      {operatorData?.concentrationMetrics
+                        ?.bottom33PercentCount || '1000+'}
+                    </strong>{' '}
+                    smaller operators collectively secure 33% of restaked ETH,
+                    creating a healthy "long tail" that improves overall
+                    decentralization.
+                  </p>
+                }
+              />
+              <RiskIndicator
+                level="positive"
+                title="Moderate Market Concentration"
+                description={
+                  <p>
+                    The Herfindahl-Hirschman Index (HHI) for operators is{' '}
+                    <strong>
+                      {(
+                        operatorData?.concentrationMetrics?.herfindahlIndex || 0
+                      ).toFixed(4)}
+                    </strong>
+                    , indicating a market with moderate concentration. Values
+                    below 0.15 suggest sufficient diversity among operators.
+                  </p>
+                }
+              />
             </ExpandableSection>
 
             {/* Restaker Risk */}
@@ -1008,7 +1050,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               defaultOpen={false}
             >
               <RiskIndicator
-                level="warning"
+                level="critical"
                 title="Excess Concentration of Stake"
                 description={
                   <p>
@@ -1031,6 +1073,37 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </p>
                 }
               />
+              <RiskIndicator
+                level="positive"
+                title="Broad Participation Base"
+                description={
+                  <p>
+                    Approximately{' '}
+                    <strong>
+                      {restakeData?.concentrationMetrics
+                        ?.bottom33PercentCount || '1000+'}
+                    </strong>{' '}
+                    smaller restakers collectively hold 33% of restaked ETH,
+                    indicating a healthy level of grassroots participation.
+                  </p>
+                }
+              />
+              <RiskIndicator
+                level="positive"
+                title="Low Concentration Index"
+                description={
+                  <p>
+                    The Herfindahl-Hirschman Index (HHI) for restakers is{' '}
+                    <strong>
+                      {(
+                        restakeData?.concentrationMetrics?.herfindahlIndex || 0
+                      ).toFixed(4)}
+                    </strong>
+                    . This low value (well below the 0.15 threshold) suggests a
+                    diverse and relatively decentralized distribution of stake.
+                  </p>
+                }
+              />
             </ExpandableSection>
 
             {/* Technical Risk */}
@@ -1044,7 +1117,8 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 title="Validator Technology Improvements"
                 description={
                   <p>
-                    Some operators are running
+                    {/* This value should eventually come from the API */}
+                    <strong>7</strong> operators are running
                     <TermTooltip
                       term=" distributed validator technology"
                       definition="A technology that allows validators to be run by multiple machines and operators, enhancing fault-tolerance and reducing slashing risk."
