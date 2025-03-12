@@ -679,14 +679,14 @@ const MetricSummaryCard: React.FC<{
       {icon}
       <h3 className="text-gray-700 font-medium ml-3">{title}</h3>
     </div>
-    <p className="text-2xl font-bold text-gray-900 mb-1">
-      {value}
+    <div className="mb-1">
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
       {usdValue && (
-        <span className="text-lg font-normal text-gray-600 ml-2">
-          (${usdValue})
-        </span>
+        <p className="text-md font-normal text-gray-600 mt-1">
+          (${usdValue} USD)
+        </p>
       )}
-    </p>
+    </div>
     {description && (
       <p className="text-xs text-gray-500 mt-auto">{description}</p>
     )}
@@ -740,10 +740,41 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
   const restakerTopCount =
     restakeData?.concentrationMetrics?.top33PercentCount || '?';
 
-  // Get the P2P market share if available
-  const p2pGroupData = operatorData?.majorOperatorGroupMetrics?.['p2p'] || null;
-  const p2pShare = p2pGroupData ? p2pGroupData.total_market_share * 100 : 0;
+  // Get the major operator market shares with case-insensitive lookup
+  const findOperatorData = (operatorName: string) => {
+    if (!operatorData?.majorOperatorGroupMetrics) return null;
+    
+    // Try different possible key formats
+    const possibleKeys = [
+      operatorName.toLowerCase(),             // 'p2p'
+      operatorName.toUpperCase(),             // 'P2P'
+      operatorName.replace(' ', '_').toLowerCase(),  // 'node_monster'
+      operatorName                            // Exact match
+    ];
+    
+    // Search for any matching key
+    for (const key of Object.keys(operatorData.majorOperatorGroupMetrics)) {
+      if (possibleKeys.includes(key.toLowerCase()) || key.toLowerCase().includes(operatorName.toLowerCase())) {
+        return operatorData.majorOperatorGroupMetrics[key];
+      }
+    }
+    
+    return null;
+  };
+  
+  // Get P2P data
+  const p2pData = findOperatorData('p2p');
+  const p2pShare = p2pData ? p2pData.total_market_share * 100 : 0;
   const formattedP2PShare = p2pShare.toFixed(1);
+  
+  // Get Node Monster data
+  const nodeMonsterData = findOperatorData('node monster');
+  const nodeMonsterShare = nodeMonsterData ? nodeMonsterData.total_market_share * 100 : 0;
+  const formattedNodeMonsterShare = nodeMonsterShare.toFixed(1);
+  
+  // Calculate combined market share
+  const combinedShare = p2pShare + nodeMonsterShare;
+  const formattedCombinedShare = combinedShare.toFixed(1);
 
   return (
     <>
@@ -852,10 +883,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   />
                 </div>
                 <p className="text-sm text-red-800">
-                  <span className="font-bold">Major Operator Risk:</span> P2P
-                  controls{' '}
-                  <span className="font-bold">{formattedP2PShare}%</span> of
-                  total restaked assets across its operators.
+                  <span className="font-bold">Major Operator Risk:</span> Between P2P ({formattedP2PShare}%) and Node Monster ({formattedNodeMonsterShare}%), these two professional operators control <span className="font-bold">{formattedCombinedShare}%</span> of total restaked assets.
                 </p>
               </div>
               <div className="flex items-start">
@@ -1011,17 +1039,6 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               severity="warning"
               defaultOpen={false}
             >
-              <RiskIndicator
-                level="warning"
-                title="Early-Stage Technology"
-                description={
-                  <p>
-                    EigenLayer and associated AVSs are relatively new,
-                    unaudited, or have limited production testing. This
-                    increases the risk of undiscovered vulnerabilities.
-                  </p>
-                }
-              />
               <RiskIndicator
                 level="positive"
                 title="Validator Technology Improvements"
