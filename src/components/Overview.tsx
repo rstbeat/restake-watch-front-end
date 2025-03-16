@@ -522,7 +522,7 @@ const StyledIcon: React.FC<{
       }}
     >
       <div className="text-white">{icon}</div>
-    </div>
+                  </div>
   );
 };
 
@@ -540,7 +540,7 @@ const SmallStyledIcon: React.FC<{
       }}
     >
       <div className="text-white">{icon}</div>
-    </div>
+                </div>
   );
 };
 
@@ -590,11 +590,11 @@ const RiskIndicator: React.FC<{
           icon={levelStyles[level].icon}
           gradientColors={levelStyles[level].colors}
         />
-      </div>
+              </div>
       <div>
         <h4 className={`text-sm ${levelStyles[level].title} mb-1`}>{title}</h4>
         <div className="text-sm">{description}</div>
-      </div>
+            </div>
     </div>
   );
 };
@@ -656,10 +656,10 @@ const ExpandableSection: React.FC<{
             gradientColors={severityIcons[severity].colors}
           />
           <span className="ml-2">{title}</span>
-        </div>
+                    </div>
         <div className="flex items-center justify-center rounded-full p-1 h-6 w-6 bg-white bg-opacity-30">
           {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-        </div>
+                  </div>
       </button>
       {isOpen && <div className="p-4 bg-white">{children}</div>}
     </div>
@@ -793,7 +793,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 gradientColors={['#8b5cf6', '#d946ef']}
                 size="h-10 w-10"
               />
-            </div>
+                    </div>
             Risk Overview
           </h2>
           <p className="text-sm text-gray-600">
@@ -841,7 +841,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               }
               description="Number of unique addresses restaking ETH (with more than 0 restaked assets)"
             />
-          </div>
+                  </div>
 
           {/* Critical Risk Metrics Alert */}
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
@@ -859,13 +859,13 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     icon={<AlertCircle className="h-3 w-3" />}
                     gradientColors={['#ef4444', '#f97316']}
                   />
-                </div>
+                    </div>
                 <p className="text-sm text-red-800">
                   <span className="font-bold">Governance Risk:</span> EigenLayer
                   relies on a 9-of-13 community multisig that can execute
                   IMMEDIATE upgrades without a timelock.
                 </p>
-              </div>
+                  </div>
               <div className="flex items-start">
                 <div className="shrink-0 mr-2">
                   <SmallStyledIcon
@@ -886,7 +886,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     icon={<AlertCircle className="h-3 w-3" />}
                     gradientColors={['#ef4444', '#f97316']}
                   />
-                </div>
+            </div>
                 <p className="text-sm text-red-800">
                   <span className="font-bold">Major Operator Risk:</span>{' '}
                   Between P2P ({formattedP2PShare}%) and Node Monster (
@@ -895,20 +895,20 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   <span className="font-bold">{formattedCombinedShare}%</span>{' '}
                   of total restaked assets.
                 </p>
-              </div>
+                </div>
               <div className="flex items-start">
                 <div className="shrink-0 mr-2">
                   <SmallStyledIcon
                     icon={<AlertCircle className="h-3 w-3" />}
                     gradientColors={['#ef4444', '#f97316']}
                   />
-                </div>
+              </div>
                 <p className="text-sm text-red-800">
                   <span className="font-bold">Restaker Concentration:</span> The
                   top {restakerTopCount} individual restakers control 33% of all
                   restaked assets.
                 </p>
-              </div>
+            </div>
               <div className="flex items-start">
                 <div className="shrink-0 mr-2">
                   <SmallStyledIcon
