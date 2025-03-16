@@ -1261,12 +1261,12 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 size="h-9 w-9"
               />
             </div>
-            Share of Total Restaked ETH by Major Operators
+            Major Operators by Total Restaked Value (ETH)
           </h2>
           <p className="text-sm text-gray-600 mt-1">
             This chart represents operator groups that manage multiple
             individual operators. The data shown is the aggregated sum for each
-            group.
+            group, with all asset types converted to their ETH value equivalent.
           </p>
         </CardHeader>
         <CardContent>
