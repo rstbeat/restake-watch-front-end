@@ -1334,16 +1334,16 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
       const data = payload[0].payload;
       return (
         <div className="bg-white p-3 shadow-lg rounded border border-gray-200">
-          <p className="font-semibold text-gray-900">{`${entityType === 'operators' ? 'Operator' : 'Restaker'} #${label}`}</p>
+          <p className="font-semibold text-gray-900">{`${entityType === 'operators' ? 'Individual Operator Node' : 'Restaker'} #${label}`}</p>
           <div className="space-y-1 mt-2">
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Cumulative Restake:</span>{' '}
+              <span className="font-medium">Cumulative Restake (ETH value):</span>{' '}
               <span className="text-gray-900">
                 {data.cumulativeStake.toFixed(2)}%
               </span>
             </p>
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Individual Restake:</span>{' '}
+              <span className="font-medium">Individual Restake (ETH value):</span>{' '}
               <span className="text-gray-900">
                 {data.individualStake.toFixed(4)}%
               </span>
@@ -1420,15 +1420,14 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
             <li className="flex items-start">
               <div className="shrink-0 text-red-600 mr-2">⚠️</div>
               <span>
-                The chart shows how restake is distributed among {entityType}{' '}
+                The chart shows how assets (converted to ETH value) are distributed among {entityType},
                 from largest to smallest.
               </span>
             </li>
             <li className="flex items-start">
               <div className="shrink-0 text-purple-600 mr-2">📊</div>
               <span>
-                The steep initial rise shows that a small number of {entityType}{' '}
-                control a large percentage of restake.
+                The steep initial rise shows that a small number of {entityType} control a large percentage of the total restake.
               </span>
             </li>
             {Object.entries(thresholdPoints).map(
@@ -1436,8 +1435,7 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
                 <li key={threshold} className="flex items-start">
                   <div className="shrink-0 text-blue-600 mr-2">🔍</div>
                   <span>
-                    <strong>{threshold}%</strong> of total restake is controlled
-                    by just <strong>{point.position}</strong> {entityType} (
+                    <strong>{threshold}%</strong> of total restake is controlled by just <strong>{point.position}</strong> {entityType} (
                     {point.entities.toFixed(1)}% of all {entityType})
                   </span>
                 </li>
@@ -1520,13 +1518,12 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
             How to interpret this chart:
           </h4>
           <p className="text-sm text-gray-600">
-            This chart shows how restake is distributed among {entityType},
-            ordered from largest to smallest. The steep rise at the beginning
-            indicates that a small number of {entityType} control a large
+            This chart shows how assets (converted to ETH value) are distributed among {entityType === 'operators' ? 'individual operator nodes' : entityType},
+            ordered from largest to smallest. Unlike the Professional Operator Dominance chart, this visualization considers each operator node separately, even if multiple nodes are managed by the same professional operator group. The steep rise at the beginning
+            indicates that a small number of {entityType === 'operators' ? 'individual nodes' : entityType} control a large
             percentage of the total restake. Use the scale toggle to switch
             between linear and logarithmic views - the logarithmic view helps
-            visualize the distribution among smaller {entityType} more clearly.
-            Hover over any point to see detailed statistics.
+            visualize the distribution among smaller {entityType}. For details on which professional groups operate multiple nodes, visit the Operators tab.
           </p>
         </div>
       </CardContent>
@@ -1552,7 +1549,42 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     fetchData();
   }, []);
 
-  // Color array for different sections (maintained from previous version)
+  // Find operator data helper function
+  const findOperatorData = (operatorName: string) => {
+    if (!operatorData?.majorOperatorGroupMetrics) return null;
+
+    // Try different possible key formats
+    const possibleKeys = [
+      operatorName.toLowerCase(), // 'p2p'
+      operatorName.toUpperCase(), // 'P2P'
+      operatorName.replace(' ', '_').toLowerCase(), // 'node_monster'
+      operatorName, // Exact match
+    ];
+
+    // Search for any matching key
+    for (const key of Object.keys(operatorData.majorOperatorGroupMetrics)) {
+      if (
+        possibleKeys.includes(key.toLowerCase()) ||
+        key.toLowerCase().includes(operatorName.toLowerCase())
+      ) {
+        return operatorData.majorOperatorGroupMetrics[key];
+      }
+    }
+
+    return null;
+  };
+
+  // Get operator data
+  const p2pData = findOperatorData('p2p');
+  const nodeMonsterData = findOperatorData('node monster');
+  const p2pShare = p2pData ? p2pData.total_market_share * 100 : 0;
+  const nodeMonsterShare = nodeMonsterData ? nodeMonsterData.total_market_share * 100 : 0;
+  const formattedP2PShare = p2pShare.toFixed(1);
+  const formattedNodeMonsterShare = nodeMonsterShare.toFixed(1);
+  const combinedShare = p2pShare + nodeMonsterShare;
+  const formattedCombinedShare = combinedShare.toFixed(1);
+
+  // Color array for different sections
   const purpleColors = [
     '#9C27B0', // Base purple
     '#8E24AA',
@@ -1598,23 +1630,61 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       <CompactNotes />
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold text-black flex items-center">
-            <div className="mr-3">
-              <StyledIcon
-                icon={<PieChart className="h-4 w-4" />}
-                gradientColors={['#9C27B0', '#d946ef']}
-                size="h-9 w-9"
-              />
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-xl font-semibold text-black flex items-center">
+                <div className="mr-3">
+                  <StyledIcon
+                    icon={<PieChart className="h-4 w-4" />}
+                    gradientColors={['#9C27B0', '#d946ef']}
+                    size="h-9 w-9"
+                  />
+                </div>
+                Professional Operator Dominance in EigenLayer
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                A few professional operator groups control a significant portion of the network through multiple individual nodes. This visualization shows the relative size of each major operator group's assets (converted to ETH value equivalent), with larger boxes representing more concentrated control.
+              </p>
             </div>
-            Major Operators by Total Restaked Value (ETH)
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            This chart represents operator groups that manage multiple
-            individual operators. The data shown is the aggregated sum for each
-            group, with all asset types converted to their ETH value equivalent.
-          </p>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2 items-center">
+            {p2pData && (
+              <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                <span>P2P controls {formattedP2PShare}% of total restaked assets (ETH value)</span>
+                <InfoTooltip content="P2P is the largest professional operator in EigenLayer, managing nodes for multiple projects and clients, highlighting significant concentration risk." />
+              </div>
+            )}
+            {nodeMonsterData && (
+              <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                <span>Top 2 operator groups control {formattedCombinedShare}% of network assets (in ETH value)</span>
+                <InfoTooltip content="The combined dominance of P2P and Node Monster represents a significant centralization concern." />
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
+          <div className="rounded-lg border border-gray-200 p-4 mb-4 bg-gray-50">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">Key Insights:</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li className="flex items-start">
+                <div className="shrink-0 text-red-600 mr-2">⚠️</div>
+                <span>Professional operator groups dominate EigenLayer, with P2P controlling {formattedP2PShare}% of all restaked assets (ETH value).</span>
+              </li>
+              <li className="flex items-start">
+                <div className="shrink-0 text-purple-600 mr-2">📊</div>
+                <span>The two largest operator groups (P2P and Node Monster) together control {formattedCombinedShare}% of all network assets (in ETH value).</span>
+              </li>
+              <li className="flex items-start">
+                <div className="shrink-0 text-blue-600 mr-2">🔍</div>
+                <span>Box size represents the ETH value of all assets held by each professional operator group - larger boxes indicate more concentrated control.</span>
+              </li>
+              <li className="flex items-start">
+                <div className="shrink-0 text-orange-600 mr-2">ℹ️</div>
+                <span>Note: Professional operators like P2P may operate nodes for multiple companies such as Puffer, Swell, etc. Visit the Operators tab for more detailed breakdown.</span>
+              </li>
+            </ul>
+          </div>
+
           {majorOperatorData.length > 0 && (
             <ResponsiveContainer width="100%" height={400}>
               <Treemap
@@ -1631,11 +1701,22 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                       const data = payload[0].payload;
                       return (
                         <div className="bg-white p-3 shadow-lg rounded border border-purple-200">
-                          <p className="font-semibold text-black text-base">
-                            {data.name}
-                          </p>
-                          <p className="text-black">{`${data.value.toLocaleString()} ETH`}</p>
-                          <p className="text-black">{`${data.percentage}% of total`}</p>
+                          <p className="font-semibold text-black text-base">{data.name}</p>
+                          <div className="space-y-1 mt-2">
+                            <p className="text-sm text-gray-600">
+                              <span className="font-medium">Total Assets (ETH value):</span>{' '}
+                              <span className="text-gray-900">{data.value.toLocaleString()} ETH</span>
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              <span className="font-medium">Network Share:</span>{' '}
+                              <span className="text-gray-900">{data.percentage}%</span>
+                            </p>
+                            {data.name === 'P2P' && (
+                              <p className="text-xs text-red-600 mt-1">
+                                Largest professional operator - significant concentration risk
+                              </p>
+                            )}
+                          </div>
                         </div>
                       );
                     }
@@ -1645,6 +1726,13 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
               </Treemap>
             </ResponsiveContainer>
           )}
+
+          <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">How to interpret this visualization:</h4>
+            <p className="text-sm text-gray-600">
+              Each box represents a professional operator group that may manage multiple individual nodes (often for different companies/clients), with the size proportional to the ETH value of all their restaked assets (including Beacon Chain ETH, stETH, and other assets converted to ETH value). Larger boxes indicate more concentrated control over the network. The dominance of a few large boxes highlights centralization risks in EigenLayer's current state. Hover over any box to see detailed statistics about each operator group's control over the network.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
@@ -1657,7 +1745,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
             operatorData.concentrationMetrics.top33PercentCount
           }
           title="Operator Stake Concentration"
-          description="This chart shows how ETH stake is concentrated among operators, from largest to smallest. A steep initial curve indicates high concentration."
+          description="This chart shows how assets (converted to ETH value) are concentrated among individual operator nodes (not operator groups), from largest to smallest. A steep initial curve indicates high concentration at the node level."
           entityType="operators"
         />
       )}
@@ -1668,7 +1756,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           giniIndex={restakeData.concentrationMetrics.giniIndex}
           top33PercentCount={restakeData.concentrationMetrics.top33PercentCount}
           title="Restaker Stake Concentration"
-          description="This chart shows how ETH stake is concentrated among restakers, from largest to smallest. A steep initial curve indicates high concentration."
+          description="This chart shows how assets (converted to ETH value) are concentrated among restakers, from largest to smallest. A steep initial curve indicates high concentration."
           entityType="restakers"
         />
       )}
