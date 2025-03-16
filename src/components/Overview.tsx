@@ -1241,8 +1241,14 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
     const totalPoints = Math.min(50, lorenzData.length);
     const step = Math.max(1, Math.floor(lorenzData.length / totalPoints));
 
-    const data = [];
-    const thresholdPoints = {};
+    const data: Array<{
+      position: number;
+      percentOfEntities: number;
+      cumulativeStake: number;
+      individualStake: number;
+    }> = [];
+    
+    const formattedThresholdPoints: Record<number, { entities: number; position: number }> = {};
 
     // Always include first point
     data.push({
@@ -1261,7 +1267,7 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
 
       // Check if we crossed any thresholds
       thresholds.forEach((threshold) => {
-        if (!thresholdPoints[threshold] && cumulativeStake >= threshold) {
+        if (!formattedThresholdPoints[threshold] && cumulativeStake >= threshold) {
           const prevPoint = lorenzData[i - step];
           const prevStake = prevPoint[1] * 100;
           const prevEntities = prevPoint[0] * 100;
@@ -1271,14 +1277,14 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
               (threshold - prevStake) / (cumulativeStake - prevStake);
             const interpolatedEntities =
               prevEntities + ratio * (percentOfEntities - prevEntities);
-            thresholdPoints[threshold] = {
+            formattedThresholdPoints[threshold] = {
               entities: interpolatedEntities,
               position: Math.round(
                 (interpolatedEntities * lorenzData.length) / 100,
               ),
             };
           } else {
-            thresholdPoints[threshold] = {
+            formattedThresholdPoints[threshold] = {
               entities: percentOfEntities,
               position: Math.round(
                 (percentOfEntities * lorenzData.length) / 100,
@@ -1307,7 +1313,7 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
       individualStake: finalCumulativeStake - previousCumulativeStake,
     });
 
-    return { data, thresholdPoints };
+    return { data, thresholdPoints: formattedThresholdPoints };
   };
 
   const { data, thresholdPoints } = formatDistributionData();
@@ -1435,7 +1441,8 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
                 <li key={threshold} className="flex items-start">
                   <div className="shrink-0 text-blue-600 mr-2">🔍</div>
                   <span>
-                    <strong>{threshold}%</strong> of total restake is controlled by just <strong>{point.position}</strong> {entityType} (
+                    <strong>{threshold}%</strong> of total restake is controlled by just{' '}
+                    <strong>{point.position}</strong> {entityType} (
                     {point.entities.toFixed(1)}% of all {entityType})
                   </span>
                 </li>
