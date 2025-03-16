@@ -2,6 +2,9 @@ export interface ConcentrationMetrics {
   top33PercentCount: number;
   bottom33PercentCount: number;
   herfindahlIndex: number;
+  giniIndex?: number;
+  totalActiveEntities?: number;
+  lorenzCurve?: [number, number][];
 }
 
 export interface BehaviorAnalysis {

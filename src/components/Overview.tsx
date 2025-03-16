@@ -3,6 +3,16 @@ import {
   Treemap,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+  Label,
+  ReferenceLine,
+  Area,
+  AreaChart,
 } from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -25,7 +35,7 @@ import {
   FileSpreadsheet,
   DollarSign,
 } from 'lucide-react';
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardContent } from '../components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchOperatorData, fetchETHPrice } from '../app/api/restake/restake';
 import { LucideIcon } from 'lucide-react';
@@ -522,7 +532,7 @@ const StyledIcon: React.FC<{
       }}
     >
       <div className="text-white">{icon}</div>
-                  </div>
+    </div>
   );
 };
 
@@ -540,7 +550,7 @@ const SmallStyledIcon: React.FC<{
       }}
     >
       <div className="text-white">{icon}</div>
-                </div>
+    </div>
   );
 };
 
@@ -590,11 +600,11 @@ const RiskIndicator: React.FC<{
           icon={levelStyles[level].icon}
           gradientColors={levelStyles[level].colors}
         />
-              </div>
+      </div>
       <div>
         <h4 className={`text-sm ${levelStyles[level].title} mb-1`}>{title}</h4>
         <div className="text-sm">{description}</div>
-            </div>
+      </div>
     </div>
   );
 };
@@ -656,10 +666,10 @@ const ExpandableSection: React.FC<{
             gradientColors={severityIcons[severity].colors}
           />
           <span className="ml-2">{title}</span>
-                    </div>
+        </div>
         <div className="flex items-center justify-center rounded-full p-1 h-6 w-6 bg-white bg-opacity-30">
           {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                  </div>
+        </div>
       </button>
       {isOpen && <div className="p-4 bg-white">{children}</div>}
     </div>
@@ -793,7 +803,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 gradientColors={['#8b5cf6', '#d946ef']}
                 size="h-10 w-10"
               />
-                    </div>
+            </div>
             Risk Overview
           </h2>
           <p className="text-sm text-gray-600">
@@ -841,7 +851,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               }
               description="Number of unique addresses restaking ETH (with more than 0 restaked assets)"
             />
-                  </div>
+          </div>
 
           {/* Critical Risk Metrics Alert */}
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
@@ -859,13 +869,13 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     icon={<AlertCircle className="h-3 w-3" />}
                     gradientColors={['#ef4444', '#f97316']}
                   />
-                    </div>
+                </div>
                 <p className="text-sm text-red-800">
                   <span className="font-bold">Governance Risk:</span> EigenLayer
                   relies on a 9-of-13 community multisig that can execute
                   IMMEDIATE upgrades without a timelock.
                 </p>
-                  </div>
+              </div>
               <div className="flex items-start">
                 <div className="shrink-0 mr-2">
                   <SmallStyledIcon
@@ -886,7 +896,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     icon={<AlertCircle className="h-3 w-3" />}
                     gradientColors={['#ef4444', '#f97316']}
                   />
-            </div>
+                </div>
                 <p className="text-sm text-red-800">
                   <span className="font-bold">Major Operator Risk:</span>{' '}
                   Between P2P ({formattedP2PShare}%) and Node Monster (
@@ -895,20 +905,20 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   <span className="font-bold">{formattedCombinedShare}%</span>{' '}
                   of total restaked assets.
                 </p>
-                </div>
+              </div>
               <div className="flex items-start">
                 <div className="shrink-0 mr-2">
                   <SmallStyledIcon
                     icon={<AlertCircle className="h-3 w-3" />}
                     gradientColors={['#ef4444', '#f97316']}
                   />
-              </div>
+                </div>
                 <p className="text-sm text-red-800">
                   <span className="font-bold">Restaker Concentration:</span> The
                   top {restakerTopCount} individual restakers control 33% of all
                   restaked assets.
                 </p>
-            </div>
+              </div>
               <div className="flex items-start">
                 <div className="shrink-0 mr-2">
                   <SmallStyledIcon
@@ -1189,6 +1199,306 @@ const CustomTreemapContent = (props: any) => {
   );
 };
 
+// LorenzCurveChart component to visualize inequality distribution
+interface LorenzCurveChartProps {
+  lorenzData?: [number, number][];
+  giniIndex?: number;
+  title: string;
+  description?: string;
+}
+
+// Replace with a more intuitive visualization
+interface StakeDistributionChartProps {
+  lorenzData?: [number, number][];
+  giniIndex?: number;
+  title: string;
+  description?: string;
+  top33PercentCount?: number;
+  entityType?: 'operators' | 'restakers';
+}
+
+const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
+  lorenzData,
+  giniIndex,
+  title,
+  description,
+  top33PercentCount,
+  entityType = 'operators',
+}) => {
+  // State for scale toggle
+  const [useLogScale, setUseLogScale] = useState(false);
+
+  // Skip if no lorenz data available
+  if (!lorenzData || lorenzData.length === 0) {
+    return null;
+  }
+
+  // Important thresholds to highlight
+  const thresholds = [33, 50, 67, 80, 90];
+
+  // Process data to create a more intuitive visualization
+  const formatDistributionData = () => {
+    const totalPoints = Math.min(50, lorenzData.length);
+    const step = Math.max(1, Math.floor(lorenzData.length / totalPoints));
+    
+    const data = [];
+    const thresholdPoints = {};
+    
+    // Always include first point
+    data.push({
+      position: 1,
+      percentOfEntities: lorenzData[0][0] * 100,
+      cumulativeStake: lorenzData[0][1] * 100,
+      individualStake: lorenzData[0][1] * 100, // Add individual stake
+    });
+
+    // Process other points
+    for (let i = step; i < lorenzData.length; i += step) {
+      const percentOfEntities = lorenzData[i][0] * 100;
+      const cumulativeStake = lorenzData[i][1] * 100;
+      const previousCumulativeStake = lorenzData[i - step][1] * 100;
+      const individualStake = cumulativeStake - previousCumulativeStake;
+      
+      // Check if we crossed any thresholds
+      thresholds.forEach(threshold => {
+        if (!thresholdPoints[threshold] && cumulativeStake >= threshold) {
+          const prevPoint = lorenzData[i - step];
+          const prevStake = prevPoint[1] * 100;
+          const prevEntities = prevPoint[0] * 100;
+          
+          if (prevStake < threshold) {
+            const ratio = (threshold - prevStake) / (cumulativeStake - prevStake);
+            const interpolatedEntities = prevEntities + ratio * (percentOfEntities - prevEntities);
+            thresholdPoints[threshold] = {
+              entities: interpolatedEntities,
+              position: Math.round(interpolatedEntities * lorenzData.length / 100),
+            };
+          } else {
+            thresholdPoints[threshold] = {
+              entities: percentOfEntities,
+              position: Math.round(percentOfEntities * lorenzData.length / 100),
+            };
+          }
+        }
+      });
+      
+      data.push({
+        position: Math.round(percentOfEntities * lorenzData.length / 100),
+        percentOfEntities,
+        cumulativeStake,
+        individualStake,
+      });
+    }
+    
+    // Always include last point
+    const lastIndex = lorenzData.length - 1;
+    const previousCumulativeStake = lorenzData[lastIndex - 1][1] * 100;
+    const finalCumulativeStake = lorenzData[lastIndex][1] * 100;
+    data.push({
+      position: lorenzData.length,
+      percentOfEntities: lorenzData[lastIndex][0] * 100,
+      cumulativeStake: finalCumulativeStake,
+      individualStake: finalCumulativeStake - previousCumulativeStake,
+    });
+    
+    return { data, thresholdPoints };
+  };
+
+  const { data, thresholdPoints } = formatDistributionData();
+  const totalEntities = lorenzData.length;
+  
+  const colorScheme = {
+    operators: {
+      main: '#8b5cf6',
+      light: '#c4b5fd',
+      gradient: ['#8b5cf6', '#d946ef']
+    },
+    restakers: {
+      main: '#3b82f6',
+      light: '#93c5fd',
+      gradient: ['#3b82f6', '#06b6d4']
+    }
+  };
+  
+  const colors = colorScheme[entityType];
+
+  // Custom tooltip content
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-white p-3 shadow-lg rounded border border-gray-200">
+          <p className="font-semibold text-gray-900">{`${entityType === 'operators' ? 'Operator' : 'Restaker'} #${label}`}</p>
+          <div className="space-y-1 mt-2">
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">Cumulative Restake:</span>{' '}
+              <span className="text-gray-900">{data.cumulativeStake.toFixed(2)}%</span>
+            </p>
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">Individual Restake:</span>{' '}
+              <span className="text-gray-900">{data.individualStake.toFixed(4)}%</span>
+            </p>
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">Percentile:</span>{' '}
+              <span className="text-gray-900">{data.percentOfEntities.toFixed(2)}%</span>
+            </p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-xl font-semibold text-black flex items-center">
+              <div className="mr-3">
+                <StyledIcon
+                  icon={<FileSpreadsheet className="h-4 w-4" />}
+                  gradientColors={colors.gradient}
+                  size="h-9 w-9"
+                />
+              </div>
+              {title}
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              {description || 'Visualization of restake distribution among entities.'}
+            </p>
+          </div>
+          <button
+            onClick={() => setUseLogScale(!useLogScale)}
+            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+              useLogScale
+                ? 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+            }`}
+          >
+            {useLogScale ? 'Linear Scale' : 'Log Scale'}
+          </button>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2 items-center">
+          {giniIndex !== undefined && (
+            <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+              <span>Gini Index: {giniIndex.toFixed(4)}</span>
+              <InfoTooltip content="The Gini index measures inequality on a scale from 0 to 1. A value of 0 represents perfect equality, while 1 represents perfect inequality (one entity has everything)." />
+            </div>
+          )}
+          {top33PercentCount !== undefined && (
+            <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+              <span>Just {top33PercentCount} {entityType} control 33% of all restake</span>
+              <InfoTooltip content={`Only ${top33PercentCount} ${entityType} control one-third of all restaked ETH, indicating high concentration.`} />
+            </div>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="rounded-lg border border-gray-200 p-4 mb-4 bg-gray-50">
+          <h4 className="text-sm font-semibold text-gray-700 mb-2">Key Insights:</h4>
+          <ul className="space-y-2 text-sm text-gray-600">
+            <li className="flex items-start">
+              <div className="shrink-0 text-red-600 mr-2">⚠️</div>
+              <span>The chart shows how restake is distributed among {entityType} from largest to smallest.</span>
+            </li>
+            <li className="flex items-start">
+              <div className="shrink-0 text-purple-600 mr-2">📊</div>
+              <span>The steep initial rise shows that a small number of {entityType} control a large percentage of restake.</span>
+            </li>
+            {Object.entries(thresholdPoints).map(([threshold, point]: [string, any]) => (
+              <li key={threshold} className="flex items-start">
+                <div className="shrink-0 text-blue-600 mr-2">🔍</div>
+                <span>
+                  <strong>{threshold}%</strong> of total restake is controlled by just{' '}
+                  <strong>{point.position}</strong> {entityType} ({(point.entities).toFixed(1)}% of all {entityType})
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        
+        <ResponsiveContainer width="100%" height={400}>
+          <AreaChart
+            data={data}
+            margin={{ top: 10, right: 30, left: 70, bottom: 40 }}
+          >
+            <defs>
+              <linearGradient id="colorStake" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={colors.main} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={colors.main} stopOpacity={0.2} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="position" 
+              label={{
+                value: `Number of ${entityType} (from largest to smallest)`,
+                position: 'bottom',
+                offset: 20
+              }}
+              domain={[1, totalEntities]}
+              type="number"
+              scale={useLogScale ? 'log' : 'linear'}
+              allowDecimals={false}
+              tickFormatter={(value: number) => value.toString()}
+            />
+            <YAxis 
+              label={{ 
+                value: 'Cumulative restake percentage', 
+                angle: -90, 
+                position: 'insideLeft',
+                offset: -10,
+                style: {
+                  textAnchor: 'middle'
+                }
+              }}
+              tickFormatter={(value) => `${value}%`}
+              domain={[0, 100]}
+            />
+            <RechartsTooltip content={CustomTooltip} />
+            <Area 
+              type="monotone" 
+              dataKey="cumulativeStake" 
+              stroke={colors.main} 
+              fillOpacity={1} 
+              fill="url(#colorStake)" 
+              isAnimationActive={false}
+            />
+            
+            {/* Add reference lines at key thresholds */}
+            {thresholds.map((threshold) => 
+              thresholdPoints[threshold] && (
+                <ReferenceLine 
+                  key={`threshold-${threshold}`}
+                  x={thresholdPoints[threshold].position} 
+                  stroke={colors.main}
+                  strokeDasharray="3 3"
+                  label={{
+                    value: `${threshold}% of restake`,
+                    position: 'insideTopRight',
+                    fill: colors.main,
+                    fontSize: 12
+                  }}
+                />
+              )
+            )}
+          </AreaChart>
+        </ResponsiveContainer>
+
+        <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <h4 className="text-sm font-semibold text-gray-700 mb-2">How to interpret this chart:</h4>
+          <p className="text-sm text-gray-600">
+            This chart shows how restake is distributed among {entityType}, ordered from largest to smallest. The steep rise at the beginning indicates that 
+            a small number of {entityType} control a large percentage of the total restake. Use the scale toggle to switch between linear and logarithmic views - 
+            the logarithmic view helps visualize the distribution among smaller {entityType} more clearly. Hover over any point to see detailed statistics.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
     null,
@@ -1302,6 +1612,29 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Replace Lorenz Curve with more intuitive Stake Distribution Chart */}
+      {operatorData?.concentrationMetrics?.lorenzCurve && (
+        <StakeDistributionChart
+          lorenzData={operatorData.concentrationMetrics.lorenzCurve}
+          giniIndex={operatorData.concentrationMetrics.giniIndex}
+          top33PercentCount={operatorData.concentrationMetrics.top33PercentCount}
+          title="Operator Stake Concentration"
+          description="This chart shows how ETH stake is concentrated among operators, from largest to smallest. A steep initial curve indicates high concentration."
+          entityType="operators"
+        />
+      )}
+
+      {restakeData?.concentrationMetrics?.lorenzCurve && (
+        <StakeDistributionChart
+          lorenzData={restakeData.concentrationMetrics.lorenzCurve}
+          giniIndex={restakeData.concentrationMetrics.giniIndex}
+          top33PercentCount={restakeData.concentrationMetrics.top33PercentCount}
+          title="Restaker Stake Concentration"
+          description="This chart shows how ETH stake is concentrated among restakers, from largest to smallest. A steep initial curve indicates high concentration."
+          entityType="restakers"
+        />
+      )}
     </div>
   );
 };
