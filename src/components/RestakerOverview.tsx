@@ -95,7 +95,7 @@ const RestakerOverview: React.FC = () => {
             compactDisplay: 'short',
             minimumFractionDigits: 1,
             maximumFractionDigits: 2,
-          }).format(Number(data['ETH Restaked'] || 0)),
+          }).format(Number(data['ETH Equivalent Value'] || 0)),
           numberOfStrategies: data['Number of Strategies'] || 0,
           mostUsedStrategies: data['Most Used Strategy'] || 'N/A',
         })) || [];
@@ -225,7 +225,7 @@ const RestakerOverview: React.FC = () => {
                     onClick={() => handleSort('ethRestaked')}
                     className="font-semibold"
                   >
-                    ETH Restaked
+                    Total Assets (ETH)
                     <SortIcon column="ethRestaked" />
                   </Button>
                 </TableHead>

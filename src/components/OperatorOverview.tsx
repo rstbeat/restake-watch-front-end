@@ -116,7 +116,7 @@ const OperatorOverview: React.FC = () => {
             compactDisplay: 'short',
             minimumFractionDigits: 1,
             maximumFractionDigits: 2,
-          }).format(Number(item['ETH Restaked'] || 0)),
+          }).format(Number(item['ETH Equivalent Value'] || 0)),
           numberOfStrategies: item['Number of Strategies'] || 0,
           dvtTechnology: item['DVT Technology'] || 'None',
           mostUsedStrategies: item['Most Used Strategies'] || [],
@@ -345,7 +345,7 @@ const OperatorOverview: React.FC = () => {
                     onClick={() => handleSort('ethRestaked')}
                     className="font-semibold"
                   >
-                    ETH Restaked
+                    Total Assets (ETH)
                     <SortIcon column="ethRestaked" />
                   </Button>
                 </TableHead>
