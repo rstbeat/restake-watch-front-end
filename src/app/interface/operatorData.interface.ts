@@ -2,7 +2,6 @@ export interface ConcentrationMetrics {
   top33PercentCount: number;
   bottom33PercentCount: number;
   herfindahlIndex: number;
-  giniIndex?: number;
   totalActiveEntities?: number;
   lorenzCurve?: [number, number][];
 }
@@ -91,6 +90,17 @@ export interface OperatorDataResponse {
   activeEntities: number;
   activeRestakers: number;
   majorOperatorGroupMetrics: MajorOperatorData;
+  strategyConcentrationMetrics?: {
+    [key: string]: {
+      totalAssets: number;
+      totalRestakers: number;
+      top5HoldersPercentage: number;
+      herfindahlIndex: number;
+    }
+  };
+  totalRestakedAssetsPerStrategy?: {
+    [key: string]: number;
+  };
 }
 
 export interface StakerDataResponse {
@@ -123,4 +133,9 @@ export interface RestakerDataFormatted {
   amountRestaked: string;
   numberOfStrategies: number;
   mostUsedStrategies: string;
+}
+
+export interface TotalStats {
+  count: number;
+  assets: number;
 }

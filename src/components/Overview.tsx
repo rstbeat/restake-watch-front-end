@@ -13,6 +13,9 @@ import {
   ReferenceLine,
   Area,
   AreaChart,
+  BarChart,
+  Bar,
+  Cell,
 } from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -42,6 +45,23 @@ import { LucideIcon } from 'lucide-react';
 
 interface OverviewProps {
   restakeData: any | null;
+}
+
+// New interface for strategy data
+interface StrategyMetrics {
+  totalAssets: number;
+  totalRestakers: number;
+  top5HoldersPercentage: number;
+  herfindahlIndex: number;
+}
+
+interface StrategiesData {
+  strategyConcentrationMetrics: {
+    [key: string]: StrategyMetrics;
+  };
+  totalRestakedAssetsPerStrategy: {
+    [key: string]: number;
+  };
 }
 
 const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
@@ -1210,7 +1230,6 @@ interface LorenzCurveChartProps {
 // Replace with a more intuitive visualization
 interface StakeDistributionChartProps {
   lorenzData?: [number, number][];
-  giniIndex?: number;
   title: string;
   description?: string;
   top33PercentCount?: number;
@@ -1219,7 +1238,6 @@ interface StakeDistributionChartProps {
 
 const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
   lorenzData,
-  giniIndex,
   title,
   description,
   top33PercentCount,
@@ -1372,7 +1390,7 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-xl font-semibold text-black flex items-center">
+            <h2 className="text-xl font-bold text-black flex items-center">
               <div className="mr-3">
                 <StyledIcon
                   icon={<FileSpreadsheet className="h-4 w-4" />}
@@ -1399,12 +1417,6 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
           </button>
         </div>
         <div className="mt-3 flex flex-wrap gap-2 items-center">
-          {giniIndex !== undefined && (
-            <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
-              <span>Gini Index: {giniIndex.toFixed(4)}</span>
-              <InfoTooltip content="The Gini index measures inequality on a scale from 0 to 1. A value of 0 represents perfect equality, while 1 represents perfect inequality (one entity has everything)." />
-            </div>
-          )}
           {top33PercentCount !== undefined && (
             <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
               <span>
@@ -1538,16 +1550,506 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
   );
 };
 
+// New component for Strategy visualization
+const StrategiesOverview: React.FC<{ strategiesData: StrategiesData | null }> = ({ strategiesData }) => {
+  const [useLogScale, setUseLogScale] = useState(false);
+  
+  console.log('StrategiesOverview rendering:', {
+    hasData: !!strategiesData,
+    metricsKeys: strategiesData?.strategyConcentrationMetrics ? 
+      Object.keys(strategiesData.strategyConcentrationMetrics).length : 0,
+    assetsKeys: strategiesData?.totalRestakedAssetsPerStrategy ? 
+      Object.keys(strategiesData.totalRestakedAssetsPerStrategy).length : 0
+  });
+  
+  if (!strategiesData) return null;
+  
+  const { strategyConcentrationMetrics, totalRestakedAssetsPerStrategy } = strategiesData;
+  
+  // Log all available strategies with their values
+  console.log('ALL STRATEGIES DATA:', {
+    // List all strategies with their assets
+    allStrategiesWithAssets: Object.entries(totalRestakedAssetsPerStrategy)
+      .map(([key, value]) => ({ 
+        name: key.replace(/_/g, ' '), 
+        assets: value,
+        hasMetrics: !!strategyConcentrationMetrics[key]
+      }))
+      .sort((a, b) => b.assets - a.assets),
+    
+    // Number of strategies that have concentration metrics
+    totalStrategiesWithMetrics: Object.keys(strategyConcentrationMetrics).length,
+    
+    // Number of strategies with assets > 0
+    totalStrategiesWithAssets: Object.values(totalRestakedAssetsPerStrategy)
+      .filter(value => value > 0).length,
+    
+    // Sum of all assets
+    totalAssets: Object.values(totalRestakedAssetsPerStrategy)
+      .reduce((sum, value) => sum + value, 0)
+  });
+  
+  // Use the same purple color array as the Professional Operator Dominance chart
+  const strategyColors = [
+    '#9C27B0', // Base purple
+    '#8E24AA',
+    '#7B1FA2', 
+    '#6A1B9A',
+    '#4A148C',
+    '#38006b',
+  ];
+  
+  // Format and sort strategies by total restaked assets
+  const strategiesWithData = Object.keys(totalRestakedAssetsPerStrategy)
+    .filter(strategy => totalRestakedAssetsPerStrategy[strategy] > 0)
+    .map(strategy => ({
+      name: strategy.replace(/_/g, ' '),
+      rawName: strategy,
+      assets: totalRestakedAssetsPerStrategy[strategy],
+      metrics: strategyConcentrationMetrics[strategy] || null,
+    }))
+    .sort((a, b) => b.assets - a.assets);
+  
+  // Calculate total assets
+  const totalAssets = strategiesWithData.reduce((sum, strategy) => sum + strategy.assets, 0);
+  
+  // Prepare treemap data
+  const treeMapData = strategiesWithData.map((strategy, index) => {
+    // Only skip strategies with zero assets
+    if (strategy.assets <= 0) return null;
+    
+    return {
+      name: strategy.name,
+      value: strategy.assets,
+      percentage: ((strategy.assets / totalAssets) * 100).toFixed(4),
+      fill: strategyColors[index % strategyColors.length],
+    };
+  }).filter(Boolean);
+  
+  // Get top 5 strategies for detailed cards
+  const topStrategies = strategiesWithData.slice(0, 10);
+  
+  // Log strategies being displayed in different sections
+  console.log('STRATEGIES BEING DISPLAYED:', {
+    // Strategies in treemap (all with assets > 0)
+    treemapStrategies: treeMapData.map(item => item?.name),
+    treemapCount: treeMapData.length,
+    
+    // Strategies in table (top 25)
+    tableStrategies: strategiesWithData.slice(0, 25).map(s => s.name),
+    tableCount: Math.min(25, strategiesWithData.length),
+    
+    // Strategies in expandable cards (top 10)
+    cardStrategies: topStrategies.map(s => s.name),
+    cardCount: topStrategies.length,
+    
+    // Strategies with zero assets (filtered out)
+    strategiesWithZeroAssets: Object.entries(totalRestakedAssetsPerStrategy)
+      .filter(([_, value]) => value <= 0)
+      .map(([key, _]) => key.replace(/_/g, ' ')),
+      
+    // Total number of strategies with assets > 0
+    totalStrategiesCount: strategiesWithData.length
+  });
+  
+  // Function to determine risk level based on concentration metrics
+  const getConcentrationRiskLevel = (metrics: StrategyMetrics | null): 'critical' | 'warning' | 'positive' | 'neutral' => {
+    if (!metrics) return 'neutral';
+    
+    if (metrics.top5HoldersPercentage > 75 || metrics.herfindahlIndex > 0.25) {
+      return 'critical';
+    } else if (metrics.top5HoldersPercentage > 50 || metrics.herfindahlIndex > 0.15) {
+      return 'warning';
+    } else {
+      return 'positive';
+    }
+  };
+  
+  return (
+    <>
+      <Card className="mb-6">
+        <CardHeader>
+          <h2 className="text-xl font-bold text-gray-900 flex items-center">
+            <div className="mr-3">
+              <StyledIcon
+                icon={<DollarSign className="h-5 w-5" />}
+                gradientColors={['#9C27B0', '#d946ef']}
+                size="h-10 w-10"
+              />
+            </div>
+            Strategy Distribution Overview
+          </h2>
+          <p className="text-sm text-gray-600">
+            Distribution of assets across different strategies on EigenLayer, with concentration risk metrics
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border border-gray-200 p-4 mb-4 bg-gray-50">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">Key Insights:</h4>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li className="flex items-start">
+                <div className="shrink-0 text-blue-600 mr-2">📊</div>
+                <span>
+                  BeaconChain ETH ({((totalRestakedAssetsPerStrategy['BeaconChain_ETH'] || 0) / totalAssets * 100).toFixed(1)}%) 
+                  and Lido ({((totalRestakedAssetsPerStrategy['Lido'] || 0) / totalAssets * 100).toFixed(1)}%) 
+                  are the most widely used strategies, accounting for {((
+                    (totalRestakedAssetsPerStrategy['BeaconChain_ETH'] || 0) + 
+                    (totalRestakedAssetsPerStrategy['Lido'] || 0)
+                  ) / totalAssets * 100).toFixed(1)}% of all restaked assets.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <div className="shrink-0 text-red-600 mr-2">⚠️</div>
+                <span>
+                  {strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75).length} strategies show critical concentration risk, 
+                  with top 5 operators controlling over 75% of the strategy's assets.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <div className="shrink-0 text-orange-600 mr-2">🔍</div>
+                <span>
+                  Smaller strategies tend to have higher concentration risks, with fewer operators participating and higher inequality metrics.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <div className="shrink-0 text-purple-600 mr-2">ℹ️</div>
+                <span>
+                  <strong>Note:</strong> All metrics shown here reflect the distribution of assets among operators, not restakers. This provides insights into operator-level concentration within each strategy.
+                </span>
+              </li>
+            </ul>
+          </div>
+          
+          {/* Strategy Distribution Chart */}
+          <div className="pl-0 -ml-36">
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart
+                data={strategiesWithData.slice(0, 10)}
+                layout="vertical"
+                margin={{ top: 5, right: 30, left: 60, bottom: 30 }}
+                barSize={10}
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                <XAxis 
+                  type="number" 
+                  tickFormatter={(value) => `${value.toLocaleString()} ETH`}
+                  label={{ 
+                    value: 'ETH Value',
+                    position: 'insideBottom',
+                    offset: -15,
+                    style: { 
+                      fontSize: 14,
+                      fontWeight: 500,
+                      fill: '#666'
+                    }
+                  }}
+                  domain={useLogScale ? [0.1, 'dataMax'] : [0, 'dataMax']}
+                  scale={useLogScale ? 'log' : 'linear'}
+                  allowDecimals={true}
+                  tick={{ fontSize: 11 }}
+                />
+                <YAxis 
+                  dataKey="name" 
+                  type="category" 
+                  width={240}
+                  tick={{ fontSize: 11, textAnchor: 'end' }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={0} // Display every tick/label
+                  tickMargin={5}
+                />
+                <RechartsTooltip
+                  content={({ payload }) => {
+                    if (payload && payload.length) {
+                      const strategy = payload[0].payload;
+                      const metrics = strategy.metrics;
+                      const percentage = ((strategy.assets / totalAssets) * 100).toFixed(4);
+                      return (
+                        <div className="bg-white p-3 shadow-lg rounded border border-purple-200">
+                          <p className="font-semibold text-black text-base">{strategy.name}</p>
+                          <div className="space-y-1 mt-2">
+                            <p className="text-sm text-gray-600">
+                              <span className="font-medium">Total Assets:</span>{' '}
+                              <span className="text-gray-900">{strategy.assets.toLocaleString()} ETH</span>
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              <span className="font-medium">Network Share:</span>{' '}
+                              <span className="text-gray-900">{percentage}%</span>
+                            </p>
+                            {metrics && (
+                              <>
+                                <p className="text-sm text-gray-600">
+                                  <span className="font-medium">Total Operators:</span>{' '}
+                                  <span className="text-gray-900">{metrics.totalRestakers}</span>
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  <span className="font-medium">Top 5 Operators:</span>{' '}
+                                  <span className={metrics.top5HoldersPercentage > 75 ? "text-red-600 font-bold" : "text-gray-900"}>
+                                    {metrics.top5HoldersPercentage.toFixed(1)}%
+                                  </span>
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  <span className="font-medium">Concentration Index:</span>{' '}
+                                  <span className={metrics.herfindahlIndex > 0.25 ? "text-red-600 font-bold" : "text-gray-900"}>
+                                    {metrics.herfindahlIndex.toFixed(4)}
+                                  </span>
+                                </p>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Bar 
+                  dataKey="assets" 
+                  name="ETH Value"
+                  isAnimationActive={false}
+                  radius={[0, 3, 3, 0]} // Rounded corners on right side only
+                  minPointSize={3} // Ensures very small values still appear as tiny bars
+                >
+                  {strategiesWithData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${entry.rawName}`} 
+                      fill={strategyColors[index % strategyColors.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          
+          <div className="mt-4 flex justify-end space-x-2">
+            <button 
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                useLogScale 
+                  ? 'bg-purple-100 text-purple-800 hover:bg-purple-200' 
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              }`}
+              onClick={() => {
+                setUseLogScale(!useLogScale);
+                console.log(`Switched to ${!useLogScale ? 'logarithmic' : 'linear'} scale`);
+              }}
+            >
+              {useLogScale ? 'Linear Scale' : 'Log Scale'}
+            </button>
+          </div>
+          
+          
+          <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">How to interpret this visualization:</h4>
+            <p className="text-sm text-gray-600">
+              This chart shows all strategies in EigenLayer by total ETH value. Each bar represents a strategy,
+              with longer bars indicating more widely used strategies. Data is based on operator distribution, not restaker distribution.
+              Hover over any bar to see detailed statistics about each strategy, 
+              including operator concentration metrics. Strategies with high concentration have their top 5 operators
+              controlling a significant percentage of assets, creating potential risks.
+              {useLogScale && (
+                <p className="mt-2 text-sm text-purple-700 bg-purple-50 p-2 rounded">
+                  <strong>Log Scale Active:</strong> This view compresses the scale to better visualize both large and small strategies.
+                  The difference between very large strategies (millions of ETH) and very small ones (less than 1 ETH) becomes more visible.
+                </p>
+              )}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Strategy Concentration Risk Table */}
+      <Card className="mb-6">
+        <CardHeader>
+          <h2 className="text-xl font-bold text-gray-900 flex items-center">
+            <div className="mr-3">
+              <StyledIcon
+                icon={<AlertTriangle className="h-5 w-5" />}
+                gradientColors={['#f97316', '#ef4444']}
+                size="h-10 w-10"
+              />
+            </div>
+            Strategy Concentration Risk Assessment
+          </h2>
+          <p className="text-sm text-gray-600">
+            Detailed analysis of concentration risks across different strategies
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left text-gray-700">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3">Strategy</th>
+                  <th className="px-4 py-3">Total Assets</th>
+                  <th className="px-4 py-3">Operators</th>
+                  <th className="px-4 py-3">Top 5 Operators %</th>
+                  <th className="px-4 py-3">Herfindahl</th>
+                  <th className="px-4 py-3">Risk Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                {strategiesWithData.slice(0, 25).map((strategy) => {
+                  const riskLevel = getConcentrationRiskLevel(strategy.metrics);
+                  const riskColors = {
+                    critical: 'bg-red-100 text-red-800',
+                    warning: 'bg-orange-100 text-orange-800',
+                    positive: 'bg-green-100 text-green-800',
+                    neutral: 'bg-blue-100 text-blue-800',
+                  };
+                  
+                  return (
+                    <tr key={strategy.rawName} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-3 font-medium">{strategy.name}</td>
+                      <td className="px-4 py-3">{strategy.assets.toLocaleString()}</td>
+                      <td className="px-4 py-3">{strategy.metrics?.totalRestakers || 'N/A'}</td>
+                      <td className="px-4 py-3 font-medium">
+                        {strategy.metrics ? (
+                          <span className={strategy.metrics.top5HoldersPercentage > 75 ? 'text-red-600' : 'text-gray-700'}>
+                            {strategy.metrics.top5HoldersPercentage.toFixed(1)}%
+                          </span>
+                        ) : 'N/A'}
+                      </td>
+                      <td className="px-4 py-3">
+                        {strategy.metrics ? strategy.metrics.herfindahlIndex.toFixed(4) : 'N/A'}
+                      </td>
+                      <td className="px-4 py-3">
+                        {strategy.metrics && (
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${riskColors[riskLevel]}`}>
+                            {riskLevel === 'critical' ? 'High Risk' : 
+                             riskLevel === 'warning' ? 'Medium Risk' : 
+                             'Low Risk'}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="mt-4 text-sm text-gray-600">
+            <p>* Showing top 25 strategies by total value. Concentration metrics explanation:</p>
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+              <li><strong>Total Assets:</strong> Sum of all assets managed by the strategy.</li>
+              <li><strong>Operators:</strong> Number of unique operators in the strategy.</li>
+              <li><strong>Top 5 Operators %:</strong> Percentage of strategy assets controlled by the top 5 operators. Higher values indicate more centralization.</li>
+              <li><strong>Herfindahl Index:</strong> Measure of operator concentration (0-1). Higher values indicate more concentration.</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Top Strategies Detailed Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        {topStrategies.map((strategy) => {
+          const riskLevel = getConcentrationRiskLevel(strategy.metrics);
+          const marketShare = (strategy.assets / totalAssets * 100).toFixed(1);
+          
+          return (
+            <ExpandableSection
+              key={strategy.rawName}
+              title={`${strategy.name} (${marketShare}% of network)`}
+              severity={riskLevel}
+              defaultOpen={false}
+            >
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-sm font-medium text-gray-600">Total Assets:</span>
+                  <span className="font-semibold">{strategy.assets.toLocaleString()} ETH</span>
+                </div>
+                
+                {strategy.metrics && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-600">Operators:</span>
+                      <span className="font-semibold">{strategy.metrics.totalRestakers}</span>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-600">Top 5 Operators Control:</span>
+                      <span className={strategy.metrics.top5HoldersPercentage > 75 ? 'font-bold text-red-600' : 'font-semibold'}>
+                        {strategy.metrics.top5HoldersPercentage.toFixed(1)}%
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between">
+                      <span className="text-sm font-medium text-gray-600">Concentration Index:</span>
+                      <span className={strategy.metrics.herfindahlIndex > 0.25 ? 'font-bold text-red-600' : 'font-semibold'}>
+                        {strategy.metrics.herfindahlIndex.toFixed(4)}
+                      </span>
+                    </div>
+                    
+                    <RiskIndicator
+                      level={riskLevel}
+                      title={`${strategy.name} Risk Assessment`}
+                      description={
+                        <p>
+                          {riskLevel === 'critical' 
+                            ? `This strategy has critical concentration risk with top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
+                            : riskLevel === 'warning'
+                            ? `This strategy has moderate concentration risk with relatively few operators and top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
+                            : `This strategy has good distribution across ${strategy.metrics.totalRestakers} operators with reasonable concentration metrics.`
+                          }
+                        </p>
+                      }
+                    />
+                  </>
+                )}
+              </div>
+            </ExpandableSection>
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
     null,
   );
+
+  // Add state for strategies data
+  const [strategiesData, setStrategiesData] = useState<StrategiesData | null>(null);
+
+  // Add diagnostic log for initial data
+  console.log('Overview component - Initial restakeData:', {
+    hasData: !!restakeData,
+    keys: restakeData ? Object.keys(restakeData) : [],
+    hasStrategyMetrics: !!restakeData?.strategyConcentrationMetrics,
+    hasAssetsPerStrategy: !!restakeData?.totalRestakedAssetsPerStrategy,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await fetchOperatorData();
         setOperatorData(data);
+        
+        // Log detailed information about strategy data
+        console.log('Strategy data check from operatorData:', {
+          strategyMetricsExists: !!data?.strategyConcentrationMetrics,
+          strategyMetricsType: typeof data?.strategyConcentrationMetrics,
+          strategyMetricsKeys: data?.strategyConcentrationMetrics ? 
+            Object.keys(data.strategyConcentrationMetrics) : [],
+          assetsPerStrategyExists: !!data?.totalRestakedAssetsPerStrategy,
+          assetsPerStrategyType: typeof data?.totalRestakedAssetsPerStrategy,
+          assetsPerStrategyKeys: data?.totalRestakedAssetsPerStrategy ? 
+            Object.keys(data.totalRestakedAssetsPerStrategy) : [],
+        });
+        
+        // Use strategy data from operatorData instead of restakeData
+        if (data?.strategyConcentrationMetrics && data?.totalRestakedAssetsPerStrategy) {
+          console.log('Setting strategies data from operator API');
+          setStrategiesData({
+            strategyConcentrationMetrics: data.strategyConcentrationMetrics,
+            totalRestakedAssetsPerStrategy: data.totalRestakedAssetsPerStrategy
+          });
+        } else {
+          console.log('No strategy data available from operator API');
+          setStrategiesData(null);
+        }
       } catch (error) {
         console.error('Error fetching operator data:', error);
       }
@@ -1555,6 +2057,17 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
 
     fetchData();
   }, []);
+
+  // Check if strategiesData is being updated correctly
+  useEffect(() => {
+    console.log('strategiesData updated:', {
+      exists: !!strategiesData,
+      metricsCount: strategiesData?.strategyConcentrationMetrics ? 
+        Object.keys(strategiesData.strategyConcentrationMetrics).length : 0,
+      assetsCount: strategiesData?.totalRestakedAssetsPerStrategy ? 
+        Object.keys(strategiesData.totalRestakedAssetsPerStrategy).length : 0,
+    });
+  }, [strategiesData]);
 
   // Find operator data helper function
   const findOperatorData = (operatorName: string) => {
@@ -1635,6 +2148,10 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       {/* <RiskAssessment /> */}
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
       <CompactNotes />
+      
+      {/* Add Strategies Overview component */}
+      {strategiesData && <StrategiesOverview strategiesData={strategiesData} />}
+      
       <Card>
         <CardHeader>
           <div className="flex justify-between items-start">
@@ -1747,12 +2264,11 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       {operatorData?.concentrationMetrics?.lorenzCurve && (
         <StakeDistributionChart
           lorenzData={operatorData.concentrationMetrics.lorenzCurve}
-          giniIndex={operatorData.concentrationMetrics.giniIndex}
+          title="Operator Stake Concentration"
+          description="This chart shows how assets (converted to ETH value) are concentrated among individual operator nodes (not operator groups), from largest to smallest. A steep initial curve indicates high concentration at the node level."
           top33PercentCount={
             operatorData.concentrationMetrics.top33PercentCount
           }
-          title="Operator Stake Concentration"
-          description="This chart shows how assets (converted to ETH value) are concentrated among individual operator nodes (not operator groups), from largest to smallest. A steep initial curve indicates high concentration at the node level."
           entityType="operators"
         />
       )}
@@ -1760,10 +2276,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       {restakeData?.concentrationMetrics?.lorenzCurve && (
         <StakeDistributionChart
           lorenzData={restakeData.concentrationMetrics.lorenzCurve}
-          giniIndex={restakeData.concentrationMetrics.giniIndex}
-          top33PercentCount={restakeData.concentrationMetrics.top33PercentCount}
           title="Restaker Stake Concentration"
           description="This chart shows how assets (converted to ETH value) are concentrated among restakers, from largest to smallest. A steep initial curve indicates high concentration."
+          top33PercentCount={restakeData.concentrationMetrics.top33PercentCount}
           entityType="restakers"
         />
       )}
