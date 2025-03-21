@@ -1701,7 +1701,7 @@ const StrategiesOverview: React.FC<{ strategiesData: StrategiesData | null }> = 
               <li className="flex items-start">
                 <div className="shrink-0 text-red-600 mr-2">⚠️</div>
                 <span>
-                  {strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75).length} strategies show critical concentration risk, 
+                  {strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75).length} out of {strategiesWithData.length} strategies show critical concentration risk, 
                   with top 5 operators controlling over 75% of the strategy's assets.
                 </span>
               </li>
