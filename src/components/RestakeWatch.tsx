@@ -22,6 +22,7 @@ import Image from 'next/image';
 import Sidebar from './Sidebar';
 import OperatorOverview from './OperatorOverview';
 import RestakerOverview from './RestakerOverview';
+import StrategyOverview from './StrategyOverview';
 import Overview from './Overview';
 import Footer from './Footer';
 import Roadmap from './Roadmap';
@@ -145,6 +146,12 @@ const RestakeWatch: React.FC = () => {
           >
             Restakers
           </TabsTrigger>
+          <TabsTrigger
+            value="strategies"
+            className="text-[#000000] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+          >
+            Strategies
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -157,6 +164,10 @@ const RestakeWatch: React.FC = () => {
 
         <TabsContent value="restakers" className="space-y-6">
           {RestakerOverview && <RestakerOverview />}
+        </TabsContent>
+
+        <TabsContent value="strategies" className="space-y-6">
+          {StrategyOverview && <StrategyOverview />}
         </TabsContent>
       </Tabs>
     );
