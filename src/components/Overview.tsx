@@ -1551,7 +1551,10 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
 };
 
 // New component for Strategy visualization
-const StrategiesOverview: React.FC<{ strategiesData: StrategiesData | null }> = ({ strategiesData }) => {
+const StrategiesOverview: React.FC<{ 
+  strategiesData: StrategiesData | null,
+  ethPrice?: number
+}> = ({ strategiesData, ethPrice = 0 }) => {
   const [useLogScale, setUseLogScale] = useState(false);
   
   console.log('StrategiesOverview rendering:', {
@@ -1701,8 +1704,18 @@ const StrategiesOverview: React.FC<{ strategiesData: StrategiesData | null }> = 
               <li className="flex items-start">
                 <div className="shrink-0 text-red-600 mr-2">⚠️</div>
                 <span>
-                  {strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75).length} out of {strategiesWithData.length} strategies show critical concentration risk, 
-                  with top 5 operators controlling over 75% of the strategy's assets.
+                  {(() => {
+                    const highRiskStrategies = strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75);
+                    const highRiskETHValue = highRiskStrategies.reduce((sum, s) => sum + s.assets, 0);
+                    const highRiskPercentage = (highRiskETHValue / totalAssets * 100).toFixed(1);
+                    
+                    // Calculate USD value if ethPrice is available
+                    const highRiskUSDValue = ethPrice > 0 ? 
+                      `$${Math.round(highRiskETHValue * ethPrice).toLocaleString()} USD` : '';
+                    
+                    return `${highRiskStrategies.length} out of ${strategiesWithData.length} strategies show critical concentration risk, 
+                    with top 5 operators controlling over 75% of the strategy's assets. These high-risk strategies account for ${highRiskETHValue.toLocaleString()} ETH ${highRiskUSDValue ? `(${highRiskUSDValue}) ` : ''}(${highRiskPercentage}% of all restaked assets).`;
+                  })()}
                 </span>
               </li>
               <li className="flex items-start">
@@ -2012,6 +2025,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
 
   // Add state for strategies data
   const [strategiesData, setStrategiesData] = useState<StrategiesData | null>(null);
+  const [ethPrice, setEthPrice] = useState<number>(0);
 
   // Add diagnostic log for initial data
   console.log('Overview component - Initial restakeData:', {
@@ -2074,6 +2088,23 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const getEthPrice = async () => {
+      try {
+        const price = await fetchETHPrice();
+        setEthPrice(price);
+      } catch (error) {
+        console.error('Error fetching ETH price:', error);
+      }
+    };
+
+    getEthPrice();
+
+    // Refresh price every 5 minutes
+    const interval = setInterval(getEthPrice, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // Check if strategiesData is being updated correctly
@@ -2167,8 +2198,8 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
       <CompactNotes />
       
-      {/* Add Strategies Overview component */}
-      {strategiesData && <StrategiesOverview strategiesData={strategiesData} />}
+      {/* Add Strategies Overview component with ethPrice */}
+      {strategiesData && <StrategiesOverview strategiesData={strategiesData} ethPrice={ethPrice} />}
       
       <Card>
         <CardHeader>
