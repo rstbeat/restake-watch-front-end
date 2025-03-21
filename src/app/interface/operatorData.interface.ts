@@ -93,7 +93,7 @@ export interface OperatorDataResponse {
   strategyConcentrationMetrics?: {
     [key: string]: {
       totalAssets: number;
-      totalRestakers: number;
+      totalEntities: number;
       top5HoldersPercentage: number;
       herfindahlIndex: number;
     }

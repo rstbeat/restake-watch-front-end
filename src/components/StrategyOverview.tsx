@@ -101,21 +101,11 @@ const StrategyOverview: React.FC = () => {
       const data = await fetchOperatorData();
       
       if (data?.strategyConcentrationMetrics && data?.totalRestakedAssetsPerStrategy) {
-        // Transform data to use totalEntities instead of totalRestakers if needed
+        // Use the metrics data directly, no transformation needed
         const transformedMetrics: Record<string, StrategyMetrics> = {};
         
         Object.entries(data.strategyConcentrationMetrics).forEach(([key, metrics]) => {
-          // Map totalRestakers to totalEntities if it exists
-          if ('totalRestakers' in metrics) {
-            transformedMetrics[key] = {
-              totalAssets: metrics.totalAssets,
-              totalEntities: (metrics as any).totalRestakers as number,
-              top5HoldersPercentage: metrics.top5HoldersPercentage,
-              herfindahlIndex: metrics.herfindahlIndex
-            };
-          } else if ('totalEntities' in metrics) {
-            transformedMetrics[key] = metrics as unknown as StrategyMetrics;
-          }
+          transformedMetrics[key] = metrics as unknown as StrategyMetrics;
         });
         
         setStrategiesData({

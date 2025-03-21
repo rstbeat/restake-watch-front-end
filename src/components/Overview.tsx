@@ -485,6 +485,17 @@ interface EnhancedMetricsProps {
         total_market_share: number;
       };
     };
+    strategyConcentrationMetrics?: {
+      [key: string]: {
+        totalAssets: number;
+        totalEntities: number;
+        top5HoldersPercentage: number;
+        herfindahlIndex: number;
+      };
+    };
+    totalRestakedAssetsPerStrategy?: {
+      [key: string]: number;
+    };
   } | null;
 }
 
@@ -511,6 +522,17 @@ interface UnifiedRiskMetricsOverviewProps {
         total_eth_restaked: number;
         total_market_share: number;
       };
+    };
+    strategyConcentrationMetrics?: {
+      [key: string]: {
+        totalAssets: number;
+        totalEntities: number;
+        top5HoldersPercentage: number;
+        herfindahlIndex: number;
+      };
+    };
+    totalRestakedAssetsPerStrategy?: {
+      [key: string]: number;
     };
   } | null;
 }
@@ -954,6 +976,53 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   whitelisting.
                 </p>
               </div>
+              
+              {/* Strategy Risks */}
+              {operatorData?.strategyConcentrationMetrics && (
+                <>
+                  <div className="flex items-start">
+                    <div className="shrink-0 mr-2">
+                      <SmallStyledIcon
+                        icon={<AlertCircle className="h-3 w-3" />}
+                        gradientColors={['#ef4444', '#f97316']}
+                      />
+                    </div>
+                    <p className="text-sm text-red-800">
+                      <span className="font-bold">Strategy Concentration:</span>{' '}
+                      {Object.entries(operatorData.strategyConcentrationMetrics)
+                        .filter(([_, metrics]) => (metrics as any).top5HoldersPercentage > 75)
+                        .length} strategies have critical operator concentration with top 5 operators controlling 75%+ of assets.
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="shrink-0 mr-2">
+                      <SmallStyledIcon
+                        icon={<AlertCircle className="h-3 w-3" />}
+                        gradientColors={['#ef4444', '#f97316']}
+                      />
+                    </div>
+                    <p className="text-sm text-red-800">
+                      <span className="font-bold">High-Risk Strategy Assets:</span>{' '}
+                      {ethPrice > 0 && operatorData.totalRestakedAssetsPerStrategy ? 
+                        (value => {
+                          if (value >= 1_000_000_000) {
+                            return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                          } else if (value >= 1_000_000) {
+                            return `$${(value / 1_000_000).toFixed(1)}M+`;
+                          } else {
+                            return `$${Math.round(value).toLocaleString()}`;
+                          }
+                        })(
+                          Object.entries(operatorData.strategyConcentrationMetrics)
+                            .filter(([key, metrics]) => (metrics as any).top5HoldersPercentage > 75)
+                            .reduce((sum, [key, _]) => sum + (operatorData.totalRestakedAssetsPerStrategy?.[key] || 0), 0) * ethPrice
+                        ) : ''}
+                      {' '}currently in strategies with extreme operator concentration.
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </CardContent>
@@ -1160,6 +1229,86 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 }
               />
             </ExpandableSection>
+
+            {/* Strategy Concentration Risk */}
+            {operatorData?.strategyConcentrationMetrics && (
+              <ExpandableSection
+                title="Strategy Concentration Risk"
+                severity="critical"
+                defaultOpen={false}
+              >
+                <RiskIndicator
+                  level="critical"
+                  title="Highly Concentrated Strategies"
+                  description={
+                    <p>
+                      {Object.entries(operatorData.strategyConcentrationMetrics)
+                        .filter(([_, metrics]) => (metrics as any).top5HoldersPercentage > 75)
+                        .length} strategies have critical concentration where the top 5 operators control more than 75% of assets,
+                      creating significant systemic risk.
+                    </p>
+                  }
+                />
+                
+                <RiskIndicator
+                  level="critical"
+                  title="Significant Assets in High-Risk Strategies"
+                  description={
+                    <p>
+                      {ethPrice > 0 && operatorData.totalRestakedAssetsPerStrategy ? 
+                        (value => {
+                          if (value >= 1_000_000_000) {
+                            return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                          } else if (value >= 1_000_000) {
+                            return `$${(value / 1_000_000).toFixed(1)}M+`;
+                          } else {
+                            return `$${Math.round(value).toLocaleString()}`;
+                          }
+                        })(
+                          Object.entries(operatorData.strategyConcentrationMetrics)
+                            .filter(([key, metrics]) => (metrics as any).top5HoldersPercentage > 75)
+                            .reduce((sum, [key, _]) => sum + (operatorData.totalRestakedAssetsPerStrategy?.[key] || 0), 0) * ethPrice
+                        ) : ''}
+                      {' '}worth of assets are currently in strategies with extreme operator concentration,
+                      where failure of a few key operators could lead to cascading effects.
+                    </p>
+                  }
+                />
+                
+                <RiskIndicator
+                  level="warning"
+                  title="Moderate Concentration in Popular Strategies"
+                  description={
+                    <p>
+                      Several popular strategies, including {
+                        Object.entries(operatorData.strategyConcentrationMetrics)
+                          .filter(([key, metrics]) => 
+                            (metrics as any).top5HoldersPercentage > 50 && 
+                            (metrics as any).top5HoldersPercentage <= 75 &&
+                            (operatorData.totalRestakedAssetsPerStrategy?.[key] || 0) > 10000) // Significant size
+                          .map(([key, _]) => key.replace(/_/g, ' '))
+                          .slice(0, 2) // Take up to 2 examples
+                          .join(' and ')
+                      }, have moderate concentration with top 5 operators controlling between 50-75% of assets.
+                    </p>
+                  }
+                />
+                
+                <RiskIndicator
+                  level="positive"
+                  title="Well-Distributed Major Strategies"
+                  description={
+                    <p>
+                      {Object.entries(operatorData.strategyConcentrationMetrics)
+                        .filter(([key, metrics]) => 
+                          (metrics as any).top5HoldersPercentage <= 50 && 
+                          (operatorData.totalRestakedAssetsPerStrategy?.[key] || 0) > 50000) // Very significant size
+                        .length} major strategies (with {'>'}50,000 ETH in assets) have healthy distribution with top 5 operators controlling less than 50% of assets.
+                    </p>
+                  }
+                />
+              </ExpandableSection>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -1996,21 +2145,11 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         if (data?.strategyConcentrationMetrics && data?.totalRestakedAssetsPerStrategy) {
           console.log('Setting strategies data from operator API');
           
-          // Transform data to use totalEntities instead of totalRestakers if needed
+          // Use the metrics data directly, no transformation needed
           const transformedMetrics: Record<string, StrategyMetrics> = {};
           
           Object.entries(data.strategyConcentrationMetrics).forEach(([key, metrics]) => {
-            // Map totalRestakers to totalEntities if it exists
-            if ('totalRestakers' in metrics) {
-              transformedMetrics[key] = {
-                totalAssets: metrics.totalAssets,
-                totalEntities: (metrics as any).totalRestakers as number,
-                top5HoldersPercentage: metrics.top5HoldersPercentage,
-                herfindahlIndex: metrics.herfindahlIndex
-              };
-            } else if ('totalEntities' in metrics) {
-              transformedMetrics[key] = metrics as unknown as StrategyMetrics;
-            }
+            transformedMetrics[key] = metrics as unknown as StrategyMetrics;
           });
           
           setStrategiesData({
