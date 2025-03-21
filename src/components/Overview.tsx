@@ -2037,6 +2037,17 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   // Add state for strategies data
   const [strategiesData, setStrategiesData] = useState<StrategiesData | null>(null);
   const [ethPrice, setEthPrice] = useState<number>(0);
+  
+  // Format USD value with appropriate suffix (B for billions, M for millions)
+  const formatUSDValue = (value: number): string => {
+    if (value >= 1_000_000_000) {
+      return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+    } else if (value >= 1_000_000) {
+      return `$${(value / 1_000_000).toFixed(1)}M+`;
+    } else {
+      return `$${Math.round(value).toLocaleString()}`;
+    }
+  };
 
   // Add diagnostic log for initial data
   console.log('Overview component - Initial restakeData:', {
@@ -2163,6 +2174,11 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const formattedNodeMonsterShare = nodeMonsterShare.toFixed(1);
   const combinedShare = p2pShare + nodeMonsterShare;
   const formattedCombinedShare = combinedShare.toFixed(1);
+  
+  // Calculate USD value of assets in top operators
+  const topOperatorsETHValue = (operatorData?.totalETHRestaked || 0) * (combinedShare / 100);
+  const topOperatorsUSDValue = ethPrice > 0 ? topOperatorsETHValue * ethPrice : 0;
+  const formattedTopOperatorsUSD = formatUSDValue(topOperatorsUSDValue);
 
   // Color array for different sections
   const purpleColors = [
@@ -2224,7 +2240,10 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                     size="h-9 w-9"
                   />
                 </div>
-                Professional Operator Dominance in EigenLayer
+                {ethPrice > 0 && p2pData && nodeMonsterData ? 
+                  `${formattedTopOperatorsUSD} Restaked in Top 2 Professional Operators` :
+                  `Professional Operator Dominance in EigenLayer`
+                }
               </h2>
               <p className="text-sm text-gray-600 mt-1">
                 A few professional operator groups control a significant portion of the network through multiple individual nodes. This visualization shows the relative size of each major operator group's assets (converted to ETH value equivalent), with larger boxes representing more concentrated control.
