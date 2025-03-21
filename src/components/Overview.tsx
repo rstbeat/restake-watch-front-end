@@ -50,7 +50,7 @@ interface OverviewProps {
 // New interface for strategy data
 interface StrategyMetrics {
   totalAssets: number;
-  totalRestakers: number;
+  totalEntities: number;
   top5HoldersPercentage: number;
   herfindahlIndex: number;
 }
@@ -1780,10 +1780,10 @@ const StrategiesOverview: React.FC<{ strategiesData: StrategiesData | null }> = 
                               <>
                                 <p className="text-sm text-gray-600">
                                   <span className="font-medium">Total Operators:</span>{' '}
-                                  <span className="text-gray-900">{metrics.totalRestakers}</span>
+                                  <span className="text-gray-900">{metrics.totalEntities}</span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  <span className="font-medium">Top 5 Operators:</span>{' '}
+                                  <span className="font-medium">Top 5 Operators Control:</span>{' '}
                                   <span className={metrics.top5HoldersPercentage > 75 ? "text-red-600 font-bold" : "text-gray-900"}>
                                     {metrics.top5HoldersPercentage.toFixed(1)}%
                                   </span>
@@ -1901,7 +1901,7 @@ const StrategiesOverview: React.FC<{ strategiesData: StrategiesData | null }> = 
                     <tr key={strategy.rawName} className="border-b hover:bg-gray-50">
                       <td className="px-4 py-3 font-medium">{strategy.name}</td>
                       <td className="px-4 py-3">{strategy.assets.toLocaleString()}</td>
-                      <td className="px-4 py-3">{strategy.metrics?.totalRestakers || 'N/A'}</td>
+                      <td className="px-4 py-3">{strategy.metrics?.totalEntities || 'N/A'}</td>
                       <td className="px-4 py-3 font-medium">
                         {strategy.metrics ? (
                           <span className={strategy.metrics.top5HoldersPercentage > 75 ? 'text-red-600' : 'text-gray-700'}>
@@ -1963,7 +1963,7 @@ const StrategiesOverview: React.FC<{ strategiesData: StrategiesData | null }> = 
                   <>
                     <div className="flex justify-between">
                       <span className="text-sm font-medium text-gray-600">Operators:</span>
-                      <span className="font-semibold">{strategy.metrics.totalRestakers}</span>
+                      <span className="font-semibold">{strategy.metrics.totalEntities}</span>
                     </div>
                     
                     <div className="flex justify-between">
@@ -1989,7 +1989,7 @@ const StrategiesOverview: React.FC<{ strategiesData: StrategiesData | null }> = 
                             ? `This strategy has critical concentration risk with top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
                             : riskLevel === 'warning'
                             ? `This strategy has moderate concentration risk with relatively few operators and top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
-                            : `This strategy has good distribution across ${strategy.metrics.totalRestakers} operators with reasonable concentration metrics.`
+                            : `This strategy has good distribution across ${strategy.metrics.totalEntities} operators with reasonable concentration metrics.`
                           }
                         </p>
                       }
@@ -2042,8 +2042,26 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         // Use strategy data from operatorData instead of restakeData
         if (data?.strategyConcentrationMetrics && data?.totalRestakedAssetsPerStrategy) {
           console.log('Setting strategies data from operator API');
+          
+          // Transform data to use totalEntities instead of totalRestakers if needed
+          const transformedMetrics: Record<string, StrategyMetrics> = {};
+          
+          Object.entries(data.strategyConcentrationMetrics).forEach(([key, metrics]) => {
+            // Map totalRestakers to totalEntities if it exists
+            if ('totalRestakers' in metrics) {
+              transformedMetrics[key] = {
+                totalAssets: metrics.totalAssets,
+                totalEntities: (metrics as any).totalRestakers as number,
+                top5HoldersPercentage: metrics.top5HoldersPercentage,
+                herfindahlIndex: metrics.herfindahlIndex
+              };
+            } else if ('totalEntities' in metrics) {
+              transformedMetrics[key] = metrics as unknown as StrategyMetrics;
+            }
+          });
+          
           setStrategiesData({
-            strategyConcentrationMetrics: data.strategyConcentrationMetrics,
+            strategyConcentrationMetrics: transformedMetrics,
             totalRestakedAssetsPerStrategy: data.totalRestakedAssetsPerStrategy
           });
         } else {
