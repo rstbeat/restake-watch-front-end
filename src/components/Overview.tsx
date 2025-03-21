@@ -1668,6 +1668,25 @@ const StrategiesOverview: React.FC<{
     }
   };
   
+  // Calculate high risk strategies total value
+  const highRiskStrategies = strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75);
+  const highRiskETHValue = highRiskStrategies.reduce((sum, s) => sum + s.assets, 0);
+  const highRiskUSDValue = ethPrice > 0 ? highRiskETHValue * ethPrice : 0;
+  const highRiskPercentage = (highRiskETHValue / totalAssets * 100).toFixed(1);
+  
+  // Format USD value with appropriate suffix (B for billions, M for millions)
+  const formatUSDValue = (value: number): string => {
+    if (value >= 1_000_000_000) {
+      return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+    } else if (value >= 1_000_000) {
+      return `$${(value / 1_000_000).toFixed(1)}M+`;
+    } else {
+      return `$${Math.round(value).toLocaleString()}`;
+    }
+  };
+  
+  const formattedHighRiskUSD = formatUSDValue(highRiskUSDValue);
+  
   return (
     <>
       <Card className="mb-6">
@@ -1680,7 +1699,7 @@ const StrategiesOverview: React.FC<{
                 size="h-10 w-10"
               />
             </div>
-            Strategy Distribution Overview
+            {formattedHighRiskUSD} Restaked in  Strategies Where Top 5 Operators Control 75%+
           </h2>
           <p className="text-sm text-gray-600">
             Distribution of assets across different strategies on EigenLayer, with concentration risk metrics
@@ -1704,18 +1723,10 @@ const StrategiesOverview: React.FC<{
               <li className="flex items-start">
                 <div className="shrink-0 text-red-600 mr-2">⚠️</div>
                 <span>
-                  {(() => {
-                    const highRiskStrategies = strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75);
-                    const highRiskETHValue = highRiskStrategies.reduce((sum, s) => sum + s.assets, 0);
-                    const highRiskPercentage = (highRiskETHValue / totalAssets * 100).toFixed(1);
-                    
-                    // Calculate USD value if ethPrice is available
-                    const highRiskUSDValue = ethPrice > 0 ? 
-                      `$${Math.round(highRiskETHValue * ethPrice).toLocaleString()} USD` : '';
-                    
-                    return `${highRiskStrategies.length} out of ${strategiesWithData.length} strategies show critical concentration risk, 
-                    with top 5 operators controlling over 75% of the strategy's assets. These high-risk strategies account for ${highRiskETHValue.toLocaleString()} ETH ${highRiskUSDValue ? `(${highRiskUSDValue}) ` : ''}(${highRiskPercentage}% of all restaked assets).`;
-                  })()}
+                  {highRiskStrategies.length} out of {strategiesWithData.length} strategies show critical concentration risk, 
+                  with top 5 operators controlling over 75% of the strategy's assets. These high-risk strategies account for {highRiskETHValue.toLocaleString()} ETH 
+                  {highRiskUSDValue > 0 ? ` (${formattedHighRiskUSD} USD) ` : ' '}
+                  ({highRiskPercentage}% of all restaked assets).
                 </span>
               </li>
               <li className="flex items-start">
