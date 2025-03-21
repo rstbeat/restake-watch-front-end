@@ -16,6 +16,8 @@ import {
   BarChart,
   Bar,
   Cell,
+  PieChart,
+  Pie,
 } from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -34,14 +36,15 @@ import {
   CheckCircle,
   Info,
   ExternalLink,
-  PieChart,
   FileSpreadsheet,
   DollarSign,
+  Copy,
+  Check,
+  LucideIcon,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '../components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchOperatorData, fetchETHPrice } from '../app/api/restake/restake';
-import { LucideIcon } from 'lucide-react';
 
 interface OverviewProps {
   restakeData: any | null;
@@ -2296,6 +2299,32 @@ const StrategiesOverview: React.FC<{
   );
 };
 
+// Copyable address component
+const CopyableAddress: React.FC<{ address: string }> = ({ address }) => {
+  const [copied, setCopied] = useState(false);
+  
+  const copyAddress = (address: string) => {
+    navigator.clipboard.writeText(address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  
+  return (
+    <div className="flex items-center">
+      <span className="font-mono">
+        {address.substring(0, 8)}...{address.substring(address.length - 6)}
+      </span>
+      <button 
+        onClick={() => copyAddress(address)}
+        className="ml-2 text-gray-400 hover:text-gray-600"
+        title="Copy full address"
+      >
+        {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+};
+
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
     null,
@@ -2686,6 +2715,142 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           entityType="restakers"
         />
       )}
+
+      {/* EigenLayer Whales Component */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-xl font-semibold text-black flex items-center">
+                <div className="mr-3">
+                  <StyledIcon
+                    icon={<Wallet className="h-4 w-4" />}
+                    gradientColors={['#3b82f6', '#10b981']}
+                    size="h-9 w-9"
+                  />
+                </div>
+                {ethPrice > 0 && restakeData?.stakerData
+                  ? `${formatUSDValue(
+                      restakeData.stakerData
+                        .slice(0, 20)
+                        .reduce(
+                          (sum, staker) => 
+                            sum + (staker['ETH Restaked'] || 0) * ethPrice,
+                          0
+                        )
+                    )} Restaked in Top 20 EigenLayer Whales`
+                  : `Top 20 EigenLayer Whales`}
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                A small number of individual restakers hold a significant portion 
+                of the restaked assets in EigenLayer. These "whales" can have a 
+                considerable impact on the network's security and centralization.
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2 items-center">
+            {restakeData?.stakerData && restakeData.stakerData.length > 0 && (
+              <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                <span>
+                  Top 20 whales control {
+                    (restakeData.stakerData
+                      .slice(0, 20)
+                      .reduce(
+                        (sum, staker) => sum + (staker['Market Share'] || 0),
+                        0
+                      ) * 100).toFixed(1)
+                  }% of total restaked assets
+                </span>
+                <InfoTooltip content="The concentration of assets in a small number of wallets represents a potential centralization risk for EigenLayer." />
+              </div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border border-gray-200 p-4 mb-4 bg-gray-50">
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              Key Insights:
+            </h4>
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li className="flex items-start">
+                <div className="shrink-0 text-red-600 mr-2">⚠️</div>
+                <span>
+                  Just 20 wallets hold a substantial percentage of all restaked assets,
+                  creating potential centralization concerns.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <div className="shrink-0 text-blue-600 mr-2">🔍</div>
+                <span>
+                  These whale addresses may represent individuals, institutions, or smart contracts.
+                </span>
+              </li>
+              <li className="flex items-start">
+                <div className="shrink-0 text-orange-600 mr-2">ℹ️</div>
+                <span>
+                  Do you know who these whales are? Let us know! Contact us at @espejelomar on Telegram.
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          {restakeData?.stakerData && restakeData.stakerData.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Rank
+                    </th>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Address
+                    </th>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ETH Restaked
+                    </th>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Market Share
+                    </th>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Strategies
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {restakeData.stakerData.slice(0, 20).map((staker, index) => (
+                    <tr key={staker['Staker Address']} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {index + 1}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        <CopyableAddress address={staker['Staker Address']} />
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        {new Intl.NumberFormat('en-US', {
+                          notation: 'compact',
+                          compactDisplay: 'short',
+                          minimumFractionDigits: 1,
+                          maximumFractionDigits: 2,
+                        }).format(staker['ETH Restaked'] || 0)}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        {((staker['Market Share'] || 0) * 100).toFixed(2)}%
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                        {staker['Number of Strategies'] || 0}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      <div className="mt-6">
+        {/* Add any additional content you want to display here */}
+      </div>
     </div>
   );
 };

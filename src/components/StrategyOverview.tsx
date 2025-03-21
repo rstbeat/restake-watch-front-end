@@ -297,7 +297,7 @@ const StrategyOverview: React.FC = () => {
               {highRiskPercentage}% of restaked assets (
               {highRiskETHValue.toLocaleString()} ETH
               {ethPrice > 0 ? ` / ${formatUSDValue(highRiskUSDValue)}` : ''})
-              are in high-risk concentrated strategies
+              are in highly concentrated strategies
             </p>
             <p className="text-sm text-red-600 mt-1">
               {highRiskStrategies.length} strategies have critical concentration
