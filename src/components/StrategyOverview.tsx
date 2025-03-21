@@ -86,7 +86,9 @@ const StyledIcon: React.FC<{
 };
 
 const StrategyOverview: React.FC = () => {
-  const [strategiesData, setStrategiesData] = useState<StrategiesData | null>(null);
+  const [strategiesData, setStrategiesData] = useState<StrategiesData | null>(
+    null,
+  );
   const [isLoadingStrategyData, setIsLoadingStrategyData] = useState(false);
   const [sortColumn, setSortColumn] = useState<keyof StrategyData>('assets');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -99,18 +101,23 @@ const StrategyOverview: React.FC = () => {
     try {
       setIsLoadingStrategyData(true);
       const data = await fetchOperatorData();
-      
-      if (data?.strategyConcentrationMetrics && data?.totalRestakedAssetsPerStrategy) {
+
+      if (
+        data?.strategyConcentrationMetrics &&
+        data?.totalRestakedAssetsPerStrategy
+      ) {
         // Use the metrics data directly, no transformation needed
         const transformedMetrics: Record<string, StrategyMetrics> = {};
-        
-        Object.entries(data.strategyConcentrationMetrics).forEach(([key, metrics]) => {
-          transformedMetrics[key] = metrics as unknown as StrategyMetrics;
-        });
-        
+
+        Object.entries(data.strategyConcentrationMetrics).forEach(
+          ([key, metrics]) => {
+            transformedMetrics[key] = metrics as unknown as StrategyMetrics;
+          },
+        );
+
         setStrategiesData({
           strategyConcentrationMetrics: transformedMetrics,
-          totalRestakedAssetsPerStrategy: data.totalRestakedAssetsPerStrategy
+          totalRestakedAssetsPerStrategy: data.totalRestakedAssetsPerStrategy,
         });
       }
     } catch (error) {
@@ -145,12 +152,17 @@ const StrategyOverview: React.FC = () => {
   }, []);
 
   // Function to determine risk level based on concentration metrics
-  const getConcentrationRiskLevel = (metrics: StrategyMetrics | null): 'critical' | 'warning' | 'positive' | 'neutral' => {
+  const getConcentrationRiskLevel = (
+    metrics: StrategyMetrics | null,
+  ): 'critical' | 'warning' | 'positive' | 'neutral' => {
     if (!metrics) return 'neutral';
-    
+
     if (metrics.top5HoldersPercentage > 75 || metrics.herfindahlIndex > 0.25) {
       return 'critical';
-    } else if (metrics.top5HoldersPercentage > 50 || metrics.herfindahlIndex > 0.15) {
+    } else if (
+      metrics.top5HoldersPercentage > 50 ||
+      metrics.herfindahlIndex > 0.15
+    ) {
       return 'warning';
     } else {
       return 'positive';
@@ -161,8 +173,11 @@ const StrategyOverview: React.FC = () => {
     if (!strategiesData) return [];
 
     return Object.keys(strategiesData.totalRestakedAssetsPerStrategy)
-      .filter(strategy => strategiesData.totalRestakedAssetsPerStrategy[strategy] > 0)
-      .map(strategy => ({
+      .filter(
+        (strategy) =>
+          strategiesData.totalRestakedAssetsPerStrategy[strategy] > 0,
+      )
+      .map((strategy) => ({
         name: strategy.replace(/_/g, ' '),
         rawName: strategy,
         assets: strategiesData.totalRestakedAssetsPerStrategy[strategy],
@@ -172,10 +187,10 @@ const StrategyOverview: React.FC = () => {
 
   const filteredAndSortedData = useMemo(() => {
     if (!strategiesWithData.length) return [];
-    
+
     return [...strategiesWithData]
-      .filter((strategy) => 
-        strategy.name.toLowerCase().includes(searchTerm.toLowerCase())
+      .filter((strategy) =>
+        strategy.name.toLowerCase().includes(searchTerm.toLowerCase()),
       )
       .sort((a, b) => {
         if (sortColumn === 'metrics') {
@@ -183,18 +198,18 @@ const StrategyOverview: React.FC = () => {
           const bValue = b.metrics?.herfindahlIndex || 0;
           return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
         }
-        
+
         const aValue = a[sortColumn];
         const bValue = b[sortColumn];
-        
+
         if (typeof aValue === 'number' && typeof bValue === 'number') {
           return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
         }
-        
+
         const aString = String(aValue);
         const bString = String(bValue);
-        return sortDirection === 'asc' 
-          ? aString.localeCompare(bString) 
+        return sortDirection === 'asc'
+          ? aString.localeCompare(bString)
           : bString.localeCompare(aString);
       });
   }, [strategiesWithData, sortColumn, sortDirection, searchTerm]);
@@ -242,11 +257,22 @@ const StrategyOverview: React.FC = () => {
   };
 
   // Calculate high risk strategies total value
-  const highRiskStrategies = strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75);
-  const highRiskETHValue = highRiskStrategies.reduce((sum, s) => sum + s.assets, 0);
+  const highRiskStrategies = strategiesWithData.filter(
+    (s) => s.metrics?.top5HoldersPercentage > 75,
+  );
+  const highRiskETHValue = highRiskStrategies.reduce(
+    (sum, s) => sum + s.assets,
+    0,
+  );
   const highRiskUSDValue = ethPrice > 0 ? highRiskETHValue * ethPrice : 0;
-  const totalETHValue = strategiesWithData.reduce((sum, s) => sum + s.assets, 0);
-  const highRiskPercentage = totalETHValue > 0 ? (highRiskETHValue / totalETHValue * 100).toFixed(1) : '0';
+  const totalETHValue = strategiesWithData.reduce(
+    (sum, s) => sum + s.assets,
+    0,
+  );
+  const highRiskPercentage =
+    totalETHValue > 0
+      ? ((highRiskETHValue / totalETHValue) * 100).toFixed(1)
+      : '0';
 
   return (
     <div className="space-y-6">
@@ -264,19 +290,22 @@ const StrategyOverview: React.FC = () => {
         <p className="text-sm text-gray-600 mb-4">
           Detailed analysis of concentration risks across different strategies
         </p>
-        
+
         {highRiskStrategies.length > 0 && (
           <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
             <p className="text-red-700 font-medium">
-              {highRiskPercentage}% of restaked assets ({highRiskETHValue.toLocaleString()} ETH
-              {ethPrice > 0 ? ` / ${formatUSDValue(highRiskUSDValue)}` : ''}) are in high-risk concentrated strategies
+              {highRiskPercentage}% of restaked assets (
+              {highRiskETHValue.toLocaleString()} ETH
+              {ethPrice > 0 ? ` / ${formatUSDValue(highRiskUSDValue)}` : ''})
+              are in high-risk concentrated strategies
             </p>
             <p className="text-sm text-red-600 mt-1">
-              {highRiskStrategies.length} strategies have critical concentration risk with top 5 operators controlling more than 75% of assets
+              {highRiskStrategies.length} strategies have critical concentration
+              risk with top 5 operators controlling more than 75% of assets
             </p>
           </div>
         )}
-        
+
         <div className="mb-4">
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
@@ -289,7 +318,7 @@ const StrategyOverview: React.FC = () => {
             />
           </div>
         </div>
-        
+
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
@@ -352,7 +381,7 @@ const StrategyOverview: React.FC = () => {
                     positive: 'Low Risk',
                     neutral: 'Unknown',
                   };
-                  
+
                   return (
                     <TableRow
                       key={strategy.rawName}
@@ -372,22 +401,34 @@ const StrategyOverview: React.FC = () => {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell>{strategy.metrics?.totalEntities || 'N/A'}</TableCell>
+                      <TableCell>
+                        {strategy.metrics?.totalEntities || 'N/A'}
+                      </TableCell>
                       <TableCell className="font-medium">
                         {strategy.metrics ? (
-                          <span className={strategy.metrics.top5HoldersPercentage > 75 ? 'text-red-600' : 'text-gray-700'}>
+                          <span
+                            className={
+                              strategy.metrics.top5HoldersPercentage > 75
+                                ? 'text-red-600'
+                                : 'text-gray-700'
+                            }
+                          >
                             {strategy.metrics.top5HoldersPercentage.toFixed(1)}%
                           </span>
-                        ) : 'N/A'}
+                        ) : (
+                          'N/A'
+                        )}
                       </TableCell>
                       <TableCell>
-                        {strategy.metrics ? strategy.metrics.herfindahlIndex.toFixed(4) : 'N/A'}
+                        {strategy.metrics
+                          ? strategy.metrics.herfindahlIndex.toFixed(4)
+                          : 'N/A'}
                       </TableCell>
                       <TableCell>
                         {strategy.metrics && (
-                          <Badge 
-                            color={riskColors[riskLevel]} 
-                            text={riskText[riskLevel]} 
+                          <Badge
+                            color={riskColors[riskLevel]}
+                            text={riskText[riskLevel]}
                           />
                         )}
                       </TableCell>
@@ -404,24 +445,34 @@ const StrategyOverview: React.FC = () => {
             </TableBody>
           </Table>
         </div>
-        
+
         <div className="mt-4 text-sm text-gray-600">
           <p>Concentration metrics explanation:</p>
           <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li><strong>Total Assets:</strong> Sum of all assets managed by the strategy.</li>
-            <li><strong>Operators:</strong> Number of unique operators in the strategy.</li>
-            <li><strong>Top 5 Operators %:</strong> Percentage of strategy assets controlled by the top 5 operators. Higher values indicate more centralization.</li>
-            <li><strong>Herfindahl Index:</strong> Measure of operator concentration (0-1). Higher values indicate more concentration.</li>
+            <li>
+              <strong>Total Assets:</strong> Sum of all assets managed by the
+              strategy.
+            </li>
+            <li>
+              <strong>Operators:</strong> Number of unique operators in the
+              strategy.
+            </li>
+            <li>
+              <strong>Top 5 Operators %:</strong> Percentage of strategy assets
+              controlled by the top 5 operators. Higher values indicate more
+              centralization.
+            </li>
+            <li>
+              <strong>Herfindahl Index:</strong> Measure of operator
+              concentration (0-1). Higher values indicate more concentration.
+            </li>
           </ul>
         </div>
-        
+
         <div className="mt-4 flex items-center justify-between">
           <div>
             Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-            {Math.min(
-              currentPage * itemsPerPage,
-              filteredAndSortedData.length
-            )}{' '}
+            {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)}{' '}
             of {filteredAndSortedData.length} strategies
           </div>
           <div className="flex items-center space-x-2">
@@ -455,4 +506,4 @@ const StrategyOverview: React.FC = () => {
   );
 };
 
-export default StrategyOverview; 
+export default StrategyOverview;

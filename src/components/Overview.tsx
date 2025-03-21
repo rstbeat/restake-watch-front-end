@@ -976,7 +976,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   whitelisting.
                 </p>
               </div>
-              
+
               {/* Strategy Risks */}
               {operatorData?.strategyConcentrationMetrics && (
                 <>
@@ -989,12 +989,19 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     </div>
                     <p className="text-sm text-red-800">
                       <span className="font-bold">Strategy Concentration:</span>{' '}
-                      {Object.entries(operatorData.strategyConcentrationMetrics)
-                        .filter(([_, metrics]) => (metrics as any).top5HoldersPercentage > 75)
-                        .length} strategies have critical operator concentration with top 5 operators controlling 75%+ of assets.
+                      {
+                        Object.entries(
+                          operatorData.strategyConcentrationMetrics,
+                        ).filter(
+                          ([_, metrics]) =>
+                            (metrics as any).top5HoldersPercentage > 75,
+                        ).length
+                      }{' '}
+                      strategies have critical operator concentration with top 5
+                      operators controlling 75%+ of assets.
                     </p>
                   </div>
-                  
+
                   <div className="flex items-start">
                     <div className="shrink-0 mr-2">
                       <SmallStyledIcon
@@ -1003,22 +1010,39 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                       />
                     </div>
                     <p className="text-sm text-red-800">
-                      <span className="font-bold">High-Risk Strategy Assets:</span>{' '}
-                      {ethPrice > 0 && operatorData.totalRestakedAssetsPerStrategy ? 
-                        (value => {
-                          if (value >= 1_000_000_000) {
-                            return `$${(value / 1_000_000_000).toFixed(1)}B+`;
-                          } else if (value >= 1_000_000) {
-                            return `$${(value / 1_000_000).toFixed(1)}M+`;
-                          } else {
-                            return `$${Math.round(value).toLocaleString()}`;
-                          }
-                        })(
-                          Object.entries(operatorData.strategyConcentrationMetrics)
-                            .filter(([key, metrics]) => (metrics as any).top5HoldersPercentage > 75)
-                            .reduce((sum, [key, _]) => sum + (operatorData.totalRestakedAssetsPerStrategy?.[key] || 0), 0) * ethPrice
-                        ) : ''}
-                      {' '}currently in strategies with extreme operator concentration.
+                      <span className="font-bold">
+                        High-Risk Strategy Assets:
+                      </span>{' '}
+                      {ethPrice > 0 &&
+                      operatorData.totalRestakedAssetsPerStrategy
+                        ? ((value) => {
+                            if (value >= 1_000_000_000) {
+                              return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                            } else if (value >= 1_000_000) {
+                              return `$${(value / 1_000_000).toFixed(1)}M+`;
+                            } else {
+                              return `$${Math.round(value).toLocaleString()}`;
+                            }
+                          })(
+                            Object.entries(
+                              operatorData.strategyConcentrationMetrics,
+                            )
+                              .filter(
+                                ([key, metrics]) =>
+                                  (metrics as any).top5HoldersPercentage > 75,
+                              )
+                              .reduce(
+                                (sum, [key, _]) =>
+                                  sum +
+                                  (operatorData
+                                    .totalRestakedAssetsPerStrategy?.[key] ||
+                                    0),
+                                0,
+                              ) * ethPrice,
+                          )
+                        : ''}{' '}
+                      currently in strategies with extreme operator
+                      concentration.
                     </p>
                   </div>
                 </>
@@ -1242,68 +1266,104 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   title="Highly Concentrated Strategies"
                   description={
                     <p>
-                      {Object.entries(operatorData.strategyConcentrationMetrics)
-                        .filter(([_, metrics]) => (metrics as any).top5HoldersPercentage > 75)
-                        .length} strategies have critical concentration where the top 5 operators control more than 75% of assets,
-                      creating significant systemic risk.
+                      {
+                        Object.entries(
+                          operatorData.strategyConcentrationMetrics,
+                        ).filter(
+                          ([_, metrics]) =>
+                            (metrics as any).top5HoldersPercentage > 75,
+                        ).length
+                      }{' '}
+                      strategies have critical concentration where the top 5
+                      operators control more than 75% of assets, creating
+                      significant systemic risk.
                     </p>
                   }
                 />
-                
+
                 <RiskIndicator
                   level="critical"
                   title="Significant Assets in High-Risk Strategies"
                   description={
                     <p>
-                      {ethPrice > 0 && operatorData.totalRestakedAssetsPerStrategy ? 
-                        (value => {
-                          if (value >= 1_000_000_000) {
-                            return `$${(value / 1_000_000_000).toFixed(1)}B+`;
-                          } else if (value >= 1_000_000) {
-                            return `$${(value / 1_000_000).toFixed(1)}M+`;
-                          } else {
-                            return `$${Math.round(value).toLocaleString()}`;
-                          }
-                        })(
-                          Object.entries(operatorData.strategyConcentrationMetrics)
-                            .filter(([key, metrics]) => (metrics as any).top5HoldersPercentage > 75)
-                            .reduce((sum, [key, _]) => sum + (operatorData.totalRestakedAssetsPerStrategy?.[key] || 0), 0) * ethPrice
-                        ) : ''}
-                      {' '}worth of assets are currently in strategies with extreme operator concentration,
-                      where failure of a few key operators could lead to cascading effects.
+                      {ethPrice > 0 &&
+                      operatorData.totalRestakedAssetsPerStrategy
+                        ? ((value) => {
+                            if (value >= 1_000_000_000) {
+                              return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                            } else if (value >= 1_000_000) {
+                              return `$${(value / 1_000_000).toFixed(1)}M+`;
+                            } else {
+                              return `$${Math.round(value).toLocaleString()}`;
+                            }
+                          })(
+                            Object.entries(
+                              operatorData.strategyConcentrationMetrics,
+                            )
+                              .filter(
+                                ([key, metrics]) =>
+                                  (metrics as any).top5HoldersPercentage > 75,
+                              )
+                              .reduce(
+                                (sum, [key, _]) =>
+                                  sum +
+                                  (operatorData
+                                    .totalRestakedAssetsPerStrategy?.[key] ||
+                                    0),
+                                0,
+                              ) * ethPrice,
+                          )
+                        : ''}{' '}
+                      worth of assets are currently in strategies with extreme
+                      operator concentration, where failure of a few key
+                      operators could lead to cascading effects.
                     </p>
                   }
                 />
-                
+
                 <RiskIndicator
                   level="warning"
                   title="Moderate Concentration in Popular Strategies"
                   description={
                     <p>
-                      Several popular strategies, including {
-                        Object.entries(operatorData.strategyConcentrationMetrics)
-                          .filter(([key, metrics]) => 
-                            (metrics as any).top5HoldersPercentage > 50 && 
+                      Several popular strategies, including{' '}
+                      {Object.entries(operatorData.strategyConcentrationMetrics)
+                        .filter(
+                          ([key, metrics]) =>
+                            (metrics as any).top5HoldersPercentage > 50 &&
                             (metrics as any).top5HoldersPercentage <= 75 &&
-                            (operatorData.totalRestakedAssetsPerStrategy?.[key] || 0) > 10000) // Significant size
-                          .map(([key, _]) => key.replace(/_/g, ' '))
-                          .slice(0, 2) // Take up to 2 examples
-                          .join(' and ')
-                      }, have moderate concentration with top 5 operators controlling between 50-75% of assets.
+                            (operatorData.totalRestakedAssetsPerStrategy?.[
+                              key
+                            ] || 0) > 10000,
+                        ) // Significant size
+                        .map(([key, _]) => key.replace(/_/g, ' '))
+                        .slice(0, 2) // Take up to 2 examples
+                        .join(' and ')}
+                      , have moderate concentration with top 5 operators
+                      controlling between 50-75% of assets.
                     </p>
                   }
                 />
-                
+
                 <RiskIndicator
                   level="positive"
                   title="Well-Distributed Major Strategies"
                   description={
                     <p>
-                      {Object.entries(operatorData.strategyConcentrationMetrics)
-                        .filter(([key, metrics]) => 
-                          (metrics as any).top5HoldersPercentage <= 50 && 
-                          (operatorData.totalRestakedAssetsPerStrategy?.[key] || 0) > 50000) // Very significant size
-                        .length} major strategies (with {'>'}50,000 ETH in assets) have healthy distribution with top 5 operators controlling less than 50% of assets.
+                      {
+                        Object.entries(
+                          operatorData.strategyConcentrationMetrics,
+                        ).filter(
+                          ([key, metrics]) =>
+                            (metrics as any).top5HoldersPercentage <= 50 &&
+                            (operatorData.totalRestakedAssetsPerStrategy?.[
+                              key
+                            ] || 0) > 50000,
+                        ).length // Very significant size
+                      }{' '}
+                      major strategies (with {'>'}50,000 ETH in assets) have
+                      healthy distribution with top 5 operators controlling less
+                      than 50% of assets.
                     </p>
                   }
                 />
@@ -1414,8 +1474,11 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
       cumulativeStake: number;
       individualStake: number;
     }> = [];
-    
-    const formattedThresholdPoints: Record<number, { entities: number; position: number }> = {};
+
+    const formattedThresholdPoints: Record<
+      number,
+      { entities: number; position: number }
+    > = {};
 
     // Always include first point
     data.push({
@@ -1434,7 +1497,10 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
 
       // Check if we crossed any thresholds
       thresholds.forEach((threshold) => {
-        if (!formattedThresholdPoints[threshold] && cumulativeStake >= threshold) {
+        if (
+          !formattedThresholdPoints[threshold] &&
+          cumulativeStake >= threshold
+        ) {
           const prevPoint = lorenzData[i - step];
           const prevStake = prevPoint[1] * 100;
           const prevEntities = prevPoint[0] * 100;
@@ -1510,13 +1576,17 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
           <p className="font-semibold text-gray-900">{`${entityType === 'operators' ? 'Individual Operator Node' : 'Restaker'} #${label}`}</p>
           <div className="space-y-1 mt-2">
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Cumulative Restake (ETH value):</span>{' '}
+              <span className="font-medium">
+                Cumulative Restake (ETH value):
+              </span>{' '}
               <span className="text-gray-900">
                 {data.cumulativeStake.toFixed(2)}%
               </span>
             </p>
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Individual Restake (ETH value):</span>{' '}
+              <span className="font-medium">
+                Individual Restake (ETH value):
+              </span>{' '}
               <span className="text-gray-900">
                 {data.individualStake.toFixed(4)}%
               </span>
@@ -1587,14 +1657,15 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
             <li className="flex items-start">
               <div className="shrink-0 text-red-600 mr-2">⚠️</div>
               <span>
-                The chart shows how assets (converted to ETH value) are distributed among {entityType},
-                from largest to smallest.
+                The chart shows how assets (converted to ETH value) are
+                distributed among {entityType}, from largest to smallest.
               </span>
             </li>
             <li className="flex items-start">
               <div className="shrink-0 text-purple-600 mr-2">📊</div>
               <span>
-                The steep initial rise shows that a small number of {entityType} control a large percentage of the total restake.
+                The steep initial rise shows that a small number of {entityType}{' '}
+                control a large percentage of the total restake.
               </span>
             </li>
             {Object.entries(thresholdPoints).map(
@@ -1602,8 +1673,8 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
                 <li key={threshold} className="flex items-start">
                   <div className="shrink-0 text-blue-600 mr-2">🔍</div>
                   <span>
-                    <strong>{threshold}%</strong> of total restake is controlled by just{' '}
-                    <strong>{point.position}</strong> {entityType} (
+                    <strong>{threshold}%</strong> of total restake is controlled
+                    by just <strong>{point.position}</strong> {entityType} (
                     {point.entities.toFixed(1)}% of all {entityType})
                   </span>
                 </li>
@@ -1686,12 +1757,22 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
             How to interpret this chart:
           </h4>
           <p className="text-sm text-gray-600">
-            This chart shows how assets (converted to ETH value) are distributed among {entityType === 'operators' ? 'individual operator nodes' : entityType},
-            ordered from largest to smallest. Unlike the Professional Operator Dominance chart, this visualization considers each operator node separately, even if multiple nodes are managed by the same professional operator group. The steep rise at the beginning
-            indicates that a small number of {entityType === 'operators' ? 'individual nodes' : entityType} control a large
-            percentage of the total restake. Use the scale toggle to switch
-            between linear and logarithmic views - the logarithmic view helps
-            visualize the distribution among smaller {entityType}. For details on which professional groups operate multiple nodes, visit the Operators tab.
+            This chart shows how assets (converted to ETH value) are distributed
+            among{' '}
+            {entityType === 'operators'
+              ? 'individual operator nodes'
+              : entityType}
+            , ordered from largest to smallest. Unlike the Professional Operator
+            Dominance chart, this visualization considers each operator node
+            separately, even if multiple nodes are managed by the same
+            professional operator group. The steep rise at the beginning
+            indicates that a small number of{' '}
+            {entityType === 'operators' ? 'individual nodes' : entityType}{' '}
+            control a large percentage of the total restake. Use the scale
+            toggle to switch between linear and logarithmic views - the
+            logarithmic view helps visualize the distribution among smaller{' '}
+            {entityType}. For details on which professional groups operate
+            multiple nodes, visit the Operators tab.
           </p>
         </div>
       </CardContent>
@@ -1700,129 +1781,153 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
 };
 
 // New component for Strategy visualization
-const StrategiesOverview: React.FC<{ 
-  strategiesData: StrategiesData | null,
-  ethPrice?: number
+const StrategiesOverview: React.FC<{
+  strategiesData: StrategiesData | null;
+  ethPrice?: number;
 }> = ({ strategiesData, ethPrice = 0 }) => {
   const [useLogScale, setUseLogScale] = useState(false);
-  
+
   console.log('StrategiesOverview rendering:', {
     hasData: !!strategiesData,
-    metricsKeys: strategiesData?.strategyConcentrationMetrics ? 
-      Object.keys(strategiesData.strategyConcentrationMetrics).length : 0,
-    assetsKeys: strategiesData?.totalRestakedAssetsPerStrategy ? 
-      Object.keys(strategiesData.totalRestakedAssetsPerStrategy).length : 0
+    metricsKeys: strategiesData?.strategyConcentrationMetrics
+      ? Object.keys(strategiesData.strategyConcentrationMetrics).length
+      : 0,
+    assetsKeys: strategiesData?.totalRestakedAssetsPerStrategy
+      ? Object.keys(strategiesData.totalRestakedAssetsPerStrategy).length
+      : 0,
   });
-  
+
   if (!strategiesData) return null;
-  
-  const { strategyConcentrationMetrics, totalRestakedAssetsPerStrategy } = strategiesData;
-  
+
+  const { strategyConcentrationMetrics, totalRestakedAssetsPerStrategy } =
+    strategiesData;
+
   // Log all available strategies with their values
   console.log('ALL STRATEGIES DATA:', {
     // List all strategies with their assets
     allStrategiesWithAssets: Object.entries(totalRestakedAssetsPerStrategy)
-      .map(([key, value]) => ({ 
-        name: key.replace(/_/g, ' '), 
+      .map(([key, value]) => ({
+        name: key.replace(/_/g, ' '),
         assets: value,
-        hasMetrics: !!strategyConcentrationMetrics[key]
+        hasMetrics: !!strategyConcentrationMetrics[key],
       }))
       .sort((a, b) => b.assets - a.assets),
-    
+
     // Number of strategies that have concentration metrics
-    totalStrategiesWithMetrics: Object.keys(strategyConcentrationMetrics).length,
-    
+    totalStrategiesWithMetrics: Object.keys(strategyConcentrationMetrics)
+      .length,
+
     // Number of strategies with assets > 0
-    totalStrategiesWithAssets: Object.values(totalRestakedAssetsPerStrategy)
-      .filter(value => value > 0).length,
-    
+    totalStrategiesWithAssets: Object.values(
+      totalRestakedAssetsPerStrategy,
+    ).filter((value) => value > 0).length,
+
     // Sum of all assets
-    totalAssets: Object.values(totalRestakedAssetsPerStrategy)
-      .reduce((sum, value) => sum + value, 0)
+    totalAssets: Object.values(totalRestakedAssetsPerStrategy).reduce(
+      (sum, value) => sum + value,
+      0,
+    ),
   });
-  
+
   // Use the same purple color array as the Professional Operator Dominance chart
   const strategyColors = [
     '#9C27B0', // Base purple
     '#8E24AA',
-    '#7B1FA2', 
+    '#7B1FA2',
     '#6A1B9A',
     '#4A148C',
     '#38006b',
   ];
-  
+
   // Format and sort strategies by total restaked assets
   const strategiesWithData = Object.keys(totalRestakedAssetsPerStrategy)
-    .filter(strategy => totalRestakedAssetsPerStrategy[strategy] > 0)
-    .map(strategy => ({
+    .filter((strategy) => totalRestakedAssetsPerStrategy[strategy] > 0)
+    .map((strategy) => ({
       name: strategy.replace(/_/g, ' '),
       rawName: strategy,
       assets: totalRestakedAssetsPerStrategy[strategy],
       metrics: strategyConcentrationMetrics[strategy] || null,
     }))
     .sort((a, b) => b.assets - a.assets);
-  
+
   // Calculate total assets
-  const totalAssets = strategiesWithData.reduce((sum, strategy) => sum + strategy.assets, 0);
-  
+  const totalAssets = strategiesWithData.reduce(
+    (sum, strategy) => sum + strategy.assets,
+    0,
+  );
+
   // Prepare treemap data
-  const treeMapData = strategiesWithData.map((strategy, index) => {
-    // Only skip strategies with zero assets
-    if (strategy.assets <= 0) return null;
-    
-    return {
-      name: strategy.name,
-      value: strategy.assets,
-      percentage: ((strategy.assets / totalAssets) * 100).toFixed(4),
-      fill: strategyColors[index % strategyColors.length],
-    };
-  }).filter(Boolean);
-  
+  const treeMapData = strategiesWithData
+    .map((strategy, index) => {
+      // Only skip strategies with zero assets
+      if (strategy.assets <= 0) return null;
+
+      return {
+        name: strategy.name,
+        value: strategy.assets,
+        percentage: ((strategy.assets / totalAssets) * 100).toFixed(4),
+        fill: strategyColors[index % strategyColors.length],
+      };
+    })
+    .filter(Boolean);
+
   // Get top 5 strategies for detailed cards
   const topStrategies = strategiesWithData.slice(0, 10);
-  
+
   // Log strategies being displayed in different sections
   console.log('STRATEGIES BEING DISPLAYED:', {
     // Strategies in treemap (all with assets > 0)
-    treemapStrategies: treeMapData.map(item => item?.name),
+    treemapStrategies: treeMapData.map((item) => item?.name),
     treemapCount: treeMapData.length,
-    
+
     // Strategies in table (top 25)
-    tableStrategies: strategiesWithData.slice(0, 25).map(s => s.name),
+    tableStrategies: strategiesWithData.slice(0, 25).map((s) => s.name),
     tableCount: Math.min(25, strategiesWithData.length),
-    
+
     // Strategies in expandable cards (top 10)
-    cardStrategies: topStrategies.map(s => s.name),
+    cardStrategies: topStrategies.map((s) => s.name),
     cardCount: topStrategies.length,
-    
+
     // Strategies with zero assets (filtered out)
     strategiesWithZeroAssets: Object.entries(totalRestakedAssetsPerStrategy)
       .filter(([_, value]) => value <= 0)
       .map(([key, _]) => key.replace(/_/g, ' ')),
-      
+
     // Total number of strategies with assets > 0
-    totalStrategiesCount: strategiesWithData.length
+    totalStrategiesCount: strategiesWithData.length,
   });
-  
+
   // Function to determine risk level based on concentration metrics
-  const getConcentrationRiskLevel = (metrics: StrategyMetrics | null): 'critical' | 'warning' | 'positive' | 'neutral' => {
+  const getConcentrationRiskLevel = (
+    metrics: StrategyMetrics | null,
+  ): 'critical' | 'warning' | 'positive' | 'neutral' => {
     if (!metrics) return 'neutral';
-    
+
     if (metrics.top5HoldersPercentage > 75 || metrics.herfindahlIndex > 0.25) {
       return 'critical';
-    } else if (metrics.top5HoldersPercentage > 50 || metrics.herfindahlIndex > 0.15) {
+    } else if (
+      metrics.top5HoldersPercentage > 50 ||
+      metrics.herfindahlIndex > 0.15
+    ) {
       return 'warning';
     } else {
       return 'positive';
     }
   };
-  
+
   // Calculate high risk strategies total value
-  const highRiskStrategies = strategiesWithData.filter(s => s.metrics?.top5HoldersPercentage > 75);
-  const highRiskETHValue = highRiskStrategies.reduce((sum, s) => sum + s.assets, 0);
+  const highRiskStrategies = strategiesWithData.filter(
+    (s) => s.metrics?.top5HoldersPercentage > 75,
+  );
+  const highRiskETHValue = highRiskStrategies.reduce(
+    (sum, s) => sum + s.assets,
+    0,
+  );
   const highRiskUSDValue = ethPrice > 0 ? highRiskETHValue * ethPrice : 0;
-  const highRiskPercentage = (highRiskETHValue / totalAssets * 100).toFixed(1);
-  
+  const highRiskPercentage = ((highRiskETHValue / totalAssets) * 100).toFixed(
+    1,
+  );
+
   // Format USD value with appropriate suffix (B for billions, M for millions)
   const formatUSDValue = (value: number): string => {
     if (value >= 1_000_000_000) {
@@ -1833,9 +1938,9 @@ const StrategiesOverview: React.FC<{
       return `$${Math.round(value).toLocaleString()}`;
     }
   };
-  
+
   const formattedHighRiskUSD = formatUSDValue(highRiskUSDValue);
-  
+
   return (
     <>
       <Card className="mb-6">
@@ -1848,51 +1953,79 @@ const StrategiesOverview: React.FC<{
                 size="h-10 w-10"
               />
             </div>
-            {formattedHighRiskUSD} Restaked in  Strategies Where Top 5 Operators Control 75%+
+            {formattedHighRiskUSD} Restaked in Strategies Where Top 5 Operators
+            Control 75%+
           </h2>
           <p className="text-sm text-gray-600">
-            Distribution of assets across different strategies on EigenLayer, with concentration risk metrics
+            Distribution of assets across different strategies on EigenLayer,
+            with concentration risk metrics
           </p>
         </CardHeader>
         <CardContent>
           <div className="rounded-lg border border-gray-200 p-4 mb-4 bg-gray-50">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">Key Insights:</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              Key Insights:
+            </h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start">
                 <div className="shrink-0 text-blue-600 mr-2">📊</div>
                 <span>
-                  BeaconChain ETH ({((totalRestakedAssetsPerStrategy['BeaconChain_ETH'] || 0) / totalAssets * 100).toFixed(1)}%) 
-                  and Lido ({((totalRestakedAssetsPerStrategy['Lido'] || 0) / totalAssets * 100).toFixed(1)}%) 
-                  are the most widely used strategies, accounting for {((
-                    (totalRestakedAssetsPerStrategy['BeaconChain_ETH'] || 0) + 
-                    (totalRestakedAssetsPerStrategy['Lido'] || 0)
-                  ) / totalAssets * 100).toFixed(1)}% of all restaked assets.
+                  BeaconChain ETH (
+                  {(
+                    ((totalRestakedAssetsPerStrategy['BeaconChain_ETH'] || 0) /
+                      totalAssets) *
+                    100
+                  ).toFixed(1)}
+                  %) and Lido (
+                  {(
+                    ((totalRestakedAssetsPerStrategy['Lido'] || 0) /
+                      totalAssets) *
+                    100
+                  ).toFixed(1)}
+                  %) are the most widely used strategies, accounting for{' '}
+                  {(
+                    (((totalRestakedAssetsPerStrategy['BeaconChain_ETH'] || 0) +
+                      (totalRestakedAssetsPerStrategy['Lido'] || 0)) /
+                      totalAssets) *
+                    100
+                  ).toFixed(1)}
+                  % of all restaked assets.
                 </span>
               </li>
               <li className="flex items-start">
                 <div className="shrink-0 text-red-600 mr-2">⚠️</div>
                 <span>
-                  {highRiskStrategies.length} out of {strategiesWithData.length} strategies show critical concentration risk, 
-                  with top 5 operators controlling over 75% of the strategy's assets. These high-risk strategies account for {highRiskETHValue.toLocaleString()} ETH 
-                  {highRiskUSDValue > 0 ? ` (${formattedHighRiskUSD} USD) ` : ' '}
+                  {highRiskStrategies.length} out of {strategiesWithData.length}{' '}
+                  strategies show critical concentration risk, with top 5
+                  operators controlling over 75% of the strategy's assets. These
+                  high-risk strategies account for{' '}
+                  {highRiskETHValue.toLocaleString()} ETH
+                  {highRiskUSDValue > 0
+                    ? ` (${formattedHighRiskUSD} USD) `
+                    : ' '}
                   ({highRiskPercentage}% of all restaked assets).
                 </span>
               </li>
               <li className="flex items-start">
                 <div className="shrink-0 text-orange-600 mr-2">🔍</div>
                 <span>
-                  Smaller strategies tend to have higher concentration risks, with fewer operators participating and higher inequality metrics.
+                  Smaller strategies tend to have higher concentration risks,
+                  with fewer operators participating and higher inequality
+                  metrics.
                 </span>
               </li>
               <li className="flex items-start">
                 <div className="shrink-0 text-purple-600 mr-2">ℹ️</div>
                 <span>
-                  <strong>Note:</strong> All metrics shown here reflect the distribution of assets among operators, not restakers. This provides insights into operator-level concentration within each strategy.
+                  <strong>Note:</strong> All metrics shown here reflect the
+                  distribution of assets among operators, not restakers. This
+                  provides insights into operator-level concentration within
+                  each strategy.
                 </span>
               </li>
             </ul>
           </div>
-          
+
           {/* Strategy Distribution Chart */}
           <div className="pl-0 -ml-36">
             <ResponsiveContainer width="100%" height={400}>
@@ -1902,28 +2035,32 @@ const StrategiesOverview: React.FC<{
                 margin={{ top: 5, right: 30, left: 60, bottom: 30 }}
                 barSize={10}
               >
-                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                <XAxis 
-                  type="number" 
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  horizontal={true}
+                  vertical={false}
+                />
+                <XAxis
+                  type="number"
                   tickFormatter={(value) => `${value.toLocaleString()} ETH`}
-                  label={{ 
+                  label={{
                     value: 'ETH Value',
                     position: 'insideBottom',
                     offset: -15,
-                    style: { 
+                    style: {
                       fontSize: 14,
                       fontWeight: 500,
-                      fill: '#666'
-                    }
+                      fill: '#666',
+                    },
                   }}
                   domain={useLogScale ? [0.1, 'dataMax'] : [0, 'dataMax']}
                   scale={useLogScale ? 'log' : 'linear'}
                   allowDecimals={true}
                   tick={{ fontSize: 11 }}
                 />
-                <YAxis 
-                  dataKey="name" 
-                  type="category" 
+                <YAxis
+                  dataKey="name"
+                  type="category"
                   width={240}
                   tick={{ fontSize: 11, textAnchor: 'end' }}
                   axisLine={false}
@@ -1936,34 +2073,65 @@ const StrategiesOverview: React.FC<{
                     if (payload && payload.length) {
                       const strategy = payload[0].payload;
                       const metrics = strategy.metrics;
-                      const percentage = ((strategy.assets / totalAssets) * 100).toFixed(4);
+                      const percentage = (
+                        (strategy.assets / totalAssets) *
+                        100
+                      ).toFixed(4);
                       return (
                         <div className="bg-white p-3 shadow-lg rounded border border-purple-200">
-                          <p className="font-semibold text-black text-base">{strategy.name}</p>
+                          <p className="font-semibold text-black text-base">
+                            {strategy.name}
+                          </p>
                           <div className="space-y-1 mt-2">
                             <p className="text-sm text-gray-600">
                               <span className="font-medium">Total Assets:</span>{' '}
-                              <span className="text-gray-900">{strategy.assets.toLocaleString()} ETH</span>
+                              <span className="text-gray-900">
+                                {strategy.assets.toLocaleString()} ETH
+                              </span>
                             </p>
                             <p className="text-sm text-gray-600">
-                              <span className="font-medium">Network Share:</span>{' '}
-                              <span className="text-gray-900">{percentage}%</span>
+                              <span className="font-medium">
+                                Network Share:
+                              </span>{' '}
+                              <span className="text-gray-900">
+                                {percentage}%
+                              </span>
                             </p>
                             {metrics && (
                               <>
                                 <p className="text-sm text-gray-600">
-                                  <span className="font-medium">Total Operators:</span>{' '}
-                                  <span className="text-gray-900">{metrics.totalEntities}</span>
+                                  <span className="font-medium">
+                                    Total Operators:
+                                  </span>{' '}
+                                  <span className="text-gray-900">
+                                    {metrics.totalEntities}
+                                  </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  <span className="font-medium">Top 5 Operators Control:</span>{' '}
-                                  <span className={metrics.top5HoldersPercentage > 75 ? "text-red-600 font-bold" : "text-gray-900"}>
+                                  <span className="font-medium">
+                                    Top 5 Operators Control:
+                                  </span>{' '}
+                                  <span
+                                    className={
+                                      metrics.top5HoldersPercentage > 75
+                                        ? 'text-red-600 font-bold'
+                                        : 'text-gray-900'
+                                    }
+                                  >
                                     {metrics.top5HoldersPercentage.toFixed(1)}%
                                   </span>
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  <span className="font-medium">Concentration Index:</span>{' '}
-                                  <span className={metrics.herfindahlIndex > 0.25 ? "text-red-600 font-bold" : "text-gray-900"}>
+                                  <span className="font-medium">
+                                    Concentration Index:
+                                  </span>{' '}
+                                  <span
+                                    className={
+                                      metrics.herfindahlIndex > 0.25
+                                        ? 'text-red-600 font-bold'
+                                        : 'text-gray-900'
+                                    }
+                                  >
                                     {metrics.herfindahlIndex.toFixed(4)}
                                   </span>
                                 </p>
@@ -1976,16 +2144,16 @@ const StrategiesOverview: React.FC<{
                     return null;
                   }}
                 />
-                <Bar 
-                  dataKey="assets" 
+                <Bar
+                  dataKey="assets"
                   name="ETH Value"
                   isAnimationActive={false}
                   radius={[0, 3, 3, 0]} // Rounded corners on right side only
                   minPointSize={3} // Ensures very small values still appear as tiny bars
                 >
                   {strategiesWithData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${entry.rawName}`} 
+                    <Cell
+                      key={`cell-${entry.rawName}`}
                       fill={strategyColors[index % strategyColors.length]}
                     />
                   ))}
@@ -1993,49 +2161,59 @@ const StrategiesOverview: React.FC<{
               </BarChart>
             </ResponsiveContainer>
           </div>
-          
+
           <div className="mt-4 flex justify-end space-x-2">
-            <button 
+            <button
               className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                useLogScale 
-                  ? 'bg-purple-100 text-purple-800 hover:bg-purple-200' 
+                useLogScale
+                  ? 'bg-purple-100 text-purple-800 hover:bg-purple-200'
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
               onClick={() => {
                 setUseLogScale(!useLogScale);
-                console.log(`Switched to ${!useLogScale ? 'logarithmic' : 'linear'} scale`);
+                console.log(
+                  `Switched to ${!useLogScale ? 'logarithmic' : 'linear'} scale`,
+                );
               }}
             >
               {useLogScale ? 'Linear Scale' : 'Log Scale'}
             </button>
           </div>
-          
-          
+
           <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">How to interpret this visualization:</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              How to interpret this visualization:
+            </h4>
             <p className="text-sm text-gray-600">
-              This chart shows all strategies in EigenLayer by total ETH value. Each bar represents a strategy,
-              with longer bars indicating more widely used strategies. Data is based on operator distribution, not restaker distribution.
-              Hover over any bar to see detailed statistics about each strategy, 
-              including operator concentration metrics. Strategies with high concentration have their top 5 operators
-              controlling a significant percentage of assets, creating potential risks.
+              This chart shows all strategies in EigenLayer by total ETH value.
+              Each bar represents a strategy, with longer bars indicating more
+              widely used strategies. Data is based on operator distribution,
+              not restaker distribution. Hover over any bar to see detailed
+              statistics about each strategy, including operator concentration
+              metrics. Strategies with high concentration have their top 5
+              operators controlling a significant percentage of assets, creating
+              potential risks.
               {useLogScale && (
                 <p className="mt-2 text-sm text-purple-700 bg-purple-50 p-2 rounded">
-                  <strong>Log Scale Active:</strong> This view compresses the scale to better visualize both large and small strategies.
-                  The difference between very large strategies (millions of ETH) and very small ones (less than 1 ETH) becomes more visible.
+                  <strong>Log Scale Active:</strong> This view compresses the
+                  scale to better visualize both large and small strategies. The
+                  difference between very large strategies (millions of ETH) and
+                  very small ones (less than 1 ETH) becomes more visible.
                 </p>
               )}
             </p>
           </div>
         </CardContent>
       </Card>
-      
+
       {/* Top Strategies Detailed Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         {topStrategies.map((strategy) => {
           const riskLevel = getConcentrationRiskLevel(strategy.metrics);
-          const marketShare = (strategy.assets / totalAssets * 100).toFixed(1);
-          
+          const marketShare = ((strategy.assets / totalAssets) * 100).toFixed(
+            1,
+          );
+
           return (
             <ExpandableSection
               key={strategy.rawName}
@@ -2045,42 +2223,65 @@ const StrategiesOverview: React.FC<{
             >
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">Total Assets:</span>
-                  <span className="font-semibold">{strategy.assets.toLocaleString()} ETH</span>
+                  <span className="text-sm font-medium text-gray-600">
+                    Total Assets:
+                  </span>
+                  <span className="font-semibold">
+                    {strategy.assets.toLocaleString()} ETH
+                  </span>
                 </div>
-                
+
                 {strategy.metrics && (
                   <>
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Operators:</span>
-                      <span className="font-semibold">{strategy.metrics.totalEntities}</span>
+                      <span className="text-sm font-medium text-gray-600">
+                        Operators:
+                      </span>
+                      <span className="font-semibold">
+                        {strategy.metrics.totalEntities}
+                      </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Top 5 Operators Control:</span>
-                      <span className={strategy.metrics.top5HoldersPercentage > 75 ? 'font-bold text-red-600' : 'font-semibold'}>
+                      <span className="text-sm font-medium text-gray-600">
+                        Top 5 Operators Control:
+                      </span>
+                      <span
+                        className={
+                          strategy.metrics.top5HoldersPercentage > 75
+                            ? 'font-bold text-red-600'
+                            : 'font-semibold'
+                        }
+                      >
                         {strategy.metrics.top5HoldersPercentage.toFixed(1)}%
                       </span>
                     </div>
-                    
+
                     <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">Concentration Index:</span>
-                      <span className={strategy.metrics.herfindahlIndex > 0.25 ? 'font-bold text-red-600' : 'font-semibold'}>
+                      <span className="text-sm font-medium text-gray-600">
+                        Concentration Index:
+                      </span>
+                      <span
+                        className={
+                          strategy.metrics.herfindahlIndex > 0.25
+                            ? 'font-bold text-red-600'
+                            : 'font-semibold'
+                        }
+                      >
                         {strategy.metrics.herfindahlIndex.toFixed(4)}
                       </span>
                     </div>
-                    
+
                     <RiskIndicator
                       level={riskLevel}
                       title={`${strategy.name} Risk Assessment`}
                       description={
                         <p>
-                          {riskLevel === 'critical' 
+                          {riskLevel === 'critical'
                             ? `This strategy has critical concentration risk with top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
                             : riskLevel === 'warning'
-                            ? `This strategy has moderate concentration risk with relatively few operators and top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
-                            : `This strategy has good distribution across ${strategy.metrics.totalEntities} operators with reasonable concentration metrics.`
-                          }
+                              ? `This strategy has moderate concentration risk with relatively few operators and top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
+                              : `This strategy has good distribution across ${strategy.metrics.totalEntities} operators with reasonable concentration metrics.`}
                         </p>
                       }
                     />
@@ -2101,9 +2302,11 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   );
 
   // Add state for strategies data
-  const [strategiesData, setStrategiesData] = useState<StrategiesData | null>(null);
+  const [strategiesData, setStrategiesData] = useState<StrategiesData | null>(
+    null,
+  );
   const [ethPrice, setEthPrice] = useState<number>(0);
-  
+
   // Format USD value with appropriate suffix (B for billions, M for millions)
   const formatUSDValue = (value: number): string => {
     if (value >= 1_000_000_000) {
@@ -2128,33 +2331,40 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       try {
         const data = await fetchOperatorData();
         setOperatorData(data);
-        
+
         // Log detailed information about strategy data
         console.log('Strategy data check from operatorData:', {
           strategyMetricsExists: !!data?.strategyConcentrationMetrics,
           strategyMetricsType: typeof data?.strategyConcentrationMetrics,
-          strategyMetricsKeys: data?.strategyConcentrationMetrics ? 
-            Object.keys(data.strategyConcentrationMetrics) : [],
+          strategyMetricsKeys: data?.strategyConcentrationMetrics
+            ? Object.keys(data.strategyConcentrationMetrics)
+            : [],
           assetsPerStrategyExists: !!data?.totalRestakedAssetsPerStrategy,
           assetsPerStrategyType: typeof data?.totalRestakedAssetsPerStrategy,
-          assetsPerStrategyKeys: data?.totalRestakedAssetsPerStrategy ? 
-            Object.keys(data.totalRestakedAssetsPerStrategy) : [],
+          assetsPerStrategyKeys: data?.totalRestakedAssetsPerStrategy
+            ? Object.keys(data.totalRestakedAssetsPerStrategy)
+            : [],
         });
-        
+
         // Use strategy data from operatorData instead of restakeData
-        if (data?.strategyConcentrationMetrics && data?.totalRestakedAssetsPerStrategy) {
+        if (
+          data?.strategyConcentrationMetrics &&
+          data?.totalRestakedAssetsPerStrategy
+        ) {
           console.log('Setting strategies data from operator API');
-          
+
           // Use the metrics data directly, no transformation needed
           const transformedMetrics: Record<string, StrategyMetrics> = {};
-          
-          Object.entries(data.strategyConcentrationMetrics).forEach(([key, metrics]) => {
-            transformedMetrics[key] = metrics as unknown as StrategyMetrics;
-          });
-          
+
+          Object.entries(data.strategyConcentrationMetrics).forEach(
+            ([key, metrics]) => {
+              transformedMetrics[key] = metrics as unknown as StrategyMetrics;
+            },
+          );
+
           setStrategiesData({
             strategyConcentrationMetrics: transformedMetrics,
-            totalRestakedAssetsPerStrategy: data.totalRestakedAssetsPerStrategy
+            totalRestakedAssetsPerStrategy: data.totalRestakedAssetsPerStrategy,
           });
         } else {
           console.log('No strategy data available from operator API');
@@ -2189,10 +2399,12 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   useEffect(() => {
     console.log('strategiesData updated:', {
       exists: !!strategiesData,
-      metricsCount: strategiesData?.strategyConcentrationMetrics ? 
-        Object.keys(strategiesData.strategyConcentrationMetrics).length : 0,
-      assetsCount: strategiesData?.totalRestakedAssetsPerStrategy ? 
-        Object.keys(strategiesData.totalRestakedAssetsPerStrategy).length : 0,
+      metricsCount: strategiesData?.strategyConcentrationMetrics
+        ? Object.keys(strategiesData.strategyConcentrationMetrics).length
+        : 0,
+      assetsCount: strategiesData?.totalRestakedAssetsPerStrategy
+        ? Object.keys(strategiesData.totalRestakedAssetsPerStrategy).length
+        : 0,
     });
   }, [strategiesData]);
 
@@ -2225,15 +2437,19 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const p2pData = findOperatorData('p2p');
   const nodeMonsterData = findOperatorData('node monster');
   const p2pShare = p2pData ? p2pData.total_market_share * 100 : 0;
-  const nodeMonsterShare = nodeMonsterData ? nodeMonsterData.total_market_share * 100 : 0;
+  const nodeMonsterShare = nodeMonsterData
+    ? nodeMonsterData.total_market_share * 100
+    : 0;
   const formattedP2PShare = p2pShare.toFixed(1);
   const formattedNodeMonsterShare = nodeMonsterShare.toFixed(1);
   const combinedShare = p2pShare + nodeMonsterShare;
   const formattedCombinedShare = combinedShare.toFixed(1);
-  
+
   // Calculate USD value of assets in top operators
-  const topOperatorsETHValue = (operatorData?.totalETHRestaked || 0) * (combinedShare / 100);
-  const topOperatorsUSDValue = ethPrice > 0 ? topOperatorsETHValue * ethPrice : 0;
+  const topOperatorsETHValue =
+    (operatorData?.totalETHRestaked || 0) * (combinedShare / 100);
+  const topOperatorsUSDValue =
+    ethPrice > 0 ? topOperatorsETHValue * ethPrice : 0;
   const formattedTopOperatorsUSD = formatUSDValue(topOperatorsUSDValue);
 
   // Color array for different sections
@@ -2280,10 +2496,15 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       {/* <RiskAssessment /> */}
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
       <CompactNotes />
-      
+
       {/* Add Strategies Overview component with ethPrice */}
-      {strategiesData && <StrategiesOverview strategiesData={strategiesData} ethPrice={ethPrice} />}
-      
+      {strategiesData && (
+        <StrategiesOverview
+          strategiesData={strategiesData}
+          ethPrice={ethPrice}
+        />
+      )}
+
       <Card>
         <CardHeader>
           <div className="flex justify-between items-start">
@@ -2296,26 +2517,35 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                     size="h-9 w-9"
                   />
                 </div>
-                {ethPrice > 0 && p2pData && nodeMonsterData ? 
-                  `${formattedTopOperatorsUSD} Restaked in Top 2 Professional Operators` :
-                  `Professional Operator Dominance in EigenLayer`
-                }
+                {ethPrice > 0 && p2pData && nodeMonsterData
+                  ? `${formattedTopOperatorsUSD} Restaked in Top 2 Professional Operators`
+                  : `Professional Operator Dominance in EigenLayer`}
               </h2>
               <p className="text-sm text-gray-600 mt-1">
-                A few professional operator groups control a significant portion of the network through multiple individual nodes. This visualization shows the relative size of each major operator group's assets (converted to ETH value equivalent), with larger boxes representing more concentrated control.
+                A few professional operator groups control a significant portion
+                of the network through multiple individual nodes. This
+                visualization shows the relative size of each major operator
+                group's assets (converted to ETH value equivalent), with larger
+                boxes representing more concentrated control.
               </p>
             </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2 items-center">
             {p2pData && (
               <div className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
-                <span>P2P controls {formattedP2PShare}% of total restaked assets (ETH value)</span>
+                <span>
+                  P2P controls {formattedP2PShare}% of total restaked assets
+                  (ETH value)
+                </span>
                 <InfoTooltip content="P2P is the largest professional operator in EigenLayer, managing nodes for multiple projects and clients, highlighting significant concentration risk." />
               </div>
             )}
             {nodeMonsterData && (
               <div className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
-                <span>Top 2 operator groups control {formattedCombinedShare}% of network assets (in ETH value)</span>
+                <span>
+                  Top 2 operator groups control {formattedCombinedShare}% of
+                  network assets (in ETH value)
+                </span>
                 <InfoTooltip content="The combined dominance of P2P and Node Monster represents a significant centralization concern." />
               </div>
             )}
@@ -2323,23 +2553,41 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         </CardHeader>
         <CardContent>
           <div className="rounded-lg border border-gray-200 p-4 mb-4 bg-gray-50">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">Key Insights:</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              Key Insights:
+            </h4>
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-start">
                 <div className="shrink-0 text-red-600 mr-2">⚠️</div>
-                <span>Professional operator groups dominate EigenLayer, with P2P controlling {formattedP2PShare}% of all restaked assets (ETH value).</span>
+                <span>
+                  Professional operator groups dominate EigenLayer, with P2P
+                  controlling {formattedP2PShare}% of all restaked assets (ETH
+                  value).
+                </span>
               </li>
               <li className="flex items-start">
                 <div className="shrink-0 text-purple-600 mr-2">📊</div>
-                <span>The two largest operator groups (P2P and Node Monster) together control {formattedCombinedShare}% of all network assets (in ETH value).</span>
+                <span>
+                  The two largest operator groups (P2P and Node Monster)
+                  together control {formattedCombinedShare}% of all network
+                  assets (in ETH value).
+                </span>
               </li>
               <li className="flex items-start">
                 <div className="shrink-0 text-blue-600 mr-2">🔍</div>
-                <span>Box size represents the ETH value of all assets held by each professional operator group - larger boxes indicate more concentrated control.</span>
+                <span>
+                  Box size represents the ETH value of all assets held by each
+                  professional operator group - larger boxes indicate more
+                  concentrated control.
+                </span>
               </li>
               <li className="flex items-start">
                 <div className="shrink-0 text-orange-600 mr-2">ℹ️</div>
-                <span>Note: Professional operators like P2P may operate nodes for multiple companies such as Puffer, Swell, etc. Visit the Operators tab for more detailed breakdown.</span>
+                <span>
+                  Note: Professional operators like P2P may operate nodes for
+                  multiple companies such as Puffer, Swell, etc. Visit the
+                  Operators tab for more detailed breakdown.
+                </span>
               </li>
             </ul>
           </div>
@@ -2360,19 +2608,30 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                       const data = payload[0].payload;
                       return (
                         <div className="bg-white p-3 shadow-lg rounded border border-purple-200">
-                          <p className="font-semibold text-black text-base">{data.name}</p>
+                          <p className="font-semibold text-black text-base">
+                            {data.name}
+                          </p>
                           <div className="space-y-1 mt-2">
                             <p className="text-sm text-gray-600">
-                              <span className="font-medium">Total Assets (ETH value):</span>{' '}
-                              <span className="text-gray-900">{data.value.toLocaleString()} ETH</span>
+                              <span className="font-medium">
+                                Total Assets (ETH value):
+                              </span>{' '}
+                              <span className="text-gray-900">
+                                {data.value.toLocaleString()} ETH
+                              </span>
                             </p>
                             <p className="text-sm text-gray-600">
-                              <span className="font-medium">Network Share:</span>{' '}
-                              <span className="text-gray-900">{data.percentage}%</span>
+                              <span className="font-medium">
+                                Network Share:
+                              </span>{' '}
+                              <span className="text-gray-900">
+                                {data.percentage}%
+                              </span>
                             </p>
                             {data.name === 'P2P' && (
                               <p className="text-xs text-red-600 mt-1">
-                                Largest professional operator - significant concentration risk
+                                Largest professional operator - significant
+                                concentration risk
                               </p>
                             )}
                           </div>
@@ -2387,9 +2646,19 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           )}
 
           <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">How to interpret this visualization:</h4>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+              How to interpret this visualization:
+            </h4>
             <p className="text-sm text-gray-600">
-              Each box represents a professional operator group that may manage multiple individual nodes (often for different companies/clients), with the size proportional to the ETH value of all their restaked assets (including Beacon Chain ETH, stETH, and other assets converted to ETH value). Larger boxes indicate more concentrated control over the network. The dominance of a few large boxes highlights centralization risks in EigenLayer's current state. Hover over any box to see detailed statistics about each operator group's control over the network.
+              Each box represents a professional operator group that may manage
+              multiple individual nodes (often for different companies/clients),
+              with the size proportional to the ETH value of all their restaked
+              assets (including Beacon Chain ETH, stETH, and other assets
+              converted to ETH value). Larger boxes indicate more concentrated
+              control over the network. The dominance of a few large boxes
+              highlights centralization risks in EigenLayer's current state.
+              Hover over any box to see detailed statistics about each operator
+              group's control over the network.
             </p>
           </div>
         </CardContent>
