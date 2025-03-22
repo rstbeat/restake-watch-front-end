@@ -2735,7 +2735,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                         .slice(0, 20)
                         .reduce(
                           (sum, staker) => 
-                            sum + (staker['ETH Restaked'] || 0) * ethPrice,
+                            sum + (staker['ETH Equivalent Value'] || 0) * ethPrice,
                           0
                         )
                     )} Restaked in Top 20 EigenLayer Whales`
@@ -2831,7 +2831,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                           compactDisplay: 'short',
                           minimumFractionDigits: 1,
                           maximumFractionDigits: 2,
-                        }).format(staker['ETH Restaked'] || 0)}
+                        }).format(staker['ETH Equivalent Value'] || 0)}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                         {((staker['Market Share'] || 0) * 100).toFixed(2)}%
