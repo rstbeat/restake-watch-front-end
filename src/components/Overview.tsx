@@ -511,6 +511,13 @@ interface UnifiedRiskMetricsOverviewProps {
       bottom33PercentCount?: number;
       herfindahlIndex?: number;
     };
+    stakerData?: Array<{
+      'Staker Address': string;
+      'ETH Equivalent Value'?: number;
+      'Market Share'?: number;
+      'Number of Strategies'?: number;
+      strategies?: any[];
+    }>;
   } | null;
   operatorData: {
     totalETHRestaked?: number;
@@ -972,6 +979,31 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   />
                 </div>
                 <p className="text-sm text-red-800">
+                  <span className="font-bold">Whale Concentration:</span>{' '}
+                  Just 20 whale addresses control{' '}
+                  {restakeData?.stakerData && (
+                    <span className="font-bold">
+                      {(
+                        restakeData.stakerData
+                          .slice(0, 20)
+                          .reduce(
+                            (sum, staker) => sum + (staker['Market Share'] || 0),
+                            0
+                          ) * 100
+                      ).toFixed(1)}%
+                    </span>
+                  )}{' '}
+                  of all restaked assets, creating significant centralization risk.
+                </p>
+              </div>
+              <div className="flex items-start">
+                <div className="shrink-0 mr-2">
+                  <SmallStyledIcon
+                    icon={<AlertCircle className="h-3 w-3" />}
+                    gradientColors={['#ef4444', '#f97316']}
+                  />
+                </div>
+                <p className="text-sm text-red-800">
                   <span className="font-bold">
                     Limited Permissionless Participation:
                   </span>{' '}
@@ -1227,6 +1259,88 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     </strong>
                     . This low value (well below the 0.15 threshold) suggests a
                     diverse and relatively decentralized distribution of stake.
+                  </p>
+                }
+              />
+            </ExpandableSection>
+
+            {/* Whale Concentration Risk - New Section */}
+            <ExpandableSection
+              title="Whale Concentration Risk"
+              severity="critical"
+              defaultOpen={false}
+            >
+              <RiskIndicator
+                level="critical"
+                title="Significant Whale Dominance"
+                description={
+                  <p>
+                    Just 20 whale addresses control{' '}
+                    {restakeData?.stakerData && (
+                      <strong>
+                        {(
+                          restakeData.stakerData
+                            .slice(0, 20)
+                            .reduce(
+                              (sum, staker) => sum + (staker['Market Share'] || 0),
+                              0
+                            ) * 100
+                        ).toFixed(1)}%
+                      </strong>
+                    )}{' '}
+                    of all restaked assets. This extreme concentration places outsized 
+                    influence in the hands of very few entities.
+                  </p>
+                }
+              />
+              <RiskIndicator
+                level="critical"
+                title="Unknown Entity Control"
+                description={
+                  <p>
+                    Most of these whale addresses have not been publicly identified. 
+                    They could represent exchanges, institutional investors, or protocol 
+                    treasuries, but this opacity creates uncertainty about their 
+                    potential influence and intentions.
+                  </p>
+                }
+              />
+              <RiskIndicator
+                level="warning"
+                title="Coordinated Action Risk"
+                description={
+                  <p>
+                    If the top 5 whales coordinated their actions, they could control{' '}
+                    {restakeData?.stakerData && (
+                      <strong>
+                        {(
+                          restakeData.stakerData
+                            .slice(0, 5)
+                            .reduce(
+                              (sum, staker) => sum + (staker['Market Share'] || 0),
+                              0
+                            ) * 100
+                        ).toFixed(1)}%
+                      </strong>
+                    )}{' '}
+                    of all restaked assets, giving them significant potential to influence 
+                    governance or protocol decisions.
+                  </p>
+                }
+              />
+              <RiskIndicator
+                level="warning"
+                title="Liquidity Risk from Whale Movement"
+                description={
+                  <p>
+                    Large withdrawals by even a few whale addresses could cause significant 
+                    liquidity shocks and market volatility. The top whale alone controls{' '}
+                    {restakeData?.stakerData && restakeData.stakerData[0] && (
+                      <strong>
+                        {((restakeData.stakerData[0]['Market Share'] || 0) * 100).toFixed(2)}%
+                      </strong>
+                    )}{' '}
+                    of all restaked assets.
                   </p>
                 }
               />
@@ -2789,7 +2903,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                       .slice(0, 20)
                       .reduce(
                         (sum, staker) => sum + (staker['Market Share'] || 0),
-                        0,
+                        0
                       ) * 100
                   ).toFixed(1)}
                   % of total restaked assets
