@@ -2302,24 +2302,28 @@ const StrategiesOverview: React.FC<{
 // Copyable address component
 const CopyableAddress: React.FC<{ address: string }> = ({ address }) => {
   const [copied, setCopied] = useState(false);
-  
+
   const copyAddress = (address: string) => {
     navigator.clipboard.writeText(address);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-  
+
   return (
     <div className="flex items-center">
       <span className="font-mono">
         {address.substring(0, 8)}...{address.substring(address.length - 6)}
       </span>
-      <button 
+      <button
         onClick={() => copyAddress(address)}
         className="ml-2 text-gray-400 hover:text-gray-600"
         title="Copy full address"
       >
-        {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+        {copied ? (
+          <Check className="h-4 w-4 text-green-500" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
       </button>
     </div>
   );
@@ -2328,23 +2332,24 @@ const CopyableAddress: React.FC<{ address: string }> = ({ address }) => {
 // Add this component definition before the Overview component
 const CopyToClipboardButton: React.FC<{ text: string }> = ({ text }) => {
   const [copied, setCopied] = useState(false);
-  
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-  
+
   return (
-    <button 
+    <button
       onClick={copyToClipboard}
       className="ml-2 text-gray-400 hover:text-gray-600"
       title="Copy full address"
     >
-      {copied ? 
-        <Check className="h-4 w-4 text-green-500" /> : 
+      {copied ? (
+        <Check className="h-4 w-4 text-green-500" />
+      ) : (
         <Copy className="h-4 w-4" />
-      }
+      )}
     </button>
   );
 };
@@ -2758,17 +2763,19 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                       restakeData.stakerData
                         .slice(0, 20)
                         .reduce(
-                          (sum, staker) => 
-                            sum + (staker['ETH Equivalent Value'] || 0) * ethPrice,
-                          0
-                        )
+                          (sum, staker) =>
+                            sum +
+                            (staker['ETH Equivalent Value'] || 0) * ethPrice,
+                          0,
+                        ),
                     )} Restaked in Top 20 EigenLayer Whales`
                   : `Top 20 EigenLayer Whales`}
               </h2>
               <p className="text-sm text-gray-600 mt-1">
-                A small number of individual restakers hold a significant portion 
-                of the restaked assets in EigenLayer. These "whales" can have a 
-                considerable impact on the network's security and centralization.
+                A small number of individual restakers hold a significant
+                portion of the restaked assets in EigenLayer. These "whales" can
+                have a considerable impact on the network's security and
+                centralization.
               </p>
             </div>
           </div>
@@ -2776,14 +2783,16 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
             {restakeData?.stakerData && restakeData.stakerData.length > 0 && (
               <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
                 <span>
-                  Top 20 whales control {
-                    (restakeData.stakerData
+                  Top 20 whales control{' '}
+                  {(
+                    restakeData.stakerData
                       .slice(0, 20)
                       .reduce(
                         (sum, staker) => sum + (staker['Market Share'] || 0),
-                        0
-                      ) * 100).toFixed(1)
-                  }% of total restaked assets
+                        0,
+                      ) * 100
+                  ).toFixed(1)}
+                  % of total restaked assets
                 </span>
                 <InfoTooltip content="The concentration of assets in a small number of wallets represents a potential centralization risk for EigenLayer." />
               </div>
@@ -2799,23 +2808,33 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
               <li className="flex items-start">
                 <div className="shrink-0 text-red-600 mr-2">⚠️</div>
                 <span>
-                  Just 20 wallets hold a substantial percentage of all restaked assets,
-                  creating potential centralization concerns.
+                  Just 20 wallets hold a substantial percentage of all restaked
+                  assets, creating potential centralization concerns.
                 </span>
               </li>
               <li className="flex items-start">
                 <div className="shrink-0 text-blue-600 mr-2">🔍</div>
                 <span>
-                  These whale addresses may represent individuals, institutions, or smart contracts.
+                  These whale addresses may represent individuals, institutions,
+                  or smart contracts.
                 </span>
               </li>
             </ul>
-            
+
             {/* Make the contact info more prominent */}
             <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
               <p className="text-blue-800 font-medium flex items-center">
                 <span className="shrink-0 text-blue-600 mr-2">🐋</span>
-                Do you know who these whales are? Help us identify them! Contact us at <a href="https://t.me/espejelomar" target="_blank" rel="noopener noreferrer" className="ml-1 underline text-blue-600 hover:text-blue-800">@espejelomar on Telegram</a>
+                Do you know who these whales are? Help us identify them! Contact
+                us at{' '}
+                <a
+                  href="https://t.me/espejelomar"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-1 underline text-blue-600 hover:text-blue-800"
+                >
+                  @espejelomar on Telegram
+                </a>
               </p>
             </div>
           </div>
@@ -2825,15 +2844,19 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
               {/* Replace table with treemap visualization */}
               <ResponsiveContainer width="100%" height={400}>
                 <Treemap
-                  data={restakeData.stakerData.slice(0, 20).map((staker, index) => ({
-                    name: `#${index + 1}: ${staker['Staker Address'].substring(0, 6)}...${staker['Staker Address'].substring(staker['Staker Address'].length - 4)}`,
-                    value: staker['ETH Equivalent Value'] || 0,
-                    fullAddress: staker['Staker Address'],
-                    percentage: staker['Market Share'] ? (staker['Market Share'] * 100).toFixed(2) : '0.00',
-                    strategies: staker['strategies'] || [],
-                    // Use the same purple color palette as Professional Operator Dominance
-                    fill: purpleColors[index % purpleColors.length]
-                  }))}
+                  data={restakeData.stakerData
+                    .slice(0, 20)
+                    .map((staker, index) => ({
+                      name: `#${index + 1}: ${staker['Staker Address'].substring(0, 6)}...${staker['Staker Address'].substring(staker['Staker Address'].length - 4)}`,
+                      value: staker['ETH Equivalent Value'] || 0,
+                      fullAddress: staker['Staker Address'],
+                      percentage: staker['Market Share']
+                        ? (staker['Market Share'] * 100).toFixed(2)
+                        : '0.00',
+                      strategies: staker['strategies'] || [],
+                      // Use the same purple color palette as Professional Operator Dominance
+                      fill: purpleColors[index % purpleColors.length],
+                    }))}
                   dataKey="value"
                   nameKey="name"
                   content={<CustomTreemapContent />}
@@ -2857,51 +2880,87 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                                 </span>
                               </p>
                               <p className="text-sm text-gray-600">
-                                <span className="font-medium">Total Assets (ETH value):</span>{' '}
+                                <span className="font-medium">
+                                  Total Assets (ETH value):
+                                </span>{' '}
                                 <span className="text-gray-900">
-                                  {new Intl.NumberFormat('en-US').format(Math.round(data.value))} ETH <span className="text-xs text-gray-500">(all assets converted to ETH equivalent)</span>
+                                  {new Intl.NumberFormat('en-US').format(
+                                    Math.round(data.value),
+                                  )}{' '}
+                                  ETH{' '}
+                                  <span className="text-xs text-gray-500">
+                                    (all assets converted to ETH equivalent)
+                                  </span>
                                 </span>
                               </p>
                               <p className="text-sm text-gray-600">
-                                <span className="font-medium">Network Share:</span>{' '}
+                                <span className="font-medium">
+                                  Network Share:
+                                </span>{' '}
                                 <span className="text-gray-900">
                                   {data.percentage}%
                                 </span>
                               </p>
-                              
+
                               {/* Display strategy information */}
-                              {data.strategies && data.strategies.length > 0 && (
-                                <div className="mt-2">
-                                  <p className="text-sm font-medium text-gray-700">Assets Breakdown:</p>
-                                  <div className="mt-1 max-h-40 overflow-y-auto">
-                                    <table className="min-w-full divide-y divide-gray-200 text-xs">
-                                      <thead className="bg-gray-50">
-                                        <tr>
-                                          <th className="px-2 py-1 text-left font-medium text-gray-500">Token</th>
-                                          <th className="px-2 py-1 text-right font-medium text-gray-500">Amount</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody className="bg-white divide-y divide-gray-100">
-                                        {data.strategies.map((strategy: any, idx: number) => (
-                                          <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                            <td className="px-2 py-1 whitespace-nowrap font-medium text-gray-900">
-                                              {strategy.token_name}
-                                              <span className="text-xs text-gray-500 ml-1">
-                                                ({strategy.strategy_name.replace(/_/g, ' ')})
-                                              </span>
-                                            </td>
-                                            <td className="px-2 py-1 whitespace-nowrap text-right text-gray-900">
-                                              {new Intl.NumberFormat('en-US', {
-                                                maximumFractionDigits: 2
-                                              }).format(strategy.token_amount)}
-                                            </td>
+                              {data.strategies &&
+                                data.strategies.length > 0 && (
+                                  <div className="mt-2">
+                                    <p className="text-sm font-medium text-gray-700">
+                                      Assets Breakdown:
+                                    </p>
+                                    <div className="mt-1 max-h-40 overflow-y-auto">
+                                      <table className="min-w-full divide-y divide-gray-200 text-xs">
+                                        <thead className="bg-gray-50">
+                                          <tr>
+                                            <th className="px-2 py-1 text-left font-medium text-gray-500">
+                                              Token
+                                            </th>
+                                            <th className="px-2 py-1 text-right font-medium text-gray-500">
+                                              Amount
+                                            </th>
                                           </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-gray-100">
+                                          {data.strategies.map(
+                                            (strategy: any, idx: number) => (
+                                              <tr
+                                                key={idx}
+                                                className={
+                                                  idx % 2 === 0
+                                                    ? 'bg-white'
+                                                    : 'bg-gray-50'
+                                                }
+                                              >
+                                                <td className="px-2 py-1 whitespace-nowrap font-medium text-gray-900">
+                                                  {strategy.token_name}
+                                                  <span className="text-xs text-gray-500 ml-1">
+                                                    (
+                                                    {strategy.strategy_name.replace(
+                                                      /_/g,
+                                                      ' ',
+                                                    )}
+                                                    )
+                                                  </span>
+                                                </td>
+                                                <td className="px-2 py-1 whitespace-nowrap text-right text-gray-900">
+                                                  {new Intl.NumberFormat(
+                                                    'en-US',
+                                                    {
+                                                      maximumFractionDigits: 2,
+                                                    },
+                                                  ).format(
+                                                    strategy.token_amount,
+                                                  )}
+                                                </td>
+                                              </tr>
+                                            ),
+                                          )}
+                                        </tbody>
+                                      </table>
+                                    </div>
                                   </div>
-                                </div>
-                              )}
+                                )}
                             </div>
                           </div>
                         );
@@ -2920,36 +2979,57 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden shadow-sm">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Rank
                       </th>
-                      <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Address
                       </th>
-                      <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         ETH Value
                       </th>
-                      <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Market Share
                       </th>
-                      <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th
+                        scope="col"
+                        className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
                         Strategies
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {restakeData.stakerData.slice(0, 6).map((staker, index) => (
-                      <tr key={staker['Staker Address']} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <tr
+                        key={staker['Staker Address']}
+                        className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                      >
                         <td className="px-3 py-3 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div 
-                              className="flex items-center justify-center rounded-full h-6 w-6 mr-2 flex-shrink-0" 
+                            <div
+                              className="flex items-center justify-center rounded-full h-6 w-6 mr-2 flex-shrink-0"
                               style={{
-                                background: purpleColors[index % purpleColors.length],
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                background:
+                                  purpleColors[index % purpleColors.length],
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                               }}
                             >
-                              <span className="text-white text-xs font-bold">#{index + 1}</span>
+                              <span className="text-white text-xs font-bold">
+                                #{index + 1}
+                              </span>
                             </div>
                           </div>
                         </td>
@@ -2968,24 +3048,35 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                           {((staker['Market Share'] || 0) * 100).toFixed(2)}%
                         </td>
                         <td className="px-3 py-3">
-                          {staker['strategies'] && staker['strategies'].length > 0 ? (
+                          {staker['strategies'] &&
+                          staker['strategies'].length > 0 ? (
                             <div className="max-h-20 overflow-y-auto pr-2">
                               <div className="space-y-1">
-                                {staker['strategies'].slice(0, 3).map((strategy: any, idx: number) => (
-                                  <div key={idx} className="flex justify-between text-xs">
-                                    <span className="text-gray-700 mr-2">
-                                      {strategy.token_name}
-                                      <span className="text-gray-500 ml-1">
-                                        ({strategy.strategy_name.replace(/_/g, ' ')})
+                                {staker['strategies']
+                                  .slice(0, 3)
+                                  .map((strategy: any, idx: number) => (
+                                    <div
+                                      key={idx}
+                                      className="flex justify-between text-xs"
+                                    >
+                                      <span className="text-gray-700 mr-2">
+                                        {strategy.token_name}
+                                        <span className="text-gray-500 ml-1">
+                                          (
+                                          {strategy.strategy_name.replace(
+                                            /_/g,
+                                            ' ',
+                                          )}
+                                          )
+                                        </span>
                                       </span>
-                                    </span>
-                                    <span className="text-gray-900 font-medium">
-                                      {new Intl.NumberFormat('en-US', {
-                                        maximumFractionDigits: 1
-                                      }).format(strategy.token_amount)}
-                                    </span>
-                                  </div>
-                                ))}
+                                      <span className="text-gray-900 font-medium">
+                                        {new Intl.NumberFormat('en-US', {
+                                          maximumFractionDigits: 1,
+                                        }).format(strategy.token_amount)}
+                                      </span>
+                                    </div>
+                                  ))}
                                 {staker['strategies'].length > 3 && (
                                   <div className="text-xs text-blue-600">
                                     + {staker['strategies'].length - 3} more
@@ -2994,7 +3085,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                               </div>
                             </div>
                           ) : (
-                            <span className="text-xs text-gray-500">No strategies</span>
+                            <span className="text-xs text-gray-500">
+                              No strategies
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -3002,23 +3095,27 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                   </tbody>
                 </table>
               </div>
-              
+
               <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <h4 className="text-sm font-semibold text-gray-700 mb-2">
                   How to interpret this visualization:
                 </h4>
                 <p className="text-sm text-gray-600">
-                  Each box represents an individual restaker ("whale"), with the size proportional to their ETH value staked. 
-                  Larger boxes indicate restakers with more significant holdings who have outsized influence on the network.
-                  Hover over any box to see detailed information about each whale, including their full address and holdings.
-                  The ETH value shown represents all assets (including non-ETH assets) converted to their ETH equivalent value.
+                  Each box represents an individual restaker ("whale"), with the
+                  size proportional to their ETH value staked. Larger boxes
+                  indicate restakers with more significant holdings who have
+                  outsized influence on the network. Hover over any box to see
+                  detailed information about each whale, including their full
+                  address and holdings. The ETH value shown represents all
+                  assets (including non-ETH assets) converted to their ETH
+                  equivalent value.
                 </p>
               </div>
             </>
           )}
         </CardContent>
       </Card>
-      
+
       <div className="mt-6">
         {/* Add any additional content you want to display here */}
       </div>
