@@ -261,12 +261,12 @@ const StrategyOverview: React.FC = () => {
     (s) => s.metrics?.top5HoldersPercentage > 75,
   );
   const highRiskETHValue = highRiskStrategies.reduce(
-    (sum, s) => sum + s.assets,
+    (sum: number, s) => sum + s.assets,
     0,
   );
   const highRiskUSDValue = ethPrice > 0 ? highRiskETHValue * ethPrice : 0;
   const totalETHValue = strategiesWithData.reduce(
-    (sum, s) => sum + s.assets,
+    (sum: number, s) => sum + s.assets,
     0,
   );
   const highRiskPercentage =

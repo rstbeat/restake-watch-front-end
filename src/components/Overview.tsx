@@ -979,21 +979,25 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   />
                 </div>
                 <p className="text-sm text-red-800">
-                  <span className="font-bold">Whale Concentration:</span>{' '}
-                  Just 20 whale addresses control{' '}
+                  <span className="font-bold">Whale Concentration:</span> Just
+                  20 whale addresses control{' '}
                   {restakeData?.stakerData && (
                     <span className="font-bold">
                       {(
                         restakeData.stakerData
                           .slice(0, 20)
                           .reduce(
-                            (sum, staker) => sum + (staker['Market Share'] || 0),
-                            0
+                            (sum: number, staker: any) =>
+                              sum +
+                              (staker['ETH Equivalent Value'] || 0) * ethPrice,
+                            0,
                           ) * 100
-                      ).toFixed(1)}%
+                      ).toFixed(1)}
+                      %
                     </span>
                   )}{' '}
-                  of all restaked assets, creating significant centralization risk.
+                  of all restaked assets, creating significant centralization
+                  risk.
                 </p>
               </div>
               <div className="flex items-start">
@@ -1067,7 +1071,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                                   (metrics as any).top5HoldersPercentage > 75,
                               )
                               .reduce(
-                                (sum, [key, _]) =>
+                                (sum: number, [key, _]) =>
                                   sum +
                                   (operatorData
                                     .totalRestakedAssetsPerStrategy?.[key] ||
@@ -1282,14 +1286,18 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                           restakeData.stakerData
                             .slice(0, 20)
                             .reduce(
-                              (sum, staker) => sum + (staker['Market Share'] || 0),
-                              0
+                              (sum: number, staker: any) =>
+                                sum +
+                                (staker['ETH Equivalent Value'] || 0) *
+                                  ethPrice,
+                              0,
                             ) * 100
-                        ).toFixed(1)}%
+                        ).toFixed(1)}
+                        %
                       </strong>
                     )}{' '}
-                    of all restaked assets. This extreme concentration places outsized 
-                    influence in the hands of very few entities.
+                    of all restaked assets. This extreme concentration places
+                    outsized influence in the hands of very few entities.
                   </p>
                 }
               />
@@ -1298,10 +1306,10 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 title="Unknown Entity Control"
                 description={
                   <p>
-                    Most of these whale addresses have not been publicly identified. 
-                    They could represent exchanges, institutional investors, or protocol 
-                    treasuries, but this opacity creates uncertainty about their 
-                    potential influence and intentions.
+                    Most of these whale addresses have not been publicly
+                    identified. They could represent exchanges, institutional
+                    investors, or protocol treasuries, but this opacity creates
+                    uncertainty about their potential influence and intentions.
                   </p>
                 }
               />
@@ -1310,21 +1318,26 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 title="Coordinated Action Risk"
                 description={
                   <p>
-                    If the top 5 whales coordinated their actions, they could control{' '}
+                    If the top 5 whales coordinated their actions, they could
+                    control{' '}
                     {restakeData?.stakerData && (
                       <strong>
                         {(
                           restakeData.stakerData
                             .slice(0, 5)
                             .reduce(
-                              (sum, staker) => sum + (staker['Market Share'] || 0),
-                              0
+                              (sum: number, staker: any) =>
+                                sum +
+                                (staker['ETH Equivalent Value'] || 0) *
+                                  ethPrice,
+                              0,
                             ) * 100
-                        ).toFixed(1)}%
+                        ).toFixed(1)}
+                        %
                       </strong>
                     )}{' '}
-                    of all restaked assets, giving them significant potential to influence 
-                    governance or protocol decisions.
+                    of all restaked assets, giving them significant potential to
+                    influence governance or protocol decisions.
                   </p>
                 }
               />
@@ -1333,11 +1346,15 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 title="Liquidity Risk from Whale Movement"
                 description={
                   <p>
-                    Large withdrawals by even a few whale addresses could cause significant 
-                    liquidity shocks and market volatility. The top whale alone controls{' '}
+                    Large withdrawals by even a few whale addresses could cause
+                    significant liquidity shocks and market volatility. The top
+                    whale alone controls{' '}
                     {restakeData?.stakerData && restakeData.stakerData[0] && (
                       <strong>
-                        {((restakeData.stakerData[0]['Market Share'] || 0) * 100).toFixed(2)}%
+                        {(
+                          (restakeData.stakerData[0]['Market Share'] || 0) * 100
+                        ).toFixed(2)}
+                        %
                       </strong>
                     )}{' '}
                     of all restaked assets.
@@ -1422,7 +1439,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                                   (metrics as any).top5HoldersPercentage > 75,
                               )
                               .reduce(
-                                (sum, [key, _]) =>
+                                (sum: number, [key, _]) =>
                                   sum +
                                   (operatorData
                                     .totalRestakedAssetsPerStrategy?.[key] ||
@@ -1941,7 +1958,7 @@ const StrategiesOverview: React.FC<{
 
     // Sum of all assets
     totalAssets: Object.values(totalRestakedAssetsPerStrategy).reduce(
-      (sum, value) => sum + value,
+      (sum: number, value) => sum + value,
       0,
     ),
   });
@@ -1969,7 +1986,7 @@ const StrategiesOverview: React.FC<{
 
   // Calculate total assets
   const totalAssets = strategiesWithData.reduce(
-    (sum, strategy) => sum + strategy.assets,
+    (sum: number, strategy) => sum + strategy.assets,
     0,
   );
 
@@ -2037,7 +2054,7 @@ const StrategiesOverview: React.FC<{
     (s) => s.metrics?.top5HoldersPercentage > 75,
   );
   const highRiskETHValue = highRiskStrategies.reduce(
-    (sum, s) => sum + s.assets,
+    (sum: number, s) => sum + s.assets,
     0,
   );
   const highRiskUSDValue = ethPrice > 0 ? highRiskETHValue * ethPrice : 0;
@@ -2650,11 +2667,12 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       );
 
   if (
-    totalRestaked > majorOperatorData.reduce((acc, curr) => acc + curr.value, 0)
+    totalRestaked >
+    majorOperatorData.reduce((acc: number, curr) => acc + curr.value, 0)
   ) {
     const othersAmount =
       totalRestaked -
-      majorOperatorData.reduce((acc, curr) => acc + curr.value, 0);
+      majorOperatorData.reduce((acc: number, curr) => acc + curr.value, 0);
     majorOperatorData.push({
       name: 'Others',
       value: Number(othersAmount.toFixed(2)),
@@ -2877,7 +2895,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                       restakeData.stakerData
                         .slice(0, 20)
                         .reduce(
-                          (sum, staker) =>
+                          (sum: number, staker: any) =>
                             sum +
                             (staker['ETH Equivalent Value'] || 0) * ethPrice,
                           0,
@@ -2902,8 +2920,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                     restakeData.stakerData
                       .slice(0, 20)
                       .reduce(
-                        (sum, staker) => sum + (staker['Market Share'] || 0),
-                        0
+                        (sum: number, staker: any) =>
+                          sum + (staker['Market Share'] || 0),
+                        0,
                       ) * 100
                   ).toFixed(1)}
                   % of total restaked assets
@@ -2960,7 +2979,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                 <Treemap
                   data={restakeData.stakerData
                     .slice(0, 20)
-                    .map((staker, index) => ({
+                    .map((staker: any, index: number) => ({
                       name: `#${index + 1}: ${staker['Staker Address'].substring(0, 6)}...${staker['Staker Address'].substring(staker['Staker Address'].length - 4)}`,
                       value: staker['ETH Equivalent Value'] || 0,
                       fullAddress: staker['Staker Address'],
@@ -3126,86 +3145,92 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {restakeData.stakerData.slice(0, 6).map((staker, index) => (
-                      <tr
-                        key={staker['Staker Address']}
-                        className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-                      >
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div
-                              className="flex items-center justify-center rounded-full h-6 w-6 mr-2 flex-shrink-0"
-                              style={{
-                                background:
-                                  purpleColors[index % purpleColors.length],
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                              }}
-                            >
-                              <span className="text-white text-xs font-bold">
-                                #{index + 1}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <CopyableAddress address={staker['Staker Address']} />
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap font-medium">
-                          {new Intl.NumberFormat('en-US', {
-                            notation: 'compact',
-                            compactDisplay: 'short',
-                            minimumFractionDigits: 1,
-                            maximumFractionDigits: 2,
-                          }).format(staker['ETH Equivalent Value'] || 0)}
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap font-medium">
-                          {((staker['Market Share'] || 0) * 100).toFixed(2)}%
-                        </td>
-                        <td className="px-3 py-3">
-                          {staker['strategies'] &&
-                          staker['strategies'].length > 0 ? (
-                            <div className="max-h-20 overflow-y-auto pr-2">
-                              <div className="space-y-1">
-                                {staker['strategies']
-                                  .slice(0, 3)
-                                  .map((strategy: any, idx: number) => (
-                                    <div
-                                      key={idx}
-                                      className="flex justify-between text-xs"
-                                    >
-                                      <span className="text-gray-700 mr-2">
-                                        {strategy.token_name}
-                                        <span className="text-gray-500 ml-1">
-                                          (
-                                          {strategy.strategy_name.replace(
-                                            /_/g,
-                                            ' ',
-                                          )}
-                                          )
-                                        </span>
-                                      </span>
-                                      <span className="text-gray-900 font-medium">
-                                        {new Intl.NumberFormat('en-US', {
-                                          maximumFractionDigits: 1,
-                                        }).format(strategy.token_amount)}
-                                      </span>
-                                    </div>
-                                  ))}
-                                {staker['strategies'].length > 3 && (
-                                  <div className="text-xs text-blue-600">
-                                    + {staker['strategies'].length - 3} more
-                                  </div>
-                                )}
+                    {restakeData.stakerData
+                      .slice(0, 6)
+                      .map((staker: any, index: number) => (
+                        <tr
+                          key={staker['Staker Address']}
+                          className={
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                          }
+                        >
+                          <td className="px-3 py-3 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div
+                                className="flex items-center justify-center rounded-full h-6 w-6 mr-2 flex-shrink-0"
+                                style={{
+                                  background:
+                                    purpleColors[index % purpleColors.length],
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                }}
+                              >
+                                <span className="text-white text-xs font-bold">
+                                  #{index + 1}
+                                </span>
                               </div>
                             </div>
-                          ) : (
-                            <span className="text-xs text-gray-500">
-                              No strategies
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                          <td className="px-3 py-3 whitespace-nowrap">
+                            <CopyableAddress
+                              address={staker['Staker Address']}
+                            />
+                          </td>
+                          <td className="px-3 py-3 whitespace-nowrap font-medium">
+                            {new Intl.NumberFormat('en-US', {
+                              notation: 'compact',
+                              compactDisplay: 'short',
+                              minimumFractionDigits: 1,
+                              maximumFractionDigits: 2,
+                            }).format(staker['ETH Equivalent Value'] || 0)}
+                          </td>
+                          <td className="px-3 py-3 whitespace-nowrap font-medium">
+                            {((staker['Market Share'] || 0) * 100).toFixed(2)}%
+                          </td>
+                          <td className="px-3 py-3">
+                            {staker['strategies'] &&
+                            staker['strategies'].length > 0 ? (
+                              <div className="max-h-20 overflow-y-auto pr-2">
+                                <div className="space-y-1">
+                                  {staker['strategies']
+                                    .slice(0, 3)
+                                    .map((strategy: any, idx: number) => (
+                                      <div
+                                        key={idx}
+                                        className="flex justify-between text-xs"
+                                      >
+                                        <span className="text-gray-700 mr-2">
+                                          {strategy.token_name}
+                                          <span className="text-gray-500 ml-1">
+                                            (
+                                            {strategy.strategy_name.replace(
+                                              /_/g,
+                                              ' ',
+                                            )}
+                                            )
+                                          </span>
+                                        </span>
+                                        <span className="text-gray-900 font-medium">
+                                          {new Intl.NumberFormat('en-US', {
+                                            maximumFractionDigits: 1,
+                                          }).format(strategy.token_amount)}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  {staker['strategies'].length > 3 && (
+                                    <div className="text-xs text-blue-600">
+                                      + {staker['strategies'].length - 3} more
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-500">
+                                No strategies
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
