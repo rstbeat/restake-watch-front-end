@@ -270,10 +270,10 @@ const RestakeWatch: React.FC = () => {
 
         <div className="flex-1 flex flex-col md:ml-48">
           {showBanner && (
-            <div className="bg-gradient-to-r from-purple-50 via-purple-100 to-indigo-50 backdrop-blur-sm text-gray-700 py-3 border-b border-purple-200 shadow-sm transition-all duration-300 ease-in-out z-20">
+            <div className="bg-gradient-to-r from-purple-50/90 via-purple-100/90 to-indigo-50/90 backdrop-blur-lg text-gray-700 py-3 border-b border-purple-200/50 shadow-sm transition-all duration-300 ease-in-out z-20">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <div className="flex items-center space-x-3">
-                  <div className="p-1.5 bg-white bg-opacity-60 rounded-full shadow-sm">
+                  <div className="p-1.5 bg-white/80 backdrop-blur-sm rounded-full shadow-sm">
                     <AlertTriangle className="h-4 w-4 text-[#ab3bd2]" />
                   </div>
                   <span className="font-medium">
@@ -291,7 +291,7 @@ const RestakeWatch: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowBanner(false)}
-                  className="rounded-full h-7 w-7 p-0 text-gray-500 hover:text-[#ab3bd2] hover:bg-white hover:bg-opacity-60 transition-colors duration-200"
+                  className="rounded-full h-7 w-7 p-0 text-gray-500 hover:text-[#ab3bd2] hover:bg-white/80 hover:backdrop-blur-sm transition-all duration-200"
                 >
                   <X className="h-3.5 w-3.5" />
                 </Button>
@@ -300,12 +300,12 @@ const RestakeWatch: React.FC = () => {
           )}
 
           <header
-            className={`sticky top-0 z-30 bg-[#e6e7ec] transition-all duration-300 ease-in-out ${
-              scrolled ? 'shadow-md' : ''
+            className={`sticky top-0 z-30 transition-all duration-300 ease-in-out ${
+              scrolled ? 'shadow-lg' : ''
             }`}
           >
             <div
-              className={`bg-[#e6e7ec] text-[#171717] py-4 border-b border-gray-200 transition-all duration-300 ${
+              className={`bg-[#e6e7ec]/90 backdrop-blur-md text-[#171717] py-4 border-b border-gray-200/50 transition-all duration-300 ${
                 scrolled ? 'py-2' : 'py-4'
               }`}
             >
@@ -504,67 +504,60 @@ const RestakeWatch: React.FC = () => {
             </div>
 
             {activePlatform === 'eigenlayer' && (
-              <div className="bg-white border-b border-gray-200 shadow-sm">
+              <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex items-center justify-between h-12">
                     <div className="flex items-center space-x-2 text-sm">
                       <span className="text-gray-600">
-                        Platform:{' '}
-                        <span className="font-medium text-[#ab3bd2]">
-                          EigenLayer
-                        </span>
+                        Platform: <span className="font-medium text-[#ab3bd2]">EigenLayer</span>
                       </span>
                       <span className="text-gray-400">|</span>
                       <div className="flex items-center">
-                        <span className="text-gray-600 mr-1">
-                          Last updated:
-                        </span>
+                        <span className="text-gray-600 mr-1">Last updated:</span>
                         {operatorData?.lastUpdated ? (
-                          <span className="text-gray-800">
-                            {formatDate(operatorData.lastUpdated)}
-                          </span>
+                          <span className="text-gray-800">{formatDate(operatorData.lastUpdated)}</span>
                         ) : (
                           <Skeleton className="h-4 w-24 rounded" />
                         )}
                       </div>
                     </div>
-
+                    
                     <div className="hidden md:flex space-x-6">
-                      <button
+                      <button 
                         onClick={() => setActiveTab('overview')}
-                        className={`text-sm py-3 font-medium border-b-2 transition-colors duration-200 ${
-                          activeTab === 'overview'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                        className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
+                          activeTab === 'overview' 
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]' 
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
                         Overview
                       </button>
-                      <button
+                      <button 
                         onClick={() => setActiveTab('operators')}
-                        className={`text-sm py-3 font-medium border-b-2 transition-colors duration-200 ${
-                          activeTab === 'operators'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                        className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
+                          activeTab === 'operators' 
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]' 
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
                         Operators
                       </button>
-                      <button
+                      <button 
                         onClick={() => setActiveTab('restakers')}
-                        className={`text-sm py-3 font-medium border-b-2 transition-colors duration-200 ${
-                          activeTab === 'restakers'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                        className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
+                          activeTab === 'restakers' 
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]' 
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
                         Restakers
                       </button>
-                      <button
+                      <button 
                         onClick={() => setActiveTab('strategies')}
-                        className={`text-sm py-3 font-medium border-b-2 transition-colors duration-200 ${
-                          activeTab === 'strategies'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                        className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
+                          activeTab === 'strategies' 
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]' 
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >

@@ -4,17 +4,30 @@ import { cn } from '../../lib/utils';
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      'rounded-xl border bg-card text-card-foreground shadow',
-      className,
-    )}
-    {...props}
-  />
-));
+  React.HTMLAttributes<HTMLDivElement> & {
+    glassEffect?: 'none' | 'light' | 'medium' | 'strong';
+  }
+>(({ className, glassEffect = 'none', ...props }, ref) => {
+  // Glassmorphism classes based on intensity
+  const glassClasses = {
+    none: '',
+    light: 'backdrop-blur-sm bg-white/70 border-white/20 hover:bg-white/80 transition-all duration-300',
+    medium: 'backdrop-blur-md bg-white/60 border-white/30 shadow-lg hover:bg-white/70 transition-all duration-300',
+    strong: 'backdrop-blur-xl bg-white/50 border-white/40 shadow-xl hover:bg-white/60 transition-all duration-300',
+  };
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'rounded-xl border bg-card text-card-foreground shadow',
+        glassEffect !== 'none' && glassClasses[glassEffect],
+        className,
+      )}
+      {...props}
+    />
+  );
+});
 Card.displayName = 'Card';
 
 const CardHeader = React.forwardRef<

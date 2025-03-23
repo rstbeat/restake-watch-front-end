@@ -131,7 +131,7 @@ const CompactNotes = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Card className="mt-4 border-l-4 border-l-purple-500">
+    <Card className="mt-4 border-l-4 border-l-purple-500" glassEffect="medium">
       <CardHeader className="pb-2">
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -675,60 +675,31 @@ const ExpandableSection: React.FC<{
 }> = ({ title, children, defaultOpen = false, severity = 'neutral' }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
-  const severityClasses = {
-    critical: 'text-red-700 bg-red-50 border-red-300',
-    warning: 'text-orange-700 bg-orange-50 border-orange-300',
-    positive: 'text-green-700 bg-green-50 border-green-300',
-    neutral: 'text-blue-700 bg-blue-50 border-blue-300',
-  };
-
-  const severityIcons = {
-    critical: {
-      icon: <AlertCircle className="h-3 w-3" />,
-      colors: ['#ef4444', '#f97316'],
-    },
-    warning: {
-      icon: <AlertTriangle className="h-3 w-3" />,
-      colors: ['#f97316', '#eab308'],
-    },
-    positive: {
-      icon: <CheckCircle className="h-3 w-3" />,
-      colors: ['#10b981', '#22c55e'],
-    },
-    neutral: {
-      icon: <Info className="h-3 w-3" />,
-      colors: ['#3b82f6', '#60a5fa'],
-    },
+  const severityColors = {
+    critical: 'bg-red-50 border-red-300',
+    warning: 'bg-yellow-50 border-yellow-300',
+    positive: 'bg-green-50 border-green-300',
+    neutral: 'bg-gray-50 border-gray-200',
   };
 
   return (
-    <div
-      className={`rounded-lg border ${severity !== 'neutral' ? 'border-l-4' : ''} ${
-        severity === 'critical'
-          ? 'border-l-red-500'
-          : severity === 'warning'
-            ? 'border-l-orange-500'
-            : severity === 'positive'
-              ? 'border-l-green-500'
-              : 'border-gray-200'
-      }`}
-    >
+    <div className={`rounded-lg border mb-4 overflow-hidden backdrop-blur-sm bg-white/80 shadow-sm ${severityColors[severity]}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between w-full p-4 text-left font-medium ${severityClasses[severity]} rounded-t-lg hover:bg-opacity-80 transition-colors`}
+        className="flex items-center justify-between w-full p-4 text-left"
       >
         <div className="flex items-center">
-          <SmallStyledIcon
-            icon={severityIcons[severity].icon}
-            gradientColors={severityIcons[severity].colors}
-          />
-          <span className="ml-2">{title}</span>
+          <h3 className="text-lg font-medium">{title}</h3>
         </div>
-        <div className="flex items-center justify-center rounded-full p-1 h-6 w-6 bg-white bg-opacity-30">
-          {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        <div>
+          {isOpen ? (
+            <ChevronUp className="h-5 w-5 text-gray-500" />
+          ) : (
+            <ChevronDown className="h-5 w-5 text-gray-500" />
+          )}
         </div>
       </button>
-      {isOpen && <div className="p-4 bg-white">{children}</div>}
+      {isOpen && <div className="p-4 bg-white/50 backdrop-blur-sm">{children}</div>}
     </div>
   );
 };
@@ -741,7 +712,7 @@ const MetricSummaryCard: React.FC<{
   description?: string;
   usdValue?: string;
 }> = ({ title, value, icon, description, usdValue }) => (
-  <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+  <div className="rounded-lg border border-purple-100 p-5 shadow-md hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/70">
     <div className="flex items-center mb-3">
       {icon}
       <h3 className="text-gray-700 font-medium ml-3">{title}</h3>
