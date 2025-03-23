@@ -330,7 +330,6 @@ const About: React.FC = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center px-4 py-2 bg-[#ab3bd2] text-white rounded-md hover:bg-[#922fb8] transition-colors shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all"
           >
-            <Phone className="mr-2 h-4 w-4" />
             Contact espejelomar.01 on Signal
             <ExternalLink className="ml-2 h-3 w-3" />
           </a>

@@ -1104,6 +1104,8 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                       operatorData.totalRestakedAssetsPerStrategy,
                     ).filter(
                       (key) =>
+                        operatorData?.totalRestakedAssetsPerStrategy?.[key] !==
+                          undefined &&
                         operatorData?.totalRestakedAssetsPerStrategy?.[key] > 0,
                     ).length
                   : 'N/A'

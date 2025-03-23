@@ -54,7 +54,7 @@ const Footer: React.FC = () => {
                 className="hover:text-[#ab3bd2] transition-colors"
                 aria-label="Signal"
               >
-                <Phone size={24} />
+                espejelomar.01
               </a>
             </div>
           </div>

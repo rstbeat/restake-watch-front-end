@@ -278,7 +278,7 @@ const RestakeWatch: React.FC = () => {
                       className="text-[#000000] hover:text-[#ab3bd2] transition-colors"
                       aria-label="Signal"
                     >
-                      <Phone size={20} />
+                      espejelomar.01
                     </a>
                     <a
                       href="https://signal.me/#eu/espejelomar.01"
@@ -286,7 +286,7 @@ const RestakeWatch: React.FC = () => {
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-3 py-1 bg-purple-100 text-[#ab3bd2] hover:bg-purple-200 rounded-md transition-colors"
                     >
-                      <DollarSign className="mr-1 h-4 w-4" /> Funding & Insights
+                      Funding & Insights
                     </a>
                     <Button
                       size="sm"
@@ -311,7 +311,7 @@ const RestakeWatch: React.FC = () => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center px-2 py-1 bg-purple-100 text-[#ab3bd2] text-xs hover:bg-purple-200 rounded-md transition-colors"
                       >
-                        <DollarSign className="mr-1 h-3 w-3" /> Funding & Tips
+                        Funding & Tips
                       </a>
                       <Button
                         size="sm"
