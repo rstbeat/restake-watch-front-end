@@ -7,6 +7,8 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  FileDown,
+  Info,
 } from 'lucide-react';
 import {
   Table,
@@ -21,6 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { fetchOperatorData, fetchETHPrice } from '../app/api/restake/restake';
+import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface StrategyMetrics {
   totalAssets: number;
@@ -66,6 +69,23 @@ const Badge: React.FC<{ color: string; text: string }> = ({ color, text }) => {
   );
 };
 
+// InfoTooltip component
+const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
+  <Tooltip.Provider>
+    <Tooltip.Root>
+      <Tooltip.Trigger asChild>
+        <Info className="inline-block ml-2 cursor-help h-4 w-4 text-gray-500" />
+      </Tooltip.Trigger>
+      <Tooltip.Portal>
+        <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs">
+          <p className="text-sm">{content}</p>
+          <Tooltip.Arrow className="fill-gray-800" />
+        </Tooltip.Content>
+      </Tooltip.Portal>
+    </Tooltip.Root>
+  </Tooltip.Provider>
+);
+
 // StyledIcon component used across overview components
 const StyledIcon: React.FC<{
   icon: React.ReactNode;
@@ -96,6 +116,9 @@ const StrategyOverview: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(25);
   const [ethPrice, setEthPrice] = useState<number>(0);
+  // New state for expandable rows and risk level filter
+  const [expandedRows, setExpandedRows] = useState<{[key: string]: boolean}>({});
+  const [filteredRiskLevel, setFilteredRiskLevel] = useState<string | null>(null);
 
   const fetchStrategyData = useCallback(async () => {
     try {
@@ -151,6 +174,45 @@ const StrategyOverview: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Toggle expansion function
+  const toggleRowExpansion = (name: string) => {
+    setExpandedRows(prev => ({
+      ...prev,
+      [name]: !prev[name]
+    }));
+  };
+
+  // Export to CSV function
+  const exportToCsv = () => {
+    if (!strategiesWithData.length) return;
+    
+    // Define CSV headers and create CSV content
+    const headers = ["Strategy", "Total Assets (ETH)", "USD Value", "Operators", "Top 5 Operators %", "Herfindahl Index", "Risk Level"];
+    const csvContent = [
+      headers.join(','),
+      ...strategiesWithData.map(strategy => {
+        const riskLevel = getConcentrationRiskLevel(strategy.metrics);
+        return [
+          `"${strategy.name}"`,
+          strategy.assets.toLocaleString(),
+          ethPrice > 0 ? `$${(strategy.assets * ethPrice).toLocaleString()}` : 'N/A',
+          strategy.metrics?.totalEntities || 'N/A',
+          strategy.metrics ? `${strategy.metrics.top5HoldersPercentage.toFixed(1)}%` : 'N/A',
+          strategy.metrics ? strategy.metrics.herfindahlIndex.toFixed(4) : 'N/A',
+          riskLevel
+        ].join(',');
+      })
+    ].join('\n');
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'strategy_data.csv');
+    link.click();
+  };
+
   // Function to determine risk level based on concentration metrics
   const getConcentrationRiskLevel = (
     metrics: StrategyMetrics | null,
@@ -189,9 +251,17 @@ const StrategyOverview: React.FC = () => {
     if (!strategiesWithData.length) return [];
 
     return [...strategiesWithData]
-      .filter((strategy) =>
-        strategy.name.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+      .filter((strategy) => {
+        const matchesSearchTerm = strategy.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
+          
+        // Add risk level filter
+        const strategyRiskLevel = getConcentrationRiskLevel(strategy.metrics);
+        const matchesRiskLevel = filteredRiskLevel === null || strategyRiskLevel === filteredRiskLevel;
+        
+        return matchesSearchTerm && matchesRiskLevel;
+      })
       .sort((a, b) => {
         if (sortColumn === 'metrics') {
           const aValue = a.metrics?.herfindahlIndex || 0;
@@ -212,7 +282,7 @@ const StrategyOverview: React.FC = () => {
           ? aString.localeCompare(bString)
           : bString.localeCompare(aString);
       });
-  }, [strategiesWithData, sortColumn, sortDirection, searchTerm]);
+  }, [strategiesWithData, sortColumn, sortDirection, searchTerm, filteredRiskLevel]);
 
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -225,7 +295,7 @@ const StrategyOverview: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, filteredRiskLevel]);
 
   const handleSort = (column: keyof StrategyData) => {
     if (column === sortColumn) {
@@ -274,6 +344,319 @@ const StrategyOverview: React.FC = () => {
       ? ((highRiskETHValue / totalETHValue) * 100).toFixed(1)
       : '0';
 
+  // Render filter controls
+  const renderFilterControls = () => (
+    <div className="mb-6">
+      <div className="relative flex-grow mb-4">
+        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+        <Input
+          type="text"
+          placeholder="Search by Strategy Name"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-8"
+        />
+      </div>
+      
+      <div className="flex flex-wrap gap-3 mb-4 justify-between">
+        <div className="flex items-center">
+          <h4 className="text-sm font-semibold mr-2">Risk Level:</h4>
+          <Button
+            variant={filteredRiskLevel === null ? "default" : "outline"}
+            size="sm"
+            onClick={() => setFilteredRiskLevel(null)}
+            className="text-xs"
+          >
+            All
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilteredRiskLevel('critical')}
+            className={`text-xs ${filteredRiskLevel === 'critical' ? "bg-red-100 border-red-300 hover:bg-red-200" : ""}`}
+          >
+            High Risk
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilteredRiskLevel('warning')}
+            className={`text-xs ${filteredRiskLevel === 'warning' ? "bg-yellow-100 border-yellow-300 hover:bg-yellow-200" : ""}`}
+          >
+            Medium Risk
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilteredRiskLevel('positive')}
+            className={`text-xs ${filteredRiskLevel === 'positive' ? "bg-green-100 border-green-300 hover:bg-green-200" : ""}`}
+          >
+            Low Risk
+          </Button>
+        </div>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={exportToCsv}
+        >
+          <FileDown className="h-4 w-4 mr-2" />
+          Export CSV
+        </Button>
+      </div>
+    </div>
+  );
+
+  // Render enhanced table
+  const renderTable = () => (
+    <div className="overflow-x-auto max-h-[70vh] border rounded-lg shadow-sm">
+      <Table>
+        <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+          <TableRow>
+            <TableHead className="w-[50px] text-center">#</TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                onClick={() => handleSort('name')}
+                className="font-semibold"
+              >
+                Strategy
+                <SortIcon column="name" />
+              </Button>
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                onClick={() => handleSort('assets')}
+                className="font-semibold"
+              >
+                Total Assets
+                <SortIcon column="assets" />
+              </Button>
+            </TableHead>
+            <TableHead>
+              Operators
+              <InfoTooltip content="Number of unique operators in the strategy" />
+            </TableHead>
+            <TableHead>
+              <Button
+                variant="ghost"
+                onClick={() => handleSort('metrics')}
+                className="font-semibold text-left"
+              >
+                Top 5 Operators %
+                <SortIcon column="metrics" />
+              </Button>
+              <InfoTooltip content="Percentage of strategy assets controlled by the top 5 operators. Higher values indicate more centralization." />
+            </TableHead>
+            <TableHead>
+              Herfindahl
+              <InfoTooltip content="Herfindahl-Hirschman Index measures market concentration (0-1). Higher values indicate more concentration." />
+            </TableHead>
+            <TableHead>Risk Level</TableHead>
+            <TableHead className="w-[50px]"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoadingStrategyData ? (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center py-8">
+                <div className="flex flex-col items-center justify-center">
+                  <Skeleton className="w-3/4 h-[20px] rounded-full mb-2" />
+                  <Skeleton className="w-2/3 h-[20px] rounded-full mb-2" />
+                  <Skeleton className="w-1/2 h-[20px] rounded-full" />
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : paginatedData.length > 0 ? (
+            paginatedData.map((strategy, index) => {
+              const riskLevel = getConcentrationRiskLevel(strategy.metrics);
+              const riskColors = {
+                critical: 'red',
+                warning: 'yellow',
+                positive: 'green',
+                neutral: 'gray',
+              };
+              const riskText = {
+                critical: 'High Risk',
+                warning: 'Medium Risk',
+                positive: 'Low Risk',
+                neutral: 'Unknown',
+              };
+              const isExpanded = expandedRows[strategy.rawName] || false;
+
+              return (
+                <React.Fragment key={strategy.rawName}>
+                  <TableRow
+                    className={`hover:bg-gray-50 transition-colors
+                      ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                      ${isExpanded ? 'border-b-0' : ''}
+                      ${riskLevel === 'critical' ? 'border-l-4 border-l-red-400' : 
+                        riskLevel === 'warning' ? 'border-l-4 border-l-yellow-400' : 
+                        riskLevel === 'positive' ? 'border-l-4 border-l-green-400' : ''}`}
+                  >
+                    <TableCell className="font-semibold text-center">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {strategy.name}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-semibold">{strategy.assets.toLocaleString()} ETH</span>
+                        {ethPrice > 0 && (
+                          <span className="text-xs text-gray-500">
+                            {formatUSDValue(strategy.assets * ethPrice)}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Badge 
+                        color={
+                          strategy.metrics?.totalEntities && strategy.metrics.totalEntities > 20 ? "green" : 
+                          strategy.metrics?.totalEntities && strategy.metrics.totalEntities > 10 ? "blue" : 
+                          "gray"
+                        } 
+                        text={strategy.metrics?.totalEntities?.toString() || 'N/A'}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {strategy.metrics ? (
+                        <div className="flex flex-col">
+                          <div className="flex items-center mb-1 w-full max-w-[150px]">
+                            <span className={`mr-2 font-semibold ${
+                              strategy.metrics.top5HoldersPercentage > 75 
+                                ? "text-red-600" 
+                                : strategy.metrics.top5HoldersPercentage > 50
+                                  ? "text-amber-600"
+                                  : "text-green-600"
+                            }`}>
+                              {strategy.metrics.top5HoldersPercentage.toFixed(1)}%
+                            </span>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className={`${
+                                  strategy.metrics.top5HoldersPercentage > 75
+                                    ? "bg-red-500"
+                                    : strategy.metrics.top5HoldersPercentage > 50
+                                      ? "bg-amber-500"
+                                      : "bg-green-500"
+                                } h-2 rounded-full transition-all`}
+                                style={{ width: `${Math.min(strategy.metrics.top5HoldersPercentage, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        'N/A'
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {strategy.metrics
+                        ? <span className={
+                            strategy.metrics.herfindahlIndex > 0.25
+                              ? "text-red-600 font-semibold"
+                              : strategy.metrics.herfindahlIndex > 0.15
+                                ? "text-amber-600 font-semibold"
+                                : "text-gray-700"
+                          }>{strategy.metrics.herfindahlIndex.toFixed(4)}</span>
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      {strategy.metrics && (
+                        <Badge
+                          color={riskColors[riskLevel]}
+                          text={riskText[riskLevel]}
+                        />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleRowExpansion(strategy.rawName)}
+                        className="p-0 h-8 w-8"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  
+                  {isExpanded && (
+                    <TableRow className="bg-gray-50 border-t-0">
+                      <TableCell colSpan={8} className="p-4">
+                        <div className="text-sm">
+                          <h4 className="font-semibold mb-2 text-gray-700">Strategy Details</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <h5 className="font-medium text-gray-800 mb-2">Asset Information</h5>
+                              <p><span className="text-gray-600">Strategy Name:</span> {strategy.name}</p>
+                              <p><span className="text-gray-600">Total ETH:</span> {strategy.assets.toLocaleString()}</p>
+                              {ethPrice > 0 && (
+                                <p><span className="text-gray-600">USD Value:</span> {formatUSDValue(strategy.assets * ethPrice)}</p>
+                              )}
+                              <p><span className="text-gray-600">Network Share:</span> {((strategy.assets / totalETHValue) * 100).toFixed(2)}% of total restaked ETH</p>
+                            </div>
+                            <div className="bg-white p-3 rounded border border-gray-200">
+                              <h5 className="font-medium text-gray-800 mb-2">Concentration Metrics</h5>
+                              {strategy.metrics ? (
+                                <>
+                                  <p><span className="text-gray-600">Total Operators:</span> {strategy.metrics.totalEntities}</p>
+                                  <p><span className="text-gray-600">Top 5 Operators Control:</span> <span className={
+                                    strategy.metrics.top5HoldersPercentage > 75 ? "text-red-600 font-semibold" : ""
+                                  }>{strategy.metrics.top5HoldersPercentage.toFixed(1)}%</span></p>
+                                  <p><span className="text-gray-600">Herfindahl Index:</span> <span className={
+                                    strategy.metrics.herfindahlIndex > 0.25 ? "text-red-600 font-semibold" : ""
+                                  }>{strategy.metrics.herfindahlIndex.toFixed(4)}</span></p>
+                                  <p><span className="text-gray-600">Risk Assessment:</span> {
+                                    riskLevel === 'critical' 
+                                      ? 'High concentration risk' 
+                                      : riskLevel === 'warning'
+                                        ? 'Moderate concentration risk'
+                                        : 'Well-distributed'
+                                  }</p>
+                                </>
+                              ) : (
+                                <p className="text-gray-500 italic">Concentration metrics not available for this strategy</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
+              );
+            })
+          ) : (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center py-8">
+                <div className="flex flex-col items-center">
+                  <p className="text-gray-500 mb-2">No strategy data available</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setFilteredRiskLevel(null);
+                    }}
+                  >
+                    Clear All Filters
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg mt-8 shadow-md">
@@ -303,152 +686,51 @@ const StrategyOverview: React.FC = () => {
               {highRiskStrategies.length} strategies have critical concentration
               risk with top 5 operators controlling more than 75% of assets
             </p>
+            <p className="text-sm text-red-600 mt-1">
+              Strategies with high concentration risk are vulnerable to operator collusion or failures
+            </p>
           </div>
         )}
 
-        <div className="mb-4">
-          <div className="relative">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              type="text"
-              placeholder="Search by Strategy Name"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-8"
-            />
+        {renderFilterControls()}
+        {renderTable()}
+
+        <div className="mt-4 flex items-center justify-between">
+          <div>
+            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+            {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)}{' '}
+            of {filteredAndSortedData.length} strategies
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              Previous
+            </Button>
+            <div className="text-sm px-3 py-1 bg-gray-100 rounded-md">
+              Page {currentPage} of {totalPages}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px] text-center">#</TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleSort('name')}
-                    className="font-semibold"
-                  >
-                    Strategy
-                    <SortIcon column="name" />
-                  </Button>
-                </TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleSort('assets')}
-                    className="font-semibold"
-                  >
-                    Total Assets
-                    <SortIcon column="assets" />
-                  </Button>
-                </TableHead>
-                <TableHead>Operators</TableHead>
-                <TableHead>
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleSort('metrics')}
-                    className="font-semibold text-left"
-                  >
-                    Top 5 Operators %
-                    <SortIcon column="metrics" />
-                  </Button>
-                </TableHead>
-                <TableHead>Herfindahl</TableHead>
-                <TableHead>Risk Level</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoadingStrategyData ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center">
-                    <Skeleton className="w-full h-[20px] rounded-full" />
-                  </TableCell>
-                </TableRow>
-              ) : paginatedData.length > 0 ? (
-                paginatedData.map((strategy, index) => {
-                  const riskLevel = getConcentrationRiskLevel(strategy.metrics);
-                  const riskColors = {
-                    critical: 'red',
-                    warning: 'yellow',
-                    positive: 'green',
-                    neutral: 'gray',
-                  };
-                  const riskText = {
-                    critical: 'High Risk',
-                    warning: 'Medium Risk',
-                    positive: 'Low Risk',
-                    neutral: 'Unknown',
-                  };
-
-                  return (
-                    <TableRow
-                      key={strategy.rawName}
-                      className="hover:bg-gray-50"
-                    >
-                      <TableCell className="font-semibold text-center">
-                        {(currentPage - 1) * itemsPerPage + index + 1}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {strategy.name}
-                      </TableCell>
-                      <TableCell>
-                        {strategy.assets.toLocaleString()} ETH
-                        {ethPrice > 0 && (
-                          <div className="text-xs text-gray-500">
-                            {formatUSDValue(strategy.assets * ethPrice)}
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {strategy.metrics?.totalEntities || 'N/A'}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {strategy.metrics ? (
-                          <span
-                            className={
-                              strategy.metrics.top5HoldersPercentage > 75
-                                ? 'text-red-600'
-                                : 'text-gray-700'
-                            }
-                          >
-                            {strategy.metrics.top5HoldersPercentage.toFixed(1)}%
-                          </span>
-                        ) : (
-                          'N/A'
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {strategy.metrics
-                          ? strategy.metrics.herfindahlIndex.toFixed(4)
-                          : 'N/A'}
-                      </TableCell>
-                      <TableCell>
-                        {strategy.metrics && (
-                          <Badge
-                            color={riskColors[riskLevel]}
-                            text={riskText[riskLevel]}
-                          />
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center">
-                    No strategy data available
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div className="mt-4 text-sm text-gray-600">
-          <p>Concentration metrics explanation:</p>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
+        <div className="mt-4 text-sm text-gray-600 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="font-medium mb-2">Concentration metrics explanation:</p>
+          <ul className="list-disc pl-5 space-y-1">
             <li>
               <strong>Total Assets:</strong> Sum of all assets managed by the
               strategy.
@@ -466,40 +748,15 @@ const StrategyOverview: React.FC = () => {
               <strong>Herfindahl Index:</strong> Measure of operator
               concentration (0-1). Higher values indicate more concentration.
             </li>
+            <li>
+              <strong>Risk Levels:</strong>
+              <ul className="list-none pl-5 mt-1 space-y-1">
+                <li className="flex items-center"><Badge color="red" text="High Risk" /> <span className="ml-2">Top 5 operators control more than 75% of assets or Herfindahl Index {'>'} 0.25</span></li>
+                <li className="flex items-center"><Badge color="yellow" text="Medium Risk" /> <span className="ml-2">Top 5 operators control 50-75% of assets or Herfindahl Index between 0.15-0.25</span></li>
+                <li className="flex items-center"><Badge color="green" text="Low Risk" /> <span className="ml-2">Well-distributed strategy with no significant concentration</span></li>
+              </ul>
+            </li>
           </ul>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-            {Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)}{' '}
-            of {filteredAndSortedData.length} strategies
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-            <div className="text-sm">
-              Page {currentPage} of {totalPages}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={currentPage === totalPages}
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
       </div>
     </div>

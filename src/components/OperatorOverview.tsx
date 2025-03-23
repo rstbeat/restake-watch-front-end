@@ -330,7 +330,7 @@ const OperatorOverview: React.FC = () => {
             onClick={() => setFilteredMarketShare(5)}
             className={`text-xs ${filteredMarketShare === 5 ? "bg-red-100 border-red-300 hover:bg-red-200" : ""}`}
           >
-            High Share (>5%)
+            High Share (&gt;5%)
           </Button>
           <Button
             variant="outline"
