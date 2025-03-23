@@ -198,15 +198,17 @@ const RestakeWatch: React.FC = () => {
 
         <div className="flex-1 flex flex-col overflow-hidden md:ml-48">
           {showBanner && (
-            <div className="bg-[#e6e7ec] text-gray-500 py-2 border-b border-gray-200">
+            <div className="bg-gradient-to-r from-purple-50 via-purple-100 to-indigo-50 backdrop-blur-sm text-gray-700 py-3 border-b border-purple-200 shadow-sm transition-all duration-300 ease-in-out">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                  <AlertTriangle className="h-5 w-5 text-gray-500" />
-                  <span>
+                <div className="flex items-center space-x-3">
+                  <div className="p-1.5 bg-white bg-opacity-60 rounded-full shadow-sm">
+                    <AlertTriangle className="h-4 w-4 text-[#ab3bd2]" />
+                  </div>
+                  <span className="font-medium">
                     New paper release:{' '}
                     <Link
                       href="/publications"
-                      className="underline font-semibold hover:text-[#ab3bd2]"
+                      className="relative inline-block font-semibold hover:text-[#ab3bd2] transition-colors duration-200 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-[#ab3bd2] after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"
                     >
                       Fortify or Falter: A Comprehensive Restaking Risk
                       Assessment
@@ -217,9 +219,9 @@ const RestakeWatch: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowBanner(false)}
-                  className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+                  className="rounded-full h-7 w-7 p-0 text-gray-500 hover:text-[#ab3bd2] hover:bg-white hover:bg-opacity-60 transition-colors duration-200"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </Button>
               </div>
             </div>
