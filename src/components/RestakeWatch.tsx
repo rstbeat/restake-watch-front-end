@@ -73,6 +73,10 @@ const RestakeWatch: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [visibleSection, setVisibleSection] = useState('overview');
 
+  // Animation states
+  const [tabChanged, setTabChanged] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
+
   // Backers data for the carousel
   const backersData = [
     {
@@ -141,6 +145,21 @@ const RestakeWatch: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle tab change animation
+  useEffect(() => {
+    if (tabChanged) {
+      const timer = setTimeout(() => {
+        setTabChanged(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [tabChanged]);
+
+  // Handle data loading animation
+  useEffect(() => {
+    setDataLoading(isLoadingStakerData || isLoadingOperatorData);
+  }, [isLoadingStakerData, isLoadingOperatorData]);
+
   const fetchStakerDataCallback = useCallback(async () => {
     if (activePlatform !== 'eigenlayer') return;
     try {
@@ -184,6 +203,11 @@ const RestakeWatch: React.FC = () => {
     return new Date(dateString).toLocaleString('en-US', options) + ' UTC';
   };
 
+  const handleTabChange = (value: string) => {
+    setTabChanged(true);
+    setActiveTab(value);
+  };
+
   const renderContent = () => {
     if (activePlatform !== 'eigenlayer') {
       return (
@@ -203,49 +227,61 @@ const RestakeWatch: React.FC = () => {
     return (
       <Tabs
         value={activeTab}
-        onValueChange={setActiveTab}
+        onValueChange={handleTabChange}
         className="space-y-6"
       >
         <TabsList className="bg-white rounded-lg shadow-md">
           <TabsTrigger
             value="overview"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="operators"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Operators
           </TabsTrigger>
           <TabsTrigger
             value="restakers"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Restakers
           </TabsTrigger>
           <TabsTrigger
             value="strategies"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Strategies
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent
+          value="overview"
+          className={`space-y-6 transition-opacity duration-300 ease-in-out ${tabChanged && activeTab === 'overview' ? 'opacity-0 animate-in fade-in-0' : 'opacity-100'}`}
+        >
           {Overview && <Overview restakeData={stakerData} />}
         </TabsContent>
 
-        <TabsContent value="operators" className="space-y-6">
+        <TabsContent
+          value="operators"
+          className={`space-y-6 transition-opacity duration-300 ease-in-out ${tabChanged && activeTab === 'operators' ? 'opacity-0 animate-in fade-in-0' : 'opacity-100'}`}
+        >
           {OperatorOverview && <OperatorOverview />}
         </TabsContent>
 
-        <TabsContent value="restakers" className="space-y-6">
+        <TabsContent
+          value="restakers"
+          className={`space-y-6 transition-opacity duration-300 ease-in-out ${tabChanged && activeTab === 'restakers' ? 'opacity-0 animate-in fade-in-0' : 'opacity-100'}`}
+        >
           {RestakerOverview && <RestakerOverview />}
         </TabsContent>
 
-        <TabsContent value="strategies" className="space-y-6">
+        <TabsContent
+          value="strategies"
+          className={`space-y-6 transition-opacity duration-300 ease-in-out ${tabChanged && activeTab === 'strategies' ? 'opacity-0 animate-in fade-in-0' : 'opacity-100'}`}
+        >
           {StrategyOverview && <StrategyOverview />}
         </TabsContent>
       </Tabs>
@@ -255,7 +291,7 @@ const RestakeWatch: React.FC = () => {
   const navigateToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
-      setActiveTab(sectionId);
+      handleTabChange(sectionId);
       section.scrollIntoView({ behavior: 'smooth' });
     }
   };
@@ -271,10 +307,10 @@ const RestakeWatch: React.FC = () => {
             value={activePlatform}
             onValueChange={(value: PlatformType) => setActivePlatform(value)}
           >
-            <SelectTrigger className="w-full border-gray-300 bg-white text-[#171717] focus:border-[#ab3bd2]">
+            <SelectTrigger className="w-full border-gray-300 bg-white text-[#171717] focus:border-[#ab3bd2] transition-colors duration-200">
               <SelectValue placeholder="Select platform" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="animate-in fade-in-50 zoom-in-95 duration-150">
               <SelectItem value="eigenlayer">EigenLayer</SelectItem>
               <SelectItem value="symbiotic">Symbiotic</SelectItem>
               <SelectItem value="karak">Karak</SelectItem>
@@ -329,7 +365,9 @@ const RestakeWatch: React.FC = () => {
                     <div>
                       <h1
                         className={`font-extrabold tracking-tight bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] bg-clip-text text-transparent drop-shadow-sm transition-all duration-300 ${
-                          scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl mb-1'
+                          scrolled
+                            ? 'text-xl sm:text-2xl'
+                            : 'text-2xl sm:text-3xl md:text-4xl mb-1'
                         }`}
                       >
                         RestakeWatch
@@ -359,13 +397,13 @@ const RestakeWatch: React.FC = () => {
 
                     {!scrolled && (
                       <>
-                        <div className="flex items-center px-3 py-1 bg-white rounded-md border border-purple-200 shadow-sm">
+                        <div className="flex items-center px-3 py-1 bg-white rounded-md border border-purple-200 shadow-sm hover:shadow-md transition-all duration-200">
                           <div className="flex flex-col">
                             <span className="text-xs font-bold text-[#ab3bd2] mb-0.5">
                               Our Backers:
                             </span>
                             <div className="flex items-center">
-                              <div className="relative h-5 w-5 mr-1">
+                              <div className="relative h-5 w-5 mr-1 transform hover:scale-110 transition-transform duration-200">
                                 <Image
                                   src="/ethereum-logo.png"
                                   alt="Ethereum Foundation"
@@ -375,7 +413,7 @@ const RestakeWatch: React.FC = () => {
                                   priority
                                 />
                               </div>
-                              <div className="relative h-5 w-5">
+                              <div className="relative h-5 w-5 transform hover:scale-110 transition-transform duration-200">
                                 <Image
                                   src="/obol-logo.png"
                                   alt="Obol Collective"
@@ -392,7 +430,7 @@ const RestakeWatch: React.FC = () => {
                           href="https://twitter.com/therestakewatch"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] text-white hover:shadow-md transition-all duration-200"
+                          className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] text-white hover:shadow-md transition-all duration-200 transform hover:scale-105"
                           aria-label="Twitter"
                         >
                           <Twitter size={16} />
@@ -404,7 +442,7 @@ const RestakeWatch: React.FC = () => {
                       href="https://signal.me/#eu/espejelomar.01"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 ${
+                      className={`inline-flex items-center bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-2px] ${
                         scrolled ? 'px-3 py-1.5 text-xs' : 'px-4 py-2'
                       }`}
                     >
@@ -417,7 +455,7 @@ const RestakeWatch: React.FC = () => {
                     {!scrolled && (
                       <Button
                         size="sm"
-                        className="bg-[#06b6d4] text-white hover:bg-[#0891b2] shadow-sm hover:shadow-md transition-all duration-200"
+                        className="bg-[#06b6d4] text-white hover:bg-[#0891b2] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-2px]"
                         onClick={() => {
                           const aboutSection = document.getElementById('about');
                           if (aboutSection) {
@@ -442,7 +480,7 @@ const RestakeWatch: React.FC = () => {
                         href="https://signal.me/#eu/espejelomar.01"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white text-xs rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200"
+                        className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white text-xs rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-1px]"
                       >
                         <DollarSign className="mr-1 h-3 w-3" /> Funding
                       </a>
@@ -480,14 +518,20 @@ const RestakeWatch: React.FC = () => {
                             {formatDate(operatorData.lastUpdated)}
                           </span>
                         ) : (
-                          <Skeleton className="h-4 w-24 rounded" />
+                          <div className="relative">
+                            <Skeleton className="h-4 w-24 rounded animate-pulse" />
+                            <div
+                              className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent ${dataLoading ? 'skeleton-shine' : 'opacity-0'}`}
+                              style={{ backgroundSize: '200% 100%' }}
+                            ></div>
+                          </div>
                         )}
                       </div>
                     </div>
 
                     <div className="hidden md:flex space-x-6">
                       <button
-                        onClick={() => setActiveTab('overview')}
+                        onClick={() => handleTabChange('overview')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'overview'
                             ? 'border-[#ab3bd2] text-[#ab3bd2]'
@@ -497,7 +541,7 @@ const RestakeWatch: React.FC = () => {
                         Overview
                       </button>
                       <button
-                        onClick={() => setActiveTab('operators')}
+                        onClick={() => handleTabChange('operators')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'operators'
                             ? 'border-[#ab3bd2] text-[#ab3bd2]'
@@ -507,7 +551,7 @@ const RestakeWatch: React.FC = () => {
                         Operators
                       </button>
                       <button
-                        onClick={() => setActiveTab('restakers')}
+                        onClick={() => handleTabChange('restakers')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'restakers'
                             ? 'border-[#ab3bd2] text-[#ab3bd2]'
@@ -517,7 +561,7 @@ const RestakeWatch: React.FC = () => {
                         Restakers
                       </button>
                       <button
-                        onClick={() => setActiveTab('strategies')}
+                        onClick={() => handleTabChange('strategies')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'strategies'
                             ? 'border-[#ab3bd2] text-[#ab3bd2]'
@@ -527,11 +571,11 @@ const RestakeWatch: React.FC = () => {
                         Strategies
                       </button>
                     </div>
-                    
+
                     <div className="md:hidden flex overflow-x-auto pb-1 pt-1">
                       <div className="flex space-x-3 px-1">
                         <button
-                          onClick={() => setActiveTab('overview')}
+                          onClick={() => handleTabChange('overview')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'overview'
                               ? 'bg-[#ab3bd2] text-white'
@@ -541,7 +585,7 @@ const RestakeWatch: React.FC = () => {
                           Overview
                         </button>
                         <button
-                          onClick={() => setActiveTab('operators')}
+                          onClick={() => handleTabChange('operators')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'operators'
                               ? 'bg-[#ab3bd2] text-white'
@@ -551,7 +595,7 @@ const RestakeWatch: React.FC = () => {
                           Operators
                         </button>
                         <button
-                          onClick={() => setActiveTab('restakers')}
+                          onClick={() => handleTabChange('restakers')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'restakers'
                               ? 'bg-[#ab3bd2] text-white'
@@ -561,7 +605,7 @@ const RestakeWatch: React.FC = () => {
                           Restakers
                         </button>
                         <button
-                          onClick={() => setActiveTab('strategies')}
+                          onClick={() => handleTabChange('strategies')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'strategies'
                               ? 'bg-[#ab3bd2] text-white'
@@ -588,13 +632,22 @@ const RestakeWatch: React.FC = () => {
                 <BackersCarousel backers={backersData} />
               </div>
 
-              <div id="overview">{renderContent()}</div>
+              <div
+                id="overview"
+                className="transition-opacity duration-500 ease-in-out"
+              >
+                {renderContent()}
+              </div>
 
               <div id="roadmap">
                 <Roadmap />
               </div>
 
-              <div id="about" ref={aboutRef}>
+              <div
+                id="about"
+                ref={aboutRef}
+                className="transition-opacity duration-500 ease-in-out"
+              >
                 <About />
               </div>
             </div>
@@ -602,6 +655,75 @@ const RestakeWatch: React.FC = () => {
         </div>
       </div>
       <Footer />
+
+      {/* Add CSS animations */}
+      <style jsx global>{`
+        @keyframes skeleton-loading {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+
+        .skeleton-shine {
+          animation: skeleton-loading 1.5s infinite linear;
+        }
+
+        .animate-in {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .fade-in-0 {
+          animation-name: fadeIn;
+          animation-duration: 300ms;
+          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .zoom-in-95 {
+          animation-name: zoomIn95;
+          animation-duration: 150ms;
+          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes zoomIn95 {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .fade-in-50 {
+          animation-name: fadeIn50;
+          animation-duration: 150ms;
+          animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn50 {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };
