@@ -230,9 +230,12 @@ const RestakeWatch: React.FC = () => {
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center w-full justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold tracking-tight sm:text-3xl mb-0">
-                      The L2Beat of the Restaking Ecosystem
+                    <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mb-1">
+                      <span className="bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] bg-clip-text text-transparent drop-shadow-sm">RestakeWatch</span>
                     </h1>
+                    <p className="text-base sm:text-lg font-bold">
+                      The <span className="font-extrabold text-[#ab3bd2] underline decoration-2 underline-offset-2">L2Beat</span> of the Restaking Ecosystem
+                    </p>
                   </div>
                   <div className="hidden lg:flex items-center space-x-4">
                     <div className="flex items-center px-3 py-1 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-md border border-purple-100">
