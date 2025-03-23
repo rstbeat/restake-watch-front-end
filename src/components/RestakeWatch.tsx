@@ -235,6 +235,33 @@ const RestakeWatch: React.FC = () => {
                     </h1>
                   </div>
                   <div className="hidden lg:flex items-center space-x-4">
+                    <div className="flex items-center px-3 py-1 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-md border border-purple-100">
+                      <div className="flex items-center mr-2">
+                        <div className="relative h-5 w-5 mr-1">
+                          <Image
+                            src="/ethereum-logo.png"
+                            alt="Ethereum Foundation"
+                            fill
+                            className="object-contain"
+                            sizes="20px"
+                            priority
+                          />
+                        </div>
+                        <div className="relative h-5 w-5">
+                          <Image
+                            src="/obol-logo.png"
+                            alt="Obol Collective"
+                            fill
+                            className="object-contain"
+                            sizes="20px"
+                            priority
+                          />
+                        </div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-800">
+                        ESP &amp; Obol Backed
+                      </span>
+                    </div>
                     <a
                       href="https://twitter.com/therestakewatch"
                       target="_blank"
@@ -311,40 +338,47 @@ const RestakeWatch: React.FC = () => {
                 </div>
               )}
 
-              {/* Ethereum Foundation and Obol Support Section */}
-              <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-                <div className="flex items-center space-x-3">
-                  <div className="flex space-x-2">
-                    <div className="relative h-6 w-6">
-                      <Image
-                        src="/ethereum-logo.png"
-                        alt="Ethereum Logo"
-                        fill
-                        className="object-contain"
-                        sizes="24px"
-                        priority
-                      />
+              {/* Backers Section */}
+              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3 rounded-lg shadow-sm mb-4">
+                <div className="flex flex-col space-y-2">
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    Backed By Industry Leaders
+                  </h3>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative h-7 w-7">
+                        <Image
+                          src="/ethereum-logo.png"
+                          alt="Ethereum Foundation"
+                          fill
+                          className="object-contain"
+                          sizes="28px"
+                          priority
+                        />
+                      </div>
+                      <div className="relative h-7 w-7">
+                        <Image
+                          src="/obol-logo.png"
+                          alt="Obol Collective"
+                          fill
+                          className="object-contain"
+                          sizes="28px"
+                          priority
+                        />
+                      </div>
                     </div>
-                    <div className="relative h-6 w-6">
-                      <Image
-                        src="/obol-logo.png"
-                        alt="Obol Logo"
-                        fill
-                        className="object-contain"
-                        sizes="24px"
-                        priority
-                      />
+                    <div className="text-xs text-gray-700 ml-3">
+                      <p>
+                        Our mission to bring transparency to the restaking
+                        ecosystem is supported by grants from the{' '}
+                        <span className="font-medium">
+                          Ethereum Foundation (ESP)
+                        </span>{' '}
+                        and <span className="font-medium">Obol Collective</span>
+                        .
+                      </p>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600">
-                    A company supported by grants from the
-                    <span className="font-medium">
-                      {' '}
-                      Ethereum Foundation (ESP)
-                    </span>{' '}
-                    <span className="font-medium"> and Obol Collective</span>.
-                    Any mistake is the fault of the Restake.Watch team.
-                  </p>
                 </div>
               </div>
               {renderContent()}

@@ -190,6 +190,13 @@ const About: React.FC = () => {
                   <li className="flex items-start">
                     <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1.5 mr-2 flex-shrink-0"></span>
                     <span>
+                      <strong>Prestigious Backing:</strong> Backed by grants
+                      from the Ethereum Foundation (ESP) and Obol Collective
+                    </span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1.5 mr-2 flex-shrink-0"></span>
+                    <span>
                       Helped users safeguard millions in assets through risk
                       identification
                     </span>
