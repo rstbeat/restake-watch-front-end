@@ -49,11 +49,11 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
 // Updated Badge component to fix dynamic class issues
 const Badge: React.FC<{ color: string; text: string }> = ({ color, text }) => {
   const colorClasses: { [key: string]: string } = {
-    red: 'bg-red-100 text-red-800',
-    yellow: 'bg-yellow-100 text-yellow-800',
-    green: 'bg-green-100 text-green-800',
-    blue: 'bg-blue-100 text-blue-800',
-    gray: 'bg-gray-100 text-gray-800',
+    red: 'bg-red-500 text-white border-2 border-red-600 shadow-md',
+    yellow: 'bg-yellow-500 text-white border-2 border-yellow-600 shadow-md',
+    green: 'bg-green-500 text-white border-2 border-green-600 shadow-md',
+    blue: 'bg-blue-500 text-white border-2 border-blue-600 shadow-md',
+    gray: 'bg-gray-100 text-gray-800 border-2 border-gray-300',
   };
 
   const classes = colorClasses[color] || colorClasses['gray'];

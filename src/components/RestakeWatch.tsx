@@ -76,14 +76,14 @@ const RestakeWatch: React.FC = () => {
   // Backers data for the carousel
   const backersData = [
     {
-      id: 1,
+      id: '1',
       name: 'Ethereum Foundation (ESP)',
       logo: '/ethereum-logo.png',
       description:
         'Supporting the growth of the Ethereum ecosystem through core protocol research, development, and education.',
     },
     {
-      id: 2,
+      id: '2',
       name: 'Obol Collective',
       logo: '/obol-logo.png',
       description:
@@ -91,6 +91,20 @@ const RestakeWatch: React.FC = () => {
     },
     // Add more backers here as needed
   ];
+
+  // Helper function to apply specific risk color classes that will override glassmorphism effects
+  const getRiskColorClass = (risk: string) => {
+    switch (risk.toLowerCase()) {
+      case 'high':
+        return 'bg-red-500 text-white border-2 border-red-600 shadow-md';
+      case 'medium':
+        return 'bg-yellow-500 text-white border-2 border-yellow-600 shadow-md';
+      case 'low':
+        return 'bg-green-500 text-white border-2 border-green-600 shadow-md';
+      default:
+        return 'bg-gray-100 text-gray-800 border-2 border-gray-300';
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -334,66 +348,6 @@ const RestakeWatch: React.FC = () => {
                         of the Restaking Ecosystem
                       </p>
                     </div>
-
-                    {scrolled && (
-                      <div className="hidden md:flex ml-8 space-x-1">
-                        <button
-                          onClick={() => navigateToSection('overview')}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                            visibleSection === 'overview'
-                              ? 'bg-[#ab3bd2] text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          <Home className="h-4 w-4 mr-1.5" />
-                          Overview
-                        </button>
-                        <button
-                          onClick={() => navigateToSection('operators')}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                            visibleSection === 'operators'
-                              ? 'bg-[#ab3bd2] text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          <Users className="h-4 w-4 mr-1.5" />
-                          Operators
-                        </button>
-                        <button
-                          onClick={() => navigateToSection('restakers')}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                            visibleSection === 'restakers'
-                              ? 'bg-[#ab3bd2] text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          <Layers className="h-4 w-4 mr-1.5" />
-                          Restakers
-                        </button>
-                        <button
-                          onClick={() => navigateToSection('strategies')}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                            visibleSection === 'strategies'
-                              ? 'bg-[#ab3bd2] text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          <BarChart3 className="h-4 w-4 mr-1.5" />
-                          Strategies
-                        </button>
-                        <button
-                          onClick={() => navigateToSection('about')}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
-                            visibleSection === 'about'
-                              ? 'bg-[#ab3bd2] text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          <Info className="h-4 w-4 mr-1.5" />
-                          About
-                        </button>
-                      </div>
-                    )}
                   </div>
 
                   <div className="hidden lg:flex items-center space-x-4">
@@ -405,32 +359,34 @@ const RestakeWatch: React.FC = () => {
 
                     {!scrolled && (
                       <>
-                        <div className="flex items-center px-3 py-1 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-md border border-purple-100">
-                          <div className="flex items-center mr-2">
-                            <div className="relative h-5 w-5 mr-1">
-                              <Image
-                                src="/ethereum-logo.png"
-                                alt="Ethereum Foundation"
-                                fill
-                                className="object-contain"
-                                sizes="20px"
-                                priority
-                              />
-                            </div>
-                            <div className="relative h-5 w-5">
-                              <Image
-                                src="/obol-logo.png"
-                                alt="Obol Collective"
-                                fill
-                                className="object-contain"
-                                sizes="20px"
-                                priority
-                              />
+                        <div className="flex items-center px-3 py-1 bg-white rounded-md border border-purple-200 shadow-sm">
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-[#ab3bd2] mb-0.5">
+                              Our Backers:
+                            </span>
+                            <div className="flex items-center">
+                              <div className="relative h-5 w-5 mr-1">
+                                <Image
+                                  src="/ethereum-logo.png"
+                                  alt="Ethereum Foundation"
+                                  fill
+                                  className="object-contain"
+                                  sizes="20px"
+                                  priority
+                                />
+                              </div>
+                              <div className="relative h-5 w-5">
+                                <Image
+                                  src="/obol-logo.png"
+                                  alt="Obol Collective"
+                                  fill
+                                  className="object-contain"
+                                  sizes="20px"
+                                  priority
+                                />
+                              </div>
                             </div>
                           </div>
-                          <span className="text-xs font-medium text-gray-800">
-                            ESP &amp; Obol Backed
-                          </span>
                         </div>
                         <a
                           href="https://twitter.com/therestakewatch"
@@ -509,55 +465,62 @@ const RestakeWatch: React.FC = () => {
                   <div className="flex items-center justify-between h-12">
                     <div className="flex items-center space-x-2 text-sm">
                       <span className="text-gray-600">
-                        Platform: <span className="font-medium text-[#ab3bd2]">EigenLayer</span>
+                        Platform:{' '}
+                        <span className="font-medium text-[#ab3bd2]">
+                          EigenLayer
+                        </span>
                       </span>
                       <span className="text-gray-400">|</span>
                       <div className="flex items-center">
-                        <span className="text-gray-600 mr-1">Last updated:</span>
+                        <span className="text-gray-600 mr-1">
+                          Last updated:
+                        </span>
                         {operatorData?.lastUpdated ? (
-                          <span className="text-gray-800">{formatDate(operatorData.lastUpdated)}</span>
+                          <span className="text-gray-800">
+                            {formatDate(operatorData.lastUpdated)}
+                          </span>
                         ) : (
                           <Skeleton className="h-4 w-24 rounded" />
                         )}
                       </div>
                     </div>
-                    
+
                     <div className="hidden md:flex space-x-6">
-                      <button 
+                      <button
                         onClick={() => setActiveTab('overview')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
-                          activeTab === 'overview' 
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]' 
+                          activeTab === 'overview'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
                         Overview
                       </button>
-                      <button 
+                      <button
                         onClick={() => setActiveTab('operators')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
-                          activeTab === 'operators' 
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]' 
+                          activeTab === 'operators'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
                         Operators
                       </button>
-                      <button 
+                      <button
                         onClick={() => setActiveTab('restakers')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
-                          activeTab === 'restakers' 
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]' 
+                          activeTab === 'restakers'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
                         Restakers
                       </button>
-                      <button 
+                      <button
                         onClick={() => setActiveTab('strategies')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
-                          activeTab === 'strategies' 
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]' 
+                          activeTab === 'strategies'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
@@ -574,6 +537,9 @@ const RestakeWatch: React.FC = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {/* Backers Carousel */}
               <div className="mb-6">
+                <h3 className="text-xl font-bold text-[#171717] mb-2">
+                  Proudly Backed By:
+                </h3>
                 <BackersCarousel backers={backersData} />
               </div>
 

@@ -51,11 +51,11 @@ interface StrategiesData {
 // Badge component for color-coded risk levels
 const Badge: React.FC<{ color: string; text: string }> = ({ color, text }) => {
   const colorClasses: { [key: string]: string } = {
-    red: 'bg-red-100 text-red-800',
-    yellow: 'bg-yellow-100 text-yellow-800',
-    green: 'bg-green-100 text-green-800',
-    blue: 'bg-blue-100 text-blue-800',
-    gray: 'bg-gray-100 text-gray-800',
+    red: 'bg-red-500 text-white border-2 border-red-600 shadow-md',
+    yellow: 'bg-yellow-500 text-white border-2 border-yellow-600 shadow-md',
+    green: 'bg-green-500 text-white border-2 border-green-600 shadow-md',
+    blue: 'bg-blue-500 text-white border-2 border-blue-600 shadow-md',
+    gray: 'bg-gray-100 text-gray-800 border-2 border-gray-300',
   };
 
   const classes = colorClasses[color] || colorClasses['gray'];
@@ -204,6 +204,7 @@ const StrategyOverview: React.FC = () => {
       headers.join(','),
       ...strategiesWithData.map((strategy) => {
         const riskLevel = getConcentrationRiskLevel(strategy.metrics);
+        const riskBadge = getRiskBadge(riskLevel);
         return [
           `"${strategy.name}"`,
           strategy.assets.toLocaleString(),
@@ -217,7 +218,7 @@ const StrategyOverview: React.FC = () => {
           strategy.metrics
             ? strategy.metrics.herfindahlIndex.toFixed(4)
             : 'N/A',
-          riskLevel,
+          riskBadge.text,
         ].join(',');
       }),
     ].join('\n');
@@ -246,6 +247,20 @@ const StrategyOverview: React.FC = () => {
       return 'warning';
     } else {
       return 'positive';
+    }
+  };
+
+  // Add a helper function to convert risk levels to appropriate badge colors
+  const getRiskBadge = (risk: string): { color: string; text: string } => {
+    switch (risk) {
+      case 'critical':
+        return { color: 'red', text: 'High Risk' };
+      case 'warning':
+        return { color: 'yellow', text: 'Medium Risk' };
+      case 'positive':
+        return { color: 'green', text: 'Low Risk' };
+      default:
+        return { color: 'gray', text: 'Unknown' };
     }
   };
 
@@ -613,12 +628,18 @@ const StrategyOverview: React.FC = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {strategy.metrics && (
-                        <Badge
-                          color={riskColors[riskLevel]}
-                          text={riskText[riskLevel]}
-                        />
-                      )}
+                      {(() => {
+                        const strategyRiskLevel = getConcentrationRiskLevel(
+                          strategy.metrics,
+                        );
+                        const riskBadge = getRiskBadge(strategyRiskLevel);
+                        return (
+                          <Badge
+                            color={riskBadge.color}
+                            text={riskBadge.text}
+                          />
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       <Button

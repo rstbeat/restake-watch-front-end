@@ -611,56 +611,99 @@ const SmallStyledIcon: React.FC<{
   );
 };
 
-// Risk indicator component
+// Function to determine risk level based on concentration metrics
+const getConcentrationRiskLevel = (
+  metrics: StrategyMetrics | null,
+): 'critical' | 'warning' | 'positive' | 'neutral' => {
+  if (!metrics) return 'neutral';
+
+  if (metrics.top5HoldersPercentage > 75 || metrics.herfindahlIndex > 0.25) {
+    return 'critical';
+  } else if (
+    metrics.top5HoldersPercentage > 50 ||
+    metrics.herfindahlIndex > 0.15
+  ) {
+    return 'warning';
+  } else {
+    return 'positive';
+  }
+};
+
+// Add a helper function to convert risk levels to appropriate badge colors
+const getRiskBadge = (risk: string): { color: string; label: string } => {
+  switch (risk) {
+    case 'critical':
+      return {
+        color: 'bg-red-500 text-white border-2 border-red-600 shadow-md',
+        label: 'High Risk',
+      };
+    case 'warning':
+      return {
+        color: 'bg-yellow-500 text-white border-2 border-yellow-600 shadow-md',
+        label: 'Medium Risk',
+      };
+    case 'positive':
+      return {
+        color: 'bg-green-500 text-white border-2 border-green-600 shadow-md',
+        label: 'Low Risk',
+      };
+    default:
+      return {
+        color: 'bg-gray-100 text-gray-800 border-2 border-gray-300',
+        label: 'Unknown',
+      };
+  }
+};
+
+// Also update the RiskIndicator component for better visibility
 const RiskIndicator: React.FC<{
   level: 'critical' | 'warning' | 'positive' | 'neutral';
   title: string;
   description: React.ReactNode;
 }> = ({ level, title, description }) => {
-  const levelStyles = {
-    critical: {
-      icon: <AlertCircle className="h-3 w-3" />,
-      colors: ['#ef4444', '#f97316'],
-      border: 'border-red-200',
-      bg: 'bg-red-50',
-      title: 'text-red-800 font-bold',
-    },
-    warning: {
-      icon: <AlertTriangle className="h-3 w-3" />,
-      colors: ['#f97316', '#eab308'],
-      border: 'border-orange-200',
-      bg: 'bg-orange-50',
-      title: 'text-orange-800 font-bold',
-    },
-    positive: {
-      icon: <CheckCircle className="h-3 w-3" />,
-      colors: ['#10b981', '#22c55e'],
-      border: 'border-green-200',
-      bg: 'bg-green-50',
-      title: 'text-green-800 font-bold',
-    },
-    neutral: {
-      icon: <Info className="h-3 w-3" />,
-      colors: ['#3b82f6', '#60a5fa'],
-      border: 'border-blue-200',
-      bg: 'bg-blue-50',
-      title: 'text-blue-800 font-bold',
-    },
+  const getLevelStyles = () => {
+    switch (level) {
+      case 'critical':
+        return {
+          bg: 'bg-red-500',
+          border: 'border-2 border-red-600',
+          text: 'text-white',
+          icon: '⚠️',
+        };
+      case 'warning':
+        return {
+          bg: 'bg-yellow-500',
+          border: 'border-2 border-yellow-600',
+          text: 'text-white',
+          icon: '⚠️',
+        };
+      case 'positive':
+        return {
+          bg: 'bg-green-500',
+          border: 'border-2 border-green-600',
+          text: 'text-white',
+          icon: '✓',
+        };
+      default:
+        return {
+          bg: 'bg-gray-100',
+          border: 'border-2 border-gray-300',
+          text: 'text-gray-800',
+          icon: 'ℹ️',
+        };
+    }
   };
 
+  const styles = getLevelStyles();
+
   return (
-    <div
-      className={`flex p-3 rounded-lg border ${levelStyles[level].border} ${levelStyles[level].bg}`}
-    >
-      <div className="mr-3">
-        <SmallStyledIcon
-          icon={levelStyles[level].icon}
-          gradientColors={levelStyles[level].colors}
-        />
-      </div>
-      <div>
-        <h4 className={`text-sm ${levelStyles[level].title} mb-1`}>{title}</h4>
-        <div className="text-sm">{description}</div>
+    <div className={`rounded-lg ${styles.bg} ${styles.border} p-4 shadow-md`}>
+      <div className="flex items-start">
+        <span className="text-lg mr-2">{styles.icon}</span>
+        <div>
+          <h4 className={`font-bold ${styles.text} text-sm mb-1`}>{title}</h4>
+          <div className={`${styles.text} text-sm`}>{description}</div>
+        </div>
       </div>
     </div>
   );
@@ -676,30 +719,50 @@ const ExpandableSection: React.FC<{
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const severityColors = {
-    critical: 'bg-red-50 border-red-300',
-    warning: 'bg-yellow-50 border-yellow-300',
-    positive: 'bg-green-50 border-green-300',
-    neutral: 'bg-gray-50 border-gray-200',
+    critical: 'bg-red-100 border-l-4 border-l-red-500 border border-red-300',
+    warning:
+      'bg-yellow-100 border-l-4 border-l-yellow-500 border border-yellow-300',
+    positive:
+      'bg-green-100 border-l-4 border-l-green-500 border border-green-300',
+    neutral: 'bg-gray-50 border border-gray-200',
+  };
+
+  const severityTextColors = {
+    critical: 'text-red-700',
+    warning: 'text-yellow-700',
+    positive: 'text-green-700',
+    neutral: 'text-gray-700',
   };
 
   return (
-    <div className={`rounded-lg border mb-4 overflow-hidden backdrop-blur-sm bg-white/80 shadow-sm ${severityColors[severity]}`}>
+    <div
+      className={`rounded-lg overflow-hidden shadow-md ${severityColors[severity]}`}
+    >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between w-full p-4 text-left"
       >
         <div className="flex items-center">
-          <h3 className="text-lg font-medium">{title}</h3>
+          {severity === 'critical' && (
+            <span className="mr-2 text-lg bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center">
+              !
+            </span>
+          )}
+          <h3 className={`text-lg font-bold ${severityTextColors[severity]}`}>
+            {title}
+          </h3>
         </div>
         <div>
           {isOpen ? (
-            <ChevronUp className="h-5 w-5 text-gray-500" />
+            <ChevronUp className={`h-5 w-5 ${severityTextColors[severity]}`} />
           ) : (
-            <ChevronDown className="h-5 w-5 text-gray-500" />
+            <ChevronDown
+              className={`h-5 w-5 ${severityTextColors[severity]}`}
+            />
           )}
         </div>
       </button>
-      {isOpen && <div className="p-4 bg-white/50 backdrop-blur-sm">{children}</div>}
+      {isOpen && <div className="p-4 bg-white">{children}</div>}
     </div>
   );
 };
@@ -2864,88 +2927,71 @@ const StrategiesOverview: React.FC<{
       </Card>
 
       {/* Top Strategies Detailed Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {topStrategies.map((strategy) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+        {topStrategies.map((strategy, index) => {
           const riskLevel = getConcentrationRiskLevel(strategy.metrics);
-          const marketShare = ((strategy.assets / totalAssets) * 100).toFixed(
-            1,
-          );
+          const riskBadge = getRiskBadge(riskLevel);
+
+          // Get color for the border based on risk level
+          const borderColor =
+            riskLevel === 'critical'
+              ? 'border-red-400'
+              : riskLevel === 'warning'
+                ? 'border-yellow-400'
+                : 'border-green-400';
 
           return (
-            <ExpandableSection
-              key={strategy.rawName}
-              title={`${strategy.name} (${marketShare}% of network)`}
-              severity={riskLevel}
-              defaultOpen={false}
+            <div
+              key={index}
+              className={`bg-white rounded-lg shadow-sm border-l-4 ${borderColor} border border-gray-200 p-3 hover:shadow-md transition-all`}
             >
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-sm font-medium text-gray-600">
-                    Total Assets:
-                  </span>
-                  <span className="font-semibold">
-                    {strategy.assets.toLocaleString()} ETH
+              <div className="mb-2 border-b border-gray-100 pb-2">
+                <div className="flex justify-between items-center">
+                  <h3
+                    className="text-sm font-bold text-gray-800 truncate"
+                    title={strategy.name}
+                  >
+                    {strategy.name}
+                  </h3>
+                  <span
+                    className={`inline-block px-1.5 py-0.5 rounded-full text-xs font-medium ${riskBadge.color}`}
+                  >
+                    {riskBadge.label}
                   </span>
                 </div>
-
-                {strategy.metrics && (
-                  <>
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">
-                        Operators:
-                      </span>
-                      <span className="font-semibold">
-                        {strategy.metrics.totalEntities}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">
-                        Top 5 Operators Control:
-                      </span>
-                      <span
-                        className={
-                          strategy.metrics.top5HoldersPercentage > 75
-                            ? 'font-bold text-red-600'
-                            : 'font-semibold'
-                        }
-                      >
-                        {strategy.metrics.top5HoldersPercentage.toFixed(1)}%
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-600">
-                        Concentration Index:
-                      </span>
-                      <span
-                        className={
-                          strategy.metrics.herfindahlIndex > 0.25
-                            ? 'font-bold text-red-600'
-                            : 'font-semibold'
-                        }
-                      >
-                        {strategy.metrics.herfindahlIndex.toFixed(4)}
-                      </span>
-                    </div>
-
-                    <RiskIndicator
-                      level={riskLevel}
-                      title={`${strategy.name} Risk Assessment`}
-                      description={
-                        <p>
-                          {riskLevel === 'critical'
-                            ? `This strategy has critical concentration risk with top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
-                            : riskLevel === 'warning'
-                              ? `This strategy has moderate concentration risk with relatively few operators and top 5 operators controlling ${strategy.metrics.top5HoldersPercentage.toFixed(1)}% of assets.`
-                              : `This strategy has good distribution across ${strategy.metrics.totalEntities} operators with reasonable concentration metrics.`}
-                        </p>
-                      }
-                    />
-                  </>
-                )}
+                <div className="text-right mt-1">
+                  <p className="text-base font-bold">
+                    {strategy.assets.toLocaleString()} ETH
+                  </p>
+                  {ethPrice > 0 && (
+                    <p className="text-xs text-gray-500">
+                      {formatUSDValue(strategy.assets * ethPrice)}
+                    </p>
+                  )}
+                </div>
               </div>
-            </ExpandableSection>
+
+              <div className="grid grid-cols-2 gap-1 text-xs">
+                <div className="text-gray-600">Operators:</div>
+                <div className="text-right font-semibold">
+                  {strategy.metrics?.totalEntities || 'N/A'}
+                </div>
+
+                <div className="text-gray-600">Top 5:</div>
+                <div
+                  className={`text-right font-semibold ${strategy.metrics?.top5HoldersPercentage > 75 ? 'text-red-600' : ''}`}
+                >
+                  {strategy.metrics?.top5HoldersPercentage.toFixed(1) || 'N/A'}%
+                </div>
+
+                <div className="text-gray-600">HHI:</div>
+                <div
+                  className={`text-right font-semibold ${strategy.metrics?.herfindahlIndex > 0.25 ? 'text-red-600' : ''}`}
+                >
+                  {strategy.metrics?.herfindahlIndex.toFixed(4) || 'N/A'}
+                </div>
+              </div>
+            </div>
           );
         })}
       </div>

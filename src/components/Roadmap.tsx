@@ -1,6 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { ChevronRight, CheckCircle, ExternalLink, ChevronLeft } from 'lucide-react';
+import {
+  ChevronRight,
+  CheckCircle,
+  ExternalLink,
+  ChevronLeft,
+} from 'lucide-react';
 
 // Styled icon component with gradient background
 const SmallStyledIcon: React.FC<{
@@ -43,27 +48,28 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
   activeIndex,
 }) => {
   const isActive = index === activeIndex;
-  
+
   return (
-    <div 
+    <div
       className={`flex-shrink-0 w-72 transition-all duration-500 transform ${
         isActive ? 'scale-105 z-10' : 'scale-100 opacity-80'
       }`}
     >
       <div
         className={`backdrop-blur-md p-5 rounded-xl h-full transition-all duration-300
-          ${completed 
-            ? 'bg-gradient-to-br from-green-50/90 to-emerald-50/90 border border-green-200/50 shadow-md hover:shadow-lg' 
-            : highlighted
-              ? 'bg-gradient-to-br from-purple-50/90 to-indigo-50/90 border border-purple-200/50 shadow-md hover:shadow-lg'
-              : 'bg-white/70 border border-gray-100/50 shadow-sm hover:shadow-md'
+          ${
+            completed
+              ? 'bg-gradient-to-br from-green-50/90 to-emerald-50/90 border border-green-200/50 shadow-md hover:shadow-lg'
+              : highlighted
+                ? 'bg-gradient-to-br from-purple-50/90 to-indigo-50/90 border border-purple-200/50 shadow-md hover:shadow-lg'
+                : 'bg-white/70 border border-gray-100/50 shadow-sm hover:shadow-md'
           } ${isActive ? 'shadow-lg' : ''}`}
       >
         <div className="absolute h-1 top-0 left-0 right-0 rounded-t-xl overflow-hidden">
-          <div 
+          <div
             className={`h-full ${
-              completed 
-                ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
+              completed
+                ? 'bg-gradient-to-r from-green-400 to-emerald-500'
                 : highlighted
                   ? 'bg-gradient-to-r from-purple-500 to-indigo-500'
                   : 'bg-gradient-to-r from-gray-400 to-gray-500'
@@ -71,7 +77,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
             style={{ width: '100%' }}
           />
         </div>
-        
+
         <div className="flex justify-between items-start mb-3 mt-1">
           <time className="text-sm font-medium text-gray-700 px-2 py-0.5 rounded-full bg-white/60 backdrop-blur-sm border border-gray-100/40 shadow-sm">
             {date}
@@ -83,10 +89,10 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
             />
           )}
         </div>
-        
+
         <h3 className="text-lg font-semibold mb-2 text-gray-900">{title}</h3>
         <p className="text-sm text-gray-600">{description}</p>
-        
+
         {link && (
           <a
             href={link}
@@ -107,57 +113,63 @@ const Roadmap: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [autoScroll, setAutoScroll] = useState(true);
   const [isHovering, setIsHovering] = useState(false);
-  
+
   const timelineItems = [
     {
-      date: "March 2025",
-      title: "Fortify or Falter Paper",
-      description: "Release of research paper with metrics design for the restaking ecosystem",
+      date: 'March 2025',
+      title: 'Fortify or Falter Paper',
+      description:
+        'Release of research paper with metrics design for the restaking ecosystem',
       completed: true,
-      link: "https://hackmd.io/eYiQLgHhS428QQD28_ObaQ"
+      link: 'https://hackmd.io/eYiQLgHhS428QQD28_ObaQ',
     },
     {
-      date: "March 2025",
-      title: "ECI Implementation",
-      description: "Launch of Exposure Concentration Index (ECI) metric for EigenLayer",
-      completed: true
+      date: 'March 2025',
+      title: 'ECI Implementation',
+      description:
+        'Launch of Exposure Concentration Index (ECI) metric for EigenLayer',
+      completed: true,
     },
     {
-      date: "March 2025",
-      title: "WCI Implementation",
-      description: "Launch of Whitelisting Concentration Index (WCI) metric for EigenLayer"
+      date: 'March 2025',
+      title: 'WCI Implementation',
+      description:
+        'Launch of Whitelisting Concentration Index (WCI) metric for EigenLayer',
     },
     {
-      date: "April 2025",
-      title: "GBP Implementation",
-      description: "Launch of Governance Bribery Potential (GBP) metric for EigenLayer"
+      date: 'April 2025',
+      title: 'GBP Implementation',
+      description:
+        'Launch of Governance Bribery Potential (GBP) metric for EigenLayer',
     },
     {
-      date: "April 2025",
-      title: "CAPVAR Implementation",
-      description: "Launch of Cross-Asset Price & Volatile Asset Risk (CAPVAR) metric for EigenLayer"
+      date: 'April 2025',
+      title: 'CAPVAR Implementation',
+      description:
+        'Launch of Cross-Asset Price & Volatile Asset Risk (CAPVAR) metric for EigenLayer',
     },
     {
-      date: "April 2025",
-      title: "CF Implementation",
-      description: "Launch of Contagion Factor (CF) metric for EigenLayer"
+      date: 'April 2025',
+      title: 'CF Implementation',
+      description: 'Launch of Contagion Factor (CF) metric for EigenLayer',
     },
     {
-      date: "May 2025",
-      title: "Symbiotic Data",
-      description: "Integration of symbiotic operator, restakers, and network concentration data - a particularly interesting expansion",
-      highlighted: true
-    }
+      date: 'May 2025',
+      title: 'Symbiotic Data',
+      description:
+        'Integration of symbiotic operator, restakers, and network concentration data - a particularly interesting expansion',
+      highlighted: true,
+    },
   ];
 
   // Handle scrolling
   useEffect(() => {
     if (!autoScroll || isHovering) return;
-    
+
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % timelineItems.length);
     }, 4000);
-    
+
     return () => clearInterval(interval);
   }, [autoScroll, isHovering, timelineItems.length]);
 
@@ -165,21 +177,24 @@ const Roadmap: React.FC = () => {
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) return;
-    
+
     const itemWidth = 288; // Width of each item (w-72) + margin
-    const scrollPosition = activeIndex * itemWidth - (element.clientWidth / 2) + (itemWidth / 2);
-    
+    const scrollPosition =
+      activeIndex * itemWidth - element.clientWidth / 2 + itemWidth / 2;
+
     element.scrollTo({
       left: scrollPosition,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   }, [activeIndex]);
 
   // Navigate to prev/next
   const handlePrev = () => {
-    setActiveIndex((prev) => (prev - 1 + timelineItems.length) % timelineItems.length);
+    setActiveIndex(
+      (prev) => (prev - 1 + timelineItems.length) % timelineItems.length,
+    );
   };
-  
+
   const handleNext = () => {
     setActiveIndex((prev) => (prev + 1) % timelineItems.length);
   };
@@ -191,7 +206,7 @@ const Roadmap: React.FC = () => {
           <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500"></div>
           <div className="absolute -left-16 -bottom-16 w-48 h-48 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500"></div>
         </div>
-        
+
         <div className="relative">
           <div className="flex items-center mb-1">
             <SmallStyledIcon
@@ -204,17 +219,18 @@ const Roadmap: React.FC = () => {
             </h2>
           </div>
           <p className="text-sm text-gray-600 ml-9">
-            Our upcoming milestones and metrics implementation for the EigenLayer ecosystem
+            Our upcoming milestones and metrics implementation for the
+            EigenLayer ecosystem
           </p>
-          
+
           {/* Indicator dots */}
           <div className="flex space-x-1 mt-4 ml-9">
             {timelineItems.map((_, idx) => (
-              <button 
-                key={idx} 
+              <button
+                key={idx}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  idx === activeIndex 
-                    ? 'w-6 bg-purple-500' 
+                  idx === activeIndex
+                    ? 'w-6 bg-purple-500'
                     : 'w-1.5 bg-gray-300 hover:bg-gray-400'
                 }`}
                 onClick={() => setActiveIndex(idx)}
@@ -224,7 +240,7 @@ const Roadmap: React.FC = () => {
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="p-0 mt-3">
         <div className="relative">
           <div
@@ -250,31 +266,33 @@ const Roadmap: React.FC = () => {
               ))}
             </div>
           </div>
-          
+
           {/* Navigation controls */}
-          <button 
+          <button
             onClick={handlePrev}
             className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md hover:shadow-lg hover:bg-white/90 transition-all duration-200 border border-gray-200/50 z-20"
           >
             <ChevronLeft className="h-5 w-5 text-gray-700" />
           </button>
-          
-          <button 
+
+          <button
             onClick={handleNext}
             className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md hover:shadow-lg hover:bg-white/90 transition-all duration-200 border border-gray-200/50 z-20"
           >
             <ChevronRight className="h-5 w-5 text-gray-700" />
           </button>
-          
+
           {/* Gradient fades */}
           <div className="absolute top-0 left-0 bottom-0 w-16 bg-gradient-to-r from-white via-white/90 to-transparent pointer-events-none z-10"></div>
           <div className="absolute top-0 right-0 bottom-0 w-16 bg-gradient-to-l from-white via-white/90 to-transparent pointer-events-none z-10"></div>
-          
+
           {/* Progress bar */}
           <div className="h-1 bg-gray-100 mx-8 mt-1 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
-              style={{ width: `${(activeIndex / (timelineItems.length - 1)) * 100}%` }}
+              style={{
+                width: `${(activeIndex / (timelineItems.length - 1)) * 100}%`,
+              }}
             />
           </div>
         </div>

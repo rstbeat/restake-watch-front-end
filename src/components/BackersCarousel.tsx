@@ -25,7 +25,9 @@ const BackersCarousel: React.FC<BackersCarouselProps> = ({ backers }) => {
   };
 
   const prevSlide = () => {
-    setActiveIndex((current) => (current - 1 + backers.length) % backers.length);
+    setActiveIndex(
+      (current) => (current - 1 + backers.length) % backers.length,
+    );
   };
 
   const goToSlide = (index: number) => {
@@ -62,26 +64,29 @@ const BackersCarousel: React.FC<BackersCarouselProps> = ({ backers }) => {
   };
 
   return (
-    <div 
+    <div
       className="relative rounded-xl overflow-hidden backdrop-blur-md bg-white/60 border border-purple-100/50 shadow-md hover:shadow-lg transition-all duration-300"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div className="carousel-container h-[80px] px-6 flex items-center">
-        <button 
+        <button
           onClick={prevSlide}
           className="absolute left-1 z-10 p-1 rounded-full bg-white/70 backdrop-blur-sm border border-purple-100/30 shadow-sm hover:bg-white/90 transition-all duration-200"
         >
           <ChevronLeft size={16} className="text-purple-700" />
         </button>
-        
+
         <div className="flex-1 overflow-hidden">
-          <div 
+          <div
             className="flex transition-transform duration-500 ease-in-out"
             style={{ transform: `translateX(-${activeIndex * 100}%)` }}
           >
             {backers.map((backer) => (
-              <div key={backer.id} className="min-w-full flex items-center justify-center px-4">
+              <div
+                key={backer.id}
+                className="min-w-full flex items-center justify-center px-4"
+              >
                 <div className="flex items-center">
                   <div className="relative h-8 w-8 mr-3">
                     <Image
@@ -93,31 +98,35 @@ const BackersCarousel: React.FC<BackersCarouselProps> = ({ backers }) => {
                     />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-purple-900 text-sm">{backer.name}</h3>
-                    <p className="text-xs text-gray-600">{backer.description}</p>
+                    <h3 className="font-semibold text-purple-900 text-sm">
+                      {backer.name}
+                    </h3>
+                    <p className="text-xs text-gray-600">
+                      {backer.description}
+                    </p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        
-        <button 
+
+        <button
           onClick={nextSlide}
           className="absolute right-1 z-10 p-1 rounded-full bg-white/70 backdrop-blur-sm border border-purple-100/30 shadow-sm hover:bg-white/90 transition-all duration-200"
         >
           <ChevronRight size={16} className="text-purple-700" />
         </button>
       </div>
-      
+
       <div className="absolute bottom-2 left-0 right-0 flex justify-center space-x-1">
         {backers.map((_, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              index === activeIndex 
-                ? 'w-4 bg-purple-500' 
+              index === activeIndex
+                ? 'w-4 bg-purple-500'
                 : 'w-1.5 bg-purple-200 hover:bg-purple-300'
             }`}
             aria-label={`Go to slide ${index + 1}`}
