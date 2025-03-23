@@ -250,6 +250,25 @@ const OperatorOverview: React.FC = () => {
           Displaying the concentration of restaked ETH among all operators in
           the ecosystem
         </p>
+
+        {operatorData && operatorData.length > 0 && (
+          <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
+            <p className="text-red-700 font-medium">
+              Top 5 operators control {operatorData
+                .sort((a, b) => parseFloat(b.marketShared) - parseFloat(a.marketShared))
+                .slice(0, 5)
+                .reduce((sum: number, op) => sum + parseFloat(op.marketShared), 0)
+                .toFixed(1)}% of all restaked assets
+            </p>
+            <p className="text-sm text-red-600 mt-1">
+              {operatorData.filter(op => parseFloat(op.marketShared) > 5).length} operators have more than 5% market share each, indicating significant concentration
+            </p>
+            <p className="text-sm text-red-600 mt-1">
+              Professional operators like P2P and Node Monster manage multiple individual nodes, further increasing concentration risk
+            </p>
+          </div>
+        )}
+
         <div className="mb-4 flex items-center space-x-4">
           <div className="relative flex-grow">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
