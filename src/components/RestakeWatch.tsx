@@ -266,31 +266,22 @@ const RestakeWatch: React.FC = () => {
                       href="https://twitter.com/therestakewatch"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#000000] hover:text-[#ab3bd2] transition-colors"
+                      className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 text-white hover:shadow-md transition-all duration-200"
                       aria-label="Twitter"
                     >
-                      <Twitter size={20} />
+                      <Twitter size={16} />
                     </a>
                     <a
                       href="https://signal.me/#eu/espejelomar.01"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#000000] hover:text-[#ab3bd2] transition-colors"
-                      aria-label="Signal"
+                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-md hover:from-purple-600 hover:to-purple-700 shadow-sm hover:shadow-md transition-all duration-200"
                     >
-                      espejelomar.01
-                    </a>
-                    <a
-                      href="https://signal.me/#eu/espejelomar.01"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center px-3 py-1 bg-purple-100 text-[#ab3bd2] hover:bg-purple-200 rounded-md transition-colors"
-                    >
-                      Funding & Insights
+                      <DollarSign className="mr-1.5 h-4 w-4" /> Funding & Insights
                     </a>
                     <Button
                       size="sm"
-                      className="bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
+                      className="bg-[#ab3bd2] text-white hover:bg-[#922fb8] shadow-sm hover:shadow-md transition-all duration-200"
                       onClick={() => {
                         const aboutSection = document.getElementById('about');
                         if (aboutSection) {
@@ -309,13 +300,13 @@ const RestakeWatch: React.FC = () => {
                         href="https://signal.me/#eu/espejelomar.01"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-2 py-1 bg-purple-100 text-[#ab3bd2] text-xs hover:bg-purple-200 rounded-md transition-colors"
+                        className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs rounded-md hover:from-purple-600 hover:to-purple-700 shadow-sm hover:shadow-md transition-all duration-200"
                       >
-                        Funding & Tips
+                        <DollarSign className="mr-1 h-3 w-3" /> Funding
                       </a>
                       <Button
                         size="sm"
-                        className="bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
+                        className="bg-[#ab3bd2] text-white hover:bg-[#922fb8] shadow-sm hover:shadow-md transition-all duration-200"
                         onClick={() => setIsMobileSidebarOpen(true)}
                       >
                         <Menu className="h-4 w-4" />
