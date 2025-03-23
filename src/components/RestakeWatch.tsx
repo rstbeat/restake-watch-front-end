@@ -6,6 +6,7 @@ import {
   ChevronRight,
   MessageCircle,
   Menu,
+  DollarSign,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -252,6 +253,14 @@ const RestakeWatch: React.FC = () => {
                     >
                       <MessageCircle size={20} />
                     </a>
+                    <a
+                      href="https://t.me/espejelomar"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-3 py-1 bg-purple-100 text-[#ab3bd2] hover:bg-purple-200 rounded-md transition-colors"
+                    >
+                      <DollarSign className="mr-1 h-4 w-4" /> Funding & Insights
+                    </a>
                     <Button
                       size="sm"
                       className="bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
@@ -268,13 +277,23 @@ const RestakeWatch: React.FC = () => {
                   </div>
 
                   <div className="block md:hidden">
-                    <Button
-                      size="sm"
-                      className="bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
-                      onClick={() => setIsMobileSidebarOpen(true)}
-                    >
-                      <Menu className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center space-x-2">
+                      <a
+                        href="https://t.me/espejelomar"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-2 py-1 bg-purple-100 text-[#ab3bd2] text-xs hover:bg-purple-200 rounded-md transition-colors"
+                      >
+                        <DollarSign className="mr-1 h-3 w-3" /> Funding & Tips
+                      </a>
+                      <Button
+                        size="sm"
+                        className="bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
+                        onClick={() => setIsMobileSidebarOpen(true)}
+                      >
+                        <Menu className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -12,25 +12,39 @@ const Footer: React.FC = () => {
               ❤️
             </span>
           </p>
-          <div className="flex space-x-4 order-1 sm:order-2">
-            <a
-              href="https://twitter.com/therestakewatch"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#ab3bd2] transition-colors"
-              aria-label="Twitter"
-            >
-              <Twitter size={24} />
-            </a>
-            <a
-              href="https://t.me/espejelomar"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[#ab3bd2] transition-colors"
-              aria-label="Telegram"
-            >
-              <MessageCircle size={24} />
-            </a>
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 order-1 sm:order-2">
+            <div className="text-sm rounded-md py-1 px-3 bg-purple-100 text-gray-700">
+              For funding or to share valuable info:{' '}
+              <a
+                href="https://t.me/espejelomar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-[#ab3bd2] hover:underline"
+              >
+                @espejelomar
+              </a>{' '}
+              on Telegram
+            </div>
+            <div className="flex space-x-4">
+              <a
+                href="https://twitter.com/therestakewatch"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#ab3bd2] transition-colors"
+                aria-label="Twitter"
+              >
+                <Twitter size={24} />
+              </a>
+              <a
+                href="https://t.me/espejelomar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#ab3bd2] transition-colors"
+                aria-label="Telegram"
+              >
+                <MessageCircle size={24} />
+              </a>
+            </div>
           </div>
         </div>
       </div>

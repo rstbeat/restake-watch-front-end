@@ -1,6 +1,14 @@
 import React from 'react';
-import { Shield, BarChart2, DollarSign, Coffee } from 'lucide-react';
+import {
+  Shield,
+  BarChart2,
+  DollarSign,
+  Coffee,
+  MessageCircle,
+  ExternalLink,
+} from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 // Add the StyledIcon component
 const StyledIcon: React.FC<{
@@ -95,6 +103,29 @@ const About: React.FC = () => {
           the broader ecosystem, providing critical insights needed to navigate
           the evolving world of restaking.
         </p>
+
+        {/* New CTA Section */}
+        <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-100">
+          <h3 className="text-lg font-semibold text-[#1a202c] mb-2">
+            Get in Touch
+          </h3>
+          <p className="text-sm text-gray-700 mb-3">
+            Have additional information, insights, or concerns about restaking
+            protocols? We're actively seeking funding and looking for
+            whistleblowers or anyone with valuable knowledge to improve our
+            monitoring.
+          </p>
+          <a
+            href="https://t.me/espejelomar"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-4 py-2 bg-[#ab3bd2] text-white rounded-md hover:bg-[#922fb8] transition-colors"
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            Contact @espejelomar on Telegram
+            <ExternalLink className="ml-2 h-3 w-3" />
+          </a>
+        </div>
       </CardContent>
     </Card>
   );
