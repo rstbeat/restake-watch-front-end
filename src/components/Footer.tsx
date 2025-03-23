@@ -59,18 +59,21 @@ const Footer: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex flex-col space-y-3 text-sm text-center">
             <p className="italic text-gray-500 flex items-center justify-center gap-2">
               <Coffee size={16} className="text-brown-600" />
-              Powered by excessive coffee and genuine love for decentralized Ethereum
+              Powered by excessive coffee and genuine love for decentralized
+              Ethereum
               <Heart size={16} className="text-red-500" />
             </p>
             <p className="text-xs text-gray-400">
-              Yes, we shamelessly borrowed the color palette from L2Beat. Those folks are absolute legends! 🙌
+              Yes, we shamelessly borrowed the color palette from L2Beat. Those
+              folks are absolute legends! 🙌
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              Committed to making the restaking ecosystem as secure and transparent as possible.
+              Committed to making the restaking ecosystem as secure and
+              transparent as possible.
             </p>
           </div>
         </div>

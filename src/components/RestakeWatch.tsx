@@ -32,6 +32,16 @@ import About from './About';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchStakerData, fetchOperatorData } from '../app/api/restake/restake';
 
+// Color palette CSS variables (to be injected into :root in globals.css)
+// Primary: #ab3bd2 (Purple)
+// Secondary: #3b82f6 (Blue)
+// Accent: #06b6d4 (Cyan)
+// Success: #10b981 (Green)
+// Warning: #f59e0b (Amber)
+// Error: #ef4444 (Red)
+// Background: #e6e7ec (Light Gray)
+// Text: #171717 (Near Black)
+
 type PlatformType = 'eigenlayer' | 'symbiotic' | 'karak';
 
 const RestakeWatch: React.FC = () => {
@@ -132,25 +142,25 @@ const RestakeWatch: React.FC = () => {
         <TabsList className="bg-white rounded-lg shadow-md">
           <TabsTrigger
             value="overview"
-            className="text-[#000000] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
           >
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="operators"
-            className="text-[#000000] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
           >
             Operators
           </TabsTrigger>
           <TabsTrigger
             value="restakers"
-            className="text-[#000000] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
           >
             Restakers
           </TabsTrigger>
           <TabsTrigger
             value="strategies"
-            className="text-[#000000] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white"
           >
             Strategies
           </TabsTrigger>
@@ -176,7 +186,7 @@ const RestakeWatch: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#e6e7ec] text-[#000000] font-bold">
+    <div className="flex flex-col min-h-screen bg-[#e6e7ec] text-[#171717] font-bold">
       <div className="flex flex-1">
         <Sidebar
           isMobileOpen={isMobileSidebarOpen}
@@ -186,7 +196,7 @@ const RestakeWatch: React.FC = () => {
             value={activePlatform}
             onValueChange={(value: PlatformType) => setActivePlatform(value)}
           >
-            <SelectTrigger className="w-full border-gray-300 bg-white text-[#000000] focus:border-[#ab3bd2]">
+            <SelectTrigger className="w-full border-gray-300 bg-white text-[#171717] focus:border-[#ab3bd2]">
               <SelectValue placeholder="Select platform" />
             </SelectTrigger>
             <SelectContent>
@@ -228,16 +238,22 @@ const RestakeWatch: React.FC = () => {
             </div>
           )}
 
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e6e7ec] text-[#000000]">
-            <div className="bg-[#e6e7ec] text-[#000000] py-4 border-b border-gray-200">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e6e7ec] text-[#171717]">
+            <div className="bg-[#e6e7ec] text-[#171717] py-4 border-b border-gray-200">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center w-full justify-between">
                   <div>
                     <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mb-1">
-                      <span className="bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] bg-clip-text text-transparent drop-shadow-sm">RestakeWatch</span>
+                      <span className="bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] bg-clip-text text-transparent drop-shadow-sm">
+                        RestakeWatch
+                      </span>
                     </h1>
                     <p className="text-base sm:text-lg font-bold">
-                      The <span className="font-extrabold text-[#ab3bd2] underline decoration-2 underline-offset-2">L2Beat</span> of the Restaking Ecosystem
+                      The{' '}
+                      <span className="font-extrabold text-[#ab3bd2] underline decoration-2 underline-offset-2">
+                        L2Beat
+                      </span>{' '}
+                      of the Restaking Ecosystem
                     </p>
                   </div>
                   <div className="hidden lg:flex items-center space-x-4">
@@ -272,7 +288,7 @@ const RestakeWatch: React.FC = () => {
                       href="https://twitter.com/therestakewatch"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-500 text-white hover:shadow-md transition-all duration-200"
+                      className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] text-white hover:shadow-md transition-all duration-200"
                       aria-label="Twitter"
                     >
                       <Twitter size={16} />
@@ -281,14 +297,14 @@ const RestakeWatch: React.FC = () => {
                       href="https://signal.me/#eu/espejelomar.01"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-md hover:from-purple-600 hover:to-purple-700 shadow-sm hover:shadow-md transition-all duration-200"
+                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200"
                     >
                       <DollarSign className="mr-1.5 h-4 w-4" /> Funding &
                       Insights
                     </a>
                     <Button
                       size="sm"
-                      className="bg-[#ab3bd2] text-white hover:bg-[#922fb8] shadow-sm hover:shadow-md transition-all duration-200"
+                      className="bg-[#06b6d4] text-white hover:bg-[#0891b2] shadow-sm hover:shadow-md transition-all duration-200"
                       onClick={() => {
                         const aboutSection = document.getElementById('about');
                         if (aboutSection) {
@@ -307,7 +323,7 @@ const RestakeWatch: React.FC = () => {
                         href="https://signal.me/#eu/espejelomar.01"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white text-xs rounded-md hover:from-purple-600 hover:to-purple-700 shadow-sm hover:shadow-md transition-all duration-200"
+                        className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white text-xs rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200"
                       >
                         <DollarSign className="mr-1 h-3 w-3" /> Funding
                       </a>
@@ -328,15 +344,16 @@ const RestakeWatch: React.FC = () => {
               {activePlatform === 'eigenlayer' && (
                 <div className="mb-4 text-sm flex items-center">
                   <span className="mr-1">Last updated:</span>
-                  {operatorData?.lastUpdated
-                    ? <span>{formatDate(operatorData.lastUpdated)}</span>
-                    : <Skeleton className="h-4 w-24 rounded" />
-                  }
+                  {operatorData?.lastUpdated ? (
+                    <span>{formatDate(operatorData.lastUpdated)}</span>
+                  ) : (
+                    <Skeleton className="h-4 w-24 rounded" />
+                  )}
                 </div>
               )}
 
               {/* Backers Section */}
-              <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3 rounded-lg shadow-sm mb-4">
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-3 rounded-lg shadow-sm mb-4">
                 <div className="flex flex-col space-y-2">
                   <h3 className="text-sm font-semibold text-gray-900">
                     Backed By Industry Leaders

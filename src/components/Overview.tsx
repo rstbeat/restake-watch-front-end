@@ -1127,9 +1127,11 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
             <MetricSummaryCard
               title="ETH Restaked vs. Total Supply"
               value={
-                restakePercents
-                  ? `${restakePercents.ethPercent}%`
-                  : <Skeleton className="h-6 w-16 rounded inline-block" />
+                restakePercents ? (
+                  `${restakePercents.ethPercent}%`
+                ) : (
+                  <Skeleton className="h-6 w-16 rounded inline-block" />
+                )
               }
               icon={
                 <StyledIcon
@@ -1163,9 +1165,11 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
             <MetricSummaryCard
               title="stETH Restaked vs. Total Supply"
               value={
-                restakePercents
-                  ? `${restakePercents.stethPercent}%`
-                  : <Skeleton className="h-6 w-16 rounded inline-block" />
+                restakePercents ? (
+                  `${restakePercents.stethPercent}%`
+                ) : (
+                  <Skeleton className="h-6 w-16 rounded inline-block" />
+                )
               }
               icon={
                 <StyledIcon
@@ -1195,9 +1199,11 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
             <MetricSummaryCard
               title="Combined Ecosystem Impact"
               value={
-                restakePercents
-                  ? `${restakePercents.combinedPercent}%`
-                  : <Skeleton className="h-6 w-16 rounded inline-block" />
+                restakePercents ? (
+                  `${restakePercents.combinedPercent}%`
+                ) : (
+                  <Skeleton className="h-6 w-16 rounded inline-block" />
+                )
               }
               icon={
                 <StyledIcon
