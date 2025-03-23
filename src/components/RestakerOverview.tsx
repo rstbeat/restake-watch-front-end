@@ -82,8 +82,12 @@ const RestakerOverview: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(50);
-  const [expandedRows, setExpandedRows] = useState<{[key: string]: boolean}>({});
-  const [filteredMarketShare, setFilteredMarketShare] = useState<number | null>(null);
+  const [expandedRows, setExpandedRows] = useState<{ [key: string]: boolean }>(
+    {},
+  );
+  const [filteredMarketShare, setFilteredMarketShare] = useState<number | null>(
+    null,
+  );
 
   const fetchStakerDataCallback = useCallback(async () => {
     try {
@@ -118,29 +122,35 @@ const RestakerOverview: React.FC = () => {
   }, [stakerData, fetchStakerDataCallback]);
 
   const toggleRowExpansion = (address: string) => {
-    setExpandedRows(prev => ({
+    setExpandedRows((prev) => ({
       ...prev,
-      [address]: !prev[address]
+      [address]: !prev[address],
     }));
   };
 
   const exportToCsv = () => {
     if (!stakerData) return;
-    
-    const headers = ["Address", "Market Share", "ETH Restaked", "Strategies", "Most Used Strategy"];
+
+    const headers = [
+      'Address',
+      'Market Share',
+      'ETH Restaked',
+      'Strategies',
+      'Most Used Strategy',
+    ];
     const csvContent = [
       headers.join(','),
-      ...stakerData.map(row => 
+      ...stakerData.map((row) =>
         [
           `"${row.restakerAddress}"`,
           `${row.amountRestaked}%`,
           row.ethRestaked,
           row.numberOfStrategies,
-          `"${row.mostUsedStrategies}"`
-        ].join(',')
-      )
+          `"${row.mostUsedStrategies}"`,
+        ].join(','),
+      ),
     ].join('\n');
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -156,13 +166,16 @@ const RestakerOverview: React.FC = () => {
         const matchesSearchTerm = staker.restakerAddress
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
-          
-        const matchesMarketShare = 
-          filteredMarketShare === null || 
-          (filteredMarketShare === 5 && parseFloat(staker.amountRestaked) > 5) ||
-          (filteredMarketShare === 1 && parseFloat(staker.amountRestaked) >= 1 && parseFloat(staker.amountRestaked) <= 5) ||
+
+        const matchesMarketShare =
+          filteredMarketShare === null ||
+          (filteredMarketShare === 5 &&
+            parseFloat(staker.amountRestaked) > 5) ||
+          (filteredMarketShare === 1 &&
+            parseFloat(staker.amountRestaked) >= 1 &&
+            parseFloat(staker.amountRestaked) <= 5) ||
           (filteredMarketShare === 0 && parseFloat(staker.amountRestaked) < 1);
-  
+
         return matchesSearchTerm && matchesMarketShare;
       })
       .sort((a, b) => {
@@ -231,12 +244,12 @@ const RestakerOverview: React.FC = () => {
           className="pl-8"
         />
       </div>
-      
+
       <div className="flex flex-wrap gap-3 mb-4 justify-between">
         <div className="flex items-center">
           <h4 className="text-sm font-semibold mr-2">Market Share:</h4>
           <Button
-            variant={filteredMarketShare === null ? "default" : "outline"}
+            variant={filteredMarketShare === null ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilteredMarketShare(null)}
             className="text-xs"
@@ -247,7 +260,7 @@ const RestakerOverview: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => setFilteredMarketShare(5)}
-            className={`text-xs ${filteredMarketShare === 5 ? "bg-red-100 border-red-300 hover:bg-red-200" : ""}`}
+            className={`text-xs ${filteredMarketShare === 5 ? 'bg-red-100 border-red-300 hover:bg-red-200' : ''}`}
           >
             High Share (&gt;5%)
           </Button>
@@ -255,7 +268,7 @@ const RestakerOverview: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => setFilteredMarketShare(1)}
-            className={`text-xs ${filteredMarketShare === 1 ? "bg-yellow-100 border-yellow-300 hover:bg-yellow-200" : ""}`}
+            className={`text-xs ${filteredMarketShare === 1 ? 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200' : ''}`}
           >
             Medium Share (1-5%)
           </Button>
@@ -263,17 +276,13 @@ const RestakerOverview: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => setFilteredMarketShare(0)}
-            className={`text-xs ${filteredMarketShare === 0 ? "bg-green-100 border-green-300 hover:bg-green-200" : ""}`}
+            className={`text-xs ${filteredMarketShare === 0 ? 'bg-green-100 border-green-300 hover:bg-green-200' : ''}`}
           >
             Low Share (&lt;1%)
           </Button>
         </div>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={exportToCsv}
-        >
+
+        <Button variant="outline" size="sm" onClick={exportToCsv}>
           <FileDown className="h-4 w-4 mr-2" />
           Export CSV
         </Button>
@@ -309,9 +318,7 @@ const RestakerOverview: React.FC = () => {
               </Button>
             </TableHead>
             <TableHead className="text-center">Strategies</TableHead>
-            <TableHead className="text-center">
-              Most Used Strategy
-            </TableHead>
+            <TableHead className="text-center">Most Used Strategy</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
@@ -329,7 +336,7 @@ const RestakerOverview: React.FC = () => {
           ) : paginatedData && paginatedData.length > 0 ? (
             paginatedData.map((row, index) => {
               const isExpanded = expandedRows[row.restakerAddress] || false;
-              
+
               return (
                 <React.Fragment key={row.restakerAddress || index}>
                   <TableRow
@@ -340,7 +347,7 @@ const RestakerOverview: React.FC = () => {
                     <TableCell className="font-semibold text-center">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="flex items-center justify-center">
                         <div className="font-mono text-sm px-3 py-1.5 bg-gray-100 rounded-l-md border border-r-0 border-gray-200 max-w-[180px] truncate">
@@ -349,11 +356,15 @@ const RestakerOverview: React.FC = () => {
                         <button
                           onClick={() => copyToClipboard(row.restakerAddress)}
                           className={`p-2 border border-gray-200 rounded-r-md transition-colors ${
-                            copiedAddress === row.restakerAddress 
-                              ? 'bg-green-100 text-green-700 border-green-300' 
+                            copiedAddress === row.restakerAddress
+                              ? 'bg-green-100 text-green-700 border-green-300'
                               : 'bg-gray-50 hover:bg-gray-100'
                           }`}
-                          title={copiedAddress === row.restakerAddress ? 'Copied!' : 'Copy full address'}
+                          title={
+                            copiedAddress === row.restakerAddress
+                              ? 'Copied!'
+                              : 'Copy full address'
+                          }
                         >
                           {copiedAddress === row.restakerAddress ? (
                             <Check className="h-4 w-4" />
@@ -363,29 +374,33 @@ const RestakerOverview: React.FC = () => {
                         </button>
                       </div>
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="flex flex-col items-center justify-center">
                         <div className="flex items-center mb-1 w-full max-w-[150px]">
-                          <span className={`mr-2 font-semibold ${
-                            parseFloat(row.amountRestaked) > 5 
-                              ? "text-red-600" 
-                              : parseFloat(row.amountRestaked) > 1
-                                ? "text-amber-600"
-                                : "text-green-600"
-                          }`}>
+                          <span
+                            className={`mr-2 font-semibold ${
+                              parseFloat(row.amountRestaked) > 5
+                                ? 'text-red-600'
+                                : parseFloat(row.amountRestaked) > 1
+                                  ? 'text-amber-600'
+                                  : 'text-green-600'
+                            }`}
+                          >
                             {row.amountRestaked}%
                           </span>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className={`${
                                 parseFloat(row.amountRestaked) > 5
-                                  ? "bg-red-500"
+                                  ? 'bg-red-500'
                                   : parseFloat(row.amountRestaked) > 1
-                                    ? "bg-amber-500"
-                                    : "bg-green-500"
+                                    ? 'bg-amber-500'
+                                    : 'bg-green-500'
                               } h-2 rounded-full transition-all`}
-                              style={{ width: `${Math.min(parseFloat(row.amountRestaked) * 5, 100)}%` }}
+                              style={{
+                                width: `${Math.min(parseFloat(row.amountRestaked) * 5, 100)}%`,
+                              }}
                             ></div>
                           </div>
                         </div>
@@ -395,27 +410,33 @@ const RestakerOverview: React.FC = () => {
                         {parseFloat(row.amountRestaked) >= 1 &&
                           parseFloat(row.amountRestaked) <= 5 && (
                             <Badge color="yellow" text="Medium" />
-                        )}
+                          )}
                       </div>
                     </TableCell>
-                    
+
                     <TableCell className="text-center font-medium">
                       {row.ethRestaked} ETH
                     </TableCell>
-                    
+
                     <TableCell className="text-center">
                       <div className="flex justify-center">
-                        <Badge 
-                          color={parseInt(row.numberOfStrategies.toString()) > 5 ? "green" : parseInt(row.numberOfStrategies.toString()) > 2 ? "blue" : "gray"} 
+                        <Badge
+                          color={
+                            parseInt(row.numberOfStrategies.toString()) > 5
+                              ? 'green'
+                              : parseInt(row.numberOfStrategies.toString()) > 2
+                                ? 'blue'
+                                : 'gray'
+                          }
                           text={row.numberOfStrategies.toString()}
                         />
                       </div>
                     </TableCell>
-                    
+
                     <TableCell className="text-center">
                       {row.mostUsedStrategies}
                     </TableCell>
-                    
+
                     <TableCell>
                       <Button
                         variant="ghost"
@@ -431,24 +452,62 @@ const RestakerOverview: React.FC = () => {
                       </Button>
                     </TableCell>
                   </TableRow>
-                  
+
                   {isExpanded && (
                     <TableRow className="bg-gray-50 border-t-0">
                       <TableCell colSpan={7} className="p-4">
                         <div className="text-sm">
-                          <h4 className="font-semibold mb-2 text-gray-700">Restaker Details</h4>
+                          <h4 className="font-semibold mb-2 text-gray-700">
+                            Restaker Details
+                          </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">Address Information</h5>
-                              <p><span className="text-gray-600">Full Address:</span> {row.restakerAddress}</p>
-                              <p><span className="text-gray-600">Market Share:</span> {row.amountRestaked}% of total restaked ETH</p>
-                              <p><span className="text-gray-600">ETH Restaked:</span> {row.ethRestaked}</p>
+                              <h5 className="font-medium text-gray-800 mb-2">
+                                Address Information
+                              </h5>
+                              <p>
+                                <span className="text-gray-600">
+                                  Full Address:
+                                </span>{' '}
+                                {row.restakerAddress}
+                              </p>
+                              <p>
+                                <span className="text-gray-600">
+                                  Market Share:
+                                </span>{' '}
+                                {row.amountRestaked}% of total restaked ETH
+                              </p>
+                              <p>
+                                <span className="text-gray-600">
+                                  ETH Restaked:
+                                </span>{' '}
+                                {row.ethRestaked}
+                              </p>
                             </div>
                             <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">Strategy Usage</h5>
-                              <p><span className="text-gray-600">Total Strategies:</span> {row.numberOfStrategies}</p>
-                              <p><span className="text-gray-600">Most Used Strategy:</span> {row.mostUsedStrategies}</p>
-                              <p><span className="text-gray-600">Address Type:</span> {parseFloat(row.amountRestaked) > 1 ? "Whale" : "Retail"}</p>
+                              <h5 className="font-medium text-gray-800 mb-2">
+                                Strategy Usage
+                              </h5>
+                              <p>
+                                <span className="text-gray-600">
+                                  Total Strategies:
+                                </span>{' '}
+                                {row.numberOfStrategies}
+                              </p>
+                              <p>
+                                <span className="text-gray-600">
+                                  Most Used Strategy:
+                                </span>{' '}
+                                {row.mostUsedStrategies}
+                              </p>
+                              <p>
+                                <span className="text-gray-600">
+                                  Address Type:
+                                </span>{' '}
+                                {parseFloat(row.amountRestaked) > 1
+                                  ? 'Whale'
+                                  : 'Retail'}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -462,7 +521,9 @@ const RestakerOverview: React.FC = () => {
             <TableRow>
               <TableCell colSpan={7} className="text-center py-8">
                 <div className="flex flex-col items-center">
-                  <p className="text-gray-500 mb-2">No restaker data available</p>
+                  <p className="text-gray-500 mb-2">
+                    No restaker data available
+                  </p>
                   <Button
                     variant="outline"
                     size="sm"
@@ -503,16 +564,28 @@ const RestakerOverview: React.FC = () => {
         {stakerData && stakerData.length > 0 && (
           <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
             <p className="text-red-700 font-medium">
-              Top 20 whale addresses control {stakerData
+              Top 20 whale addresses control{' '}
+              {stakerData
                 .slice(0, 20)
-                .reduce((sum: number, staker) => sum + parseFloat(staker.amountRestaked), 0)
-                .toFixed(1)}% of all restaked assets
+                .reduce(
+                  (sum: number, staker) =>
+                    sum + parseFloat(staker.amountRestaked),
+                  0,
+                )
+                .toFixed(1)}
+              % of all restaked assets
             </p>
             <p className="text-sm text-red-600 mt-1">
-              The largest restaker alone holds {stakerData[0]?.amountRestaked}% of the network, creating significant centralization risk
+              The largest restaker alone holds {stakerData[0]?.amountRestaked}%
+              of the network, creating significant centralization risk
             </p>
             <p className="text-sm text-red-600 mt-1">
-              {stakerData.filter(staker => parseFloat(staker.amountRestaked) > 1).length} individual addresses control more than 1% of restaked assets each
+              {
+                stakerData.filter(
+                  (staker) => parseFloat(staker.amountRestaked) > 1,
+                ).length
+              }{' '}
+              individual addresses control more than 1% of restaked assets each
             </p>
           </div>
         )}
@@ -558,6 +631,6 @@ const RestakerOverview: React.FC = () => {
       </div>
     </div>
   );
-}
+};
 
 export default RestakerOverview;

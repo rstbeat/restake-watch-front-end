@@ -101,8 +101,12 @@ const OperatorOverview: React.FC = () => {
   const [itemsPerPage] = useState(50);
   const [selectedProfessionalOperators, setSelectedProfessionalOperators] =
     useState<string[]>([]);
-  const [expandedRows, setExpandedRows] = useState<{[key: string]: boolean}>({});
-  const [filteredMarketShare, setFilteredMarketShare] = useState<number | null>(null);
+  const [expandedRows, setExpandedRows] = useState<{ [key: string]: boolean }>(
+    {},
+  );
+  const [filteredMarketShare, setFilteredMarketShare] = useState<number | null>(
+    null,
+  );
 
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
@@ -150,53 +154,63 @@ const OperatorOverview: React.FC = () => {
     return Array.from(operatorsSet);
   }, [operatorData]);
 
-  const getOperatorGroupColor = useCallback((operatorGroup: string | null): string => {
-    if (!operatorGroup) return '';
-    
-    const colorMap: {[key: string]: string} = {
-      'P2P': 'purple',
-      'Node Monster': 'green',
-      'Figment': 'blue',
-      'Stakefish': 'orange',
-      // Add more mappings as needed
-    };
-    
-    // For any group not in the mapping, return a default color
-    for (const [group, color] of Object.entries(colorMap)) {
-      if (operatorGroup.toLowerCase().includes(group.toLowerCase())) {
-        return color;
+  const getOperatorGroupColor = useCallback(
+    (operatorGroup: string | null): string => {
+      if (!operatorGroup) return '';
+
+      const colorMap: { [key: string]: string } = {
+        P2P: 'purple',
+        'Node Monster': 'green',
+        Figment: 'blue',
+        Stakefish: 'orange',
+        // Add more mappings as needed
+      };
+
+      // For any group not in the mapping, return a default color
+      for (const [group, color] of Object.entries(colorMap)) {
+        if (operatorGroup.toLowerCase().includes(group.toLowerCase())) {
+          return color;
+        }
       }
-    }
-    
-    return 'gray';
-  }, []);
+
+      return 'gray';
+    },
+    [],
+  );
 
   const toggleRowExpansion = (address: string) => {
-    setExpandedRows(prev => ({
+    setExpandedRows((prev) => ({
       ...prev,
-      [address]: !prev[address]
+      [address]: !prev[address],
     }));
   };
 
   const exportToCsv = () => {
     if (!operatorData) return;
-    
+
     // Define CSV headers and create CSV content
-    const headers = ["Name", "Address", "Market Share", "ETH Restaked", "DVT", "Professional Operator"];
+    const headers = [
+      'Name',
+      'Address',
+      'Market Share',
+      'ETH Restaked',
+      'DVT',
+      'Professional Operator',
+    ];
     const csvContent = [
       headers.join(','),
-      ...operatorData.map(row => 
+      ...operatorData.map((row) =>
         [
           `"${row.operatorName}"`,
           `"${row.operatorAddress}"`,
           `${row.marketShared}%`,
           row.ethRestaked,
           `"${row.dvtTechnology}"`,
-          `"${row.majorOperator || 'Independent'}"`
-        ].join(',')
-      )
+          `"${row.majorOperator || 'Independent'}"`,
+        ].join(','),
+      ),
     ].join('\n');
-    
+
     // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -228,15 +242,23 @@ const OperatorOverview: React.FC = () => {
             selectedProfessionalOperators.includes(operator.majorOperator));
 
         const matchesDVT = !showOnlyDVT || operator.dvtTechnology !== 'None';
-        
+
         // Add market share filter
-        const matchesMarketShare = 
-          filteredMarketShare === null || 
-          (filteredMarketShare === 5 && parseFloat(operator.marketShared) > 5) ||
-          (filteredMarketShare === 1 && parseFloat(operator.marketShared) >= 1 && parseFloat(operator.marketShared) <= 5) ||
+        const matchesMarketShare =
+          filteredMarketShare === null ||
+          (filteredMarketShare === 5 &&
+            parseFloat(operator.marketShared) > 5) ||
+          (filteredMarketShare === 1 &&
+            parseFloat(operator.marketShared) >= 1 &&
+            parseFloat(operator.marketShared) <= 5) ||
           (filteredMarketShare === 0 && parseFloat(operator.marketShared) < 1);
 
-        return matchesSearchTerm && matchesProfessionalOperator && matchesDVT && matchesMarketShare;
+        return (
+          matchesSearchTerm &&
+          matchesProfessionalOperator &&
+          matchesDVT &&
+          matchesMarketShare
+        );
       })
       .sort((a, b) => {
         const aValue = a[sortColumn];
@@ -263,7 +285,12 @@ const OperatorOverview: React.FC = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [showOnlyDVT, searchTerm, selectedProfessionalOperators, filteredMarketShare]);
+  }, [
+    showOnlyDVT,
+    searchTerm,
+    selectedProfessionalOperators,
+    filteredMarketShare,
+  ]);
 
   const totalPages = useMemo(() => {
     if (!filteredAndSortedData) return 0;
@@ -312,12 +339,12 @@ const OperatorOverview: React.FC = () => {
           className="pl-8"
         />
       </div>
-      
+
       <div className="flex flex-wrap gap-3 mb-4">
         <div className="flex items-center">
           <h4 className="text-sm font-semibold mr-2">Market Share:</h4>
           <Button
-            variant={filteredMarketShare === null ? "default" : "outline"}
+            variant={filteredMarketShare === null ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilteredMarketShare(null)}
             className="text-xs"
@@ -328,7 +355,7 @@ const OperatorOverview: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => setFilteredMarketShare(5)}
-            className={`text-xs ${filteredMarketShare === 5 ? "bg-red-100 border-red-300 hover:bg-red-200" : ""}`}
+            className={`text-xs ${filteredMarketShare === 5 ? 'bg-red-100 border-red-300 hover:bg-red-200' : ''}`}
           >
             High Share (&gt;5%)
           </Button>
@@ -336,7 +363,7 @@ const OperatorOverview: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => setFilteredMarketShare(1)}
-            className={`text-xs ${filteredMarketShare === 1 ? "bg-yellow-100 border-yellow-300 hover:bg-yellow-200" : ""}`}
+            className={`text-xs ${filteredMarketShare === 1 ? 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200' : ''}`}
           >
             Medium Share (1-5%)
           </Button>
@@ -344,12 +371,12 @@ const OperatorOverview: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => setFilteredMarketShare(0)}
-            className={`text-xs ${filteredMarketShare === 0 ? "bg-green-100 border-green-300 hover:bg-green-200" : ""}`}
+            className={`text-xs ${filteredMarketShare === 0 ? 'bg-green-100 border-green-300 hover:bg-green-200' : ''}`}
           >
             Low Share (&lt;1%)
           </Button>
         </div>
-        
+
         <div className="flex items-center space-x-2 ml-auto">
           <Checkbox
             id="show-only-dvt"
@@ -364,7 +391,7 @@ const OperatorOverview: React.FC = () => {
           </label>
         </div>
       </div>
-      
+
       <div className="flex items-center justify-between">
         <div className="flex flex-wrap items-center gap-2">
           <label className="text-sm font-medium">Professional Operator:</label>
@@ -397,7 +424,7 @@ const OperatorOverview: React.FC = () => {
             </Button>
           )}
         </div>
-        
+
         <Button
           variant="outline"
           size="sm"
@@ -479,9 +506,11 @@ const OperatorOverview: React.FC = () => {
             </TableRow>
           ) : paginatedData && paginatedData.length > 0 ? (
             paginatedData.map((row, index) => {
-              const operatorGroupColor = getOperatorGroupColor(row.majorOperator);
+              const operatorGroupColor = getOperatorGroupColor(
+                row.majorOperator,
+              );
               const isExpanded = expandedRows[row.operatorAddress] || false;
-              
+
               return (
                 <React.Fragment key={row.operatorAddress || index}>
                   <TableRow
@@ -493,11 +522,11 @@ const OperatorOverview: React.FC = () => {
                     <TableCell className="font-semibold text-center">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </TableCell>
-                    
+
                     <TableCell className="font-medium">
                       {row.operatorName}
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="flex items-center justify-center">
                         <div className="font-mono text-sm px-3 py-1.5 bg-gray-100 rounded-l-md border border-r-0 border-gray-200 max-w-[180px] truncate">
@@ -506,11 +535,15 @@ const OperatorOverview: React.FC = () => {
                         <button
                           onClick={() => copyToClipboard(row.operatorAddress)}
                           className={`p-2 border border-gray-200 rounded-r-md transition-colors ${
-                            copiedAddress === row.operatorAddress 
-                              ? 'bg-green-100 text-green-700 border-green-300' 
+                            copiedAddress === row.operatorAddress
+                              ? 'bg-green-100 text-green-700 border-green-300'
                               : 'bg-gray-50 hover:bg-gray-100'
                           }`}
-                          title={copiedAddress === row.operatorAddress ? 'Copied!' : 'Copy full address'}
+                          title={
+                            copiedAddress === row.operatorAddress
+                              ? 'Copied!'
+                              : 'Copy full address'
+                          }
                         >
                           {copiedAddress === row.operatorAddress ? (
                             <Check className="h-4 w-4" />
@@ -520,29 +553,33 @@ const OperatorOverview: React.FC = () => {
                         </button>
                       </div>
                     </TableCell>
-                    
+
                     <TableCell>
                       <div className="flex flex-col items-center justify-center">
                         <div className="flex items-center mb-1 w-full max-w-[150px]">
-                          <span className={`mr-2 font-semibold ${
-                            parseFloat(row.marketShared) > 5 
-                              ? "text-red-600" 
-                              : parseFloat(row.marketShared) > 1
-                                ? "text-amber-600"
-                                : "text-green-600"
-                          }`}>
+                          <span
+                            className={`mr-2 font-semibold ${
+                              parseFloat(row.marketShared) > 5
+                                ? 'text-red-600'
+                                : parseFloat(row.marketShared) > 1
+                                  ? 'text-amber-600'
+                                  : 'text-green-600'
+                            }`}
+                          >
                             {row.marketShared}%
                           </span>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className={`${
                                 parseFloat(row.marketShared) > 5
-                                  ? "bg-red-500"
+                                  ? 'bg-red-500'
                                   : parseFloat(row.marketShared) > 1
-                                    ? "bg-amber-500"
-                                    : "bg-green-500"
+                                    ? 'bg-amber-500'
+                                    : 'bg-green-500'
                               } h-2 rounded-full transition-all`}
-                              style={{ width: `${Math.min(parseFloat(row.marketShared) * 5, 100)}%` }}
+                              style={{
+                                width: `${Math.min(parseFloat(row.marketShared) * 5, 100)}%`,
+                              }}
                             ></div>
                           </div>
                         </div>
@@ -552,14 +589,14 @@ const OperatorOverview: React.FC = () => {
                         {parseFloat(row.marketShared) >= 1 &&
                           parseFloat(row.marketShared) <= 5 && (
                             <Badge color="yellow" text="Medium" />
-                        )}
+                          )}
                       </div>
                     </TableCell>
-                    
+
                     <TableCell className="text-center font-medium">
                       {row.ethRestaked} ETH
                     </TableCell>
-                    
+
                     <TableCell className="text-center">
                       {row.dvtTechnology !== 'None' ? (
                         <Badge color="green" text={row.dvtTechnology} />
@@ -567,7 +604,7 @@ const OperatorOverview: React.FC = () => {
                         <Badge color="gray" text="None" />
                       )}
                     </TableCell>
-                    
+
                     <TableCell className="text-center">
                       {row.majorOperator ? (
                         <Badge color="blue" text={row.majorOperator} />
@@ -575,7 +612,7 @@ const OperatorOverview: React.FC = () => {
                         <Badge color="gray" text="Independent" />
                       )}
                     </TableCell>
-                    
+
                     <TableCell>
                       <Button
                         variant="ghost"
@@ -591,32 +628,70 @@ const OperatorOverview: React.FC = () => {
                       </Button>
                     </TableCell>
                   </TableRow>
-                  
+
                   {isExpanded && (
                     <TableRow className="bg-gray-50 border-t-0">
                       <TableCell colSpan={8} className="p-4">
                         <div className="text-sm">
-                          <h4 className="font-semibold mb-2 text-gray-700">Additional Information</h4>
+                          <h4 className="font-semibold mb-2 text-gray-700">
+                            Additional Information
+                          </h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">Operator Details</h5>
-                              <p><span className="text-gray-600">Full Address:</span> {row.operatorAddress}</p>
-                              <p><span className="text-gray-600">Market Share:</span> {row.marketShared}% of total restaked ETH</p>
-                              <p><span className="text-gray-600">ETH Restaked:</span> {row.ethRestaked}</p>
+                              <h5 className="font-medium text-gray-800 mb-2">
+                                Operator Details
+                              </h5>
+                              <p>
+                                <span className="text-gray-600">
+                                  Full Address:
+                                </span>{' '}
+                                {row.operatorAddress}
+                              </p>
+                              <p>
+                                <span className="text-gray-600">
+                                  Market Share:
+                                </span>{' '}
+                                {row.marketShared}% of total restaked ETH
+                              </p>
+                              <p>
+                                <span className="text-gray-600">
+                                  ETH Restaked:
+                                </span>{' '}
+                                {row.ethRestaked}
+                              </p>
                             </div>
                             <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">Most Used Strategies</h5>
-                              {row.mostUsedStrategies && row.mostUsedStrategies.length > 0 ? (
+                              <h5 className="font-medium text-gray-800 mb-2">
+                                Most Used Strategies
+                              </h5>
+                              {row.mostUsedStrategies &&
+                              row.mostUsedStrategies.length > 0 ? (
                                 <div className="space-y-2">
-                                  {row.mostUsedStrategies.slice(0, 3).map((strategy: any, idx: number) => (
-                                    <div key={idx} className="flex justify-between items-center p-1 border-b border-gray-100">
-                                      <span>{strategy.name || 'Unknown Strategy'}</span>
-                                      <Badge color="blue" text={strategy.percentage ? `${strategy.percentage}%` : 'N/A'} />
-                                    </div>
-                                  ))}
+                                  {row.mostUsedStrategies
+                                    .slice(0, 3)
+                                    .map((strategy: any, idx: number) => (
+                                      <div
+                                        key={idx}
+                                        className="flex justify-between items-center p-1 border-b border-gray-100"
+                                      >
+                                        <span>
+                                          {strategy.name || 'Unknown Strategy'}
+                                        </span>
+                                        <Badge
+                                          color="blue"
+                                          text={
+                                            strategy.percentage
+                                              ? `${strategy.percentage}%`
+                                              : 'N/A'
+                                          }
+                                        />
+                                      </div>
+                                    ))}
                                 </div>
                               ) : (
-                                <p className="text-gray-500 italic">No strategy data available</p>
+                                <p className="text-gray-500 italic">
+                                  No strategy data available
+                                </p>
                               )}
                             </div>
                           </div>
@@ -631,7 +706,9 @@ const OperatorOverview: React.FC = () => {
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8">
                 <div className="flex flex-col items-center">
-                  <p className="text-gray-500 mb-2">No operator data available</p>
+                  <p className="text-gray-500 mb-2">
+                    No operator data available
+                  </p>
                   <Button
                     variant="outline"
                     size="sm"
@@ -674,17 +751,31 @@ const OperatorOverview: React.FC = () => {
         {operatorData && operatorData.length > 0 && (
           <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
             <p className="text-red-700 font-medium">
-              Top 5 operators control {operatorData
-                .sort((a, b) => parseFloat(b.marketShared) - parseFloat(a.marketShared))
+              Top 5 operators control{' '}
+              {operatorData
+                .sort(
+                  (a, b) =>
+                    parseFloat(b.marketShared) - parseFloat(a.marketShared),
+                )
                 .slice(0, 5)
-                .reduce((sum: number, op) => sum + parseFloat(op.marketShared), 0)
-                .toFixed(1)}% of all restaked assets
+                .reduce(
+                  (sum: number, op) => sum + parseFloat(op.marketShared),
+                  0,
+                )
+                .toFixed(1)}
+              % of all restaked assets
             </p>
             <p className="text-sm text-red-600 mt-1">
-              {operatorData.filter(op => parseFloat(op.marketShared) > 5).length} operators have more than 5% market share each, indicating significant concentration
+              {
+                operatorData.filter((op) => parseFloat(op.marketShared) > 5)
+                  .length
+              }{' '}
+              operators have more than 5% market share each, indicating
+              significant concentration
             </p>
             <p className="text-sm text-red-600 mt-1">
-              Professional operators like P2P and Node Monster manage multiple individual nodes, further increasing concentration risk
+              Professional operators like P2P and Node Monster manage multiple
+              individual nodes, further increasing concentration risk
             </p>
           </div>
         )}
