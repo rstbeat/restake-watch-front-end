@@ -47,7 +47,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {children}
       </div>
       <nav className="flex flex-col space-y-4 mt-8 p-4">
-        <Link href="/#publications">
+        <Link href="/publications">
           <Button
             variant="ghost"
             className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"

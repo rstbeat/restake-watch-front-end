@@ -205,7 +205,7 @@ const RestakeWatch: React.FC = () => {
                   <span>
                     New paper release:{' '}
                     <Link
-                      href="https://hackmd.io/@espejelomar/H14XiPt51g"
+                      href="/publications"
                       className="underline font-semibold hover:text-[#ab3bd2]"
                     >
                       Fortify or Falter: A Comprehensive Restaking Risk
@@ -277,7 +277,8 @@ const RestakeWatch: React.FC = () => {
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-md hover:from-purple-600 hover:to-purple-700 shadow-sm hover:shadow-md transition-all duration-200"
                     >
-                      <DollarSign className="mr-1.5 h-4 w-4" /> Funding & Insights
+                      <DollarSign className="mr-1.5 h-4 w-4" /> Funding &
+                      Insights
                     </a>
                     <Button
                       size="sm"
