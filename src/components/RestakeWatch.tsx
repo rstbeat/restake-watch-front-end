@@ -282,15 +282,15 @@ const RestakeWatch: React.FC = () => {
           </Select>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col md:ml-48">
+        <div className="flex-1 flex flex-col md:ml-48 w-full overflow-hidden">
           {showBanner && (
             <div className="bg-gradient-to-r from-purple-50/90 via-purple-100/90 to-indigo-50/90 backdrop-blur-lg text-gray-700 py-3 border-b border-purple-200/50 shadow-sm transition-all duration-300 ease-in-out z-20">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                <div className="flex items-center space-x-3">
-                  <div className="p-1.5 bg-white/80 backdrop-blur-sm rounded-full shadow-sm">
+                <div className="flex items-center space-x-3 overflow-x-auto whitespace-nowrap">
+                  <div className="p-1.5 bg-white/80 backdrop-blur-sm rounded-full shadow-sm flex-shrink-0">
                     <AlertTriangle className="h-4 w-4 text-[#ab3bd2]" />
                   </div>
-                  <span className="font-medium">
+                  <span className="font-medium text-sm sm:text-base">
                     New paper release:{' '}
                     <Link
                       href="/publications"
@@ -305,7 +305,7 @@ const RestakeWatch: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowBanner(false)}
-                  className="rounded-full h-7 w-7 p-0 text-gray-500 hover:text-[#ab3bd2] hover:bg-white/80 hover:backdrop-blur-sm transition-all duration-200"
+                  className="rounded-full h-7 w-7 p-0 text-gray-500 hover:text-[#ab3bd2] hover:bg-white/80 hover:backdrop-blur-sm transition-all duration-200 flex-shrink-0"
                 >
                   <X className="h-3.5 w-3.5" />
                 </Button>
@@ -329,7 +329,7 @@ const RestakeWatch: React.FC = () => {
                     <div>
                       <h1
                         className={`font-extrabold tracking-tight bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] bg-clip-text text-transparent drop-shadow-sm transition-all duration-300 ${
-                          scrolled ? 'text-2xl' : 'text-3xl sm:text-4xl mb-1'
+                          scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl md:text-4xl mb-1'
                         }`}
                       >
                         RestakeWatch
@@ -337,8 +337,8 @@ const RestakeWatch: React.FC = () => {
                       <p
                         className={`font-bold transition-all duration-300 ${
                           scrolled
-                            ? 'text-sm hidden md:block'
-                            : 'text-base sm:text-lg'
+                            ? 'text-xs sm:text-sm hidden md:block'
+                            : 'text-sm sm:text-base sm:text-lg'
                         }`}
                       >
                         The{' '}
@@ -442,13 +442,13 @@ const RestakeWatch: React.FC = () => {
                         href="https://signal.me/#eu/espejelomar.01"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white text-xs rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200"
+                        className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white text-xs rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200"
                       >
                         <DollarSign className="mr-1 h-3 w-3" /> Funding
                       </a>
                       <Button
                         size="sm"
-                        className="bg-[#ab3bd2] text-white hover:bg-[#922fb8] shadow-sm hover:shadow-md transition-all duration-200"
+                        className="p-1.5 h-auto bg-[#ab3bd2] text-white hover:bg-[#922fb8] shadow-sm hover:shadow-md transition-all duration-200"
                         onClick={() => setIsMobileSidebarOpen(true)}
                       >
                         <Menu className="h-4 w-4" />
@@ -460,18 +460,18 @@ const RestakeWatch: React.FC = () => {
             </div>
 
             {activePlatform === 'eigenlayer' && (
-              <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
+              <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm overflow-x-auto">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="flex items-center justify-between h-12">
-                    <div className="flex items-center space-x-2 text-sm">
-                      <span className="text-gray-600">
+                  <div className="flex items-center justify-between min-w-max">
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm py-3">
+                      <span className="text-gray-600 whitespace-nowrap">
                         Platform:{' '}
                         <span className="font-medium text-[#ab3bd2]">
                           EigenLayer
                         </span>
                       </span>
                       <span className="text-gray-400">|</span>
-                      <div className="flex items-center">
+                      <div className="flex items-center whitespace-nowrap">
                         <span className="text-gray-600 mr-1">
                           Last updated:
                         </span>
@@ -526,6 +526,51 @@ const RestakeWatch: React.FC = () => {
                       >
                         Strategies
                       </button>
+                    </div>
+                    
+                    <div className="md:hidden flex overflow-x-auto pb-1 pt-1">
+                      <div className="flex space-x-3 px-1">
+                        <button
+                          onClick={() => setActiveTab('overview')}
+                          className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
+                            activeTab === 'overview'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          Overview
+                        </button>
+                        <button
+                          onClick={() => setActiveTab('operators')}
+                          className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
+                            activeTab === 'operators'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          Operators
+                        </button>
+                        <button
+                          onClick={() => setActiveTab('restakers')}
+                          className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
+                            activeTab === 'restakers'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          Restakers
+                        </button>
+                        <button
+                          onClick={() => setActiveTab('strategies')}
+                          className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
+                            activeTab === 'strategies'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          Strategies
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

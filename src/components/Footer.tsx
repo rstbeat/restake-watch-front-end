@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-center sm:text-left order-2 sm:order-1 flex flex-wrap items-center justify-center sm:justify-start gap-1">
+            <p className="text-center sm:text-left order-2 sm:order-1 flex flex-wrap items-center justify-center sm:justify-start gap-1 text-sm sm:text-base w-full">
               <span>Made with un chingo de</span>
               <span
                 role="img"
@@ -21,12 +21,12 @@ const Footer: React.FC = () => {
               <span role="img" aria-label="taco and sparkles" className="mx-1">
                 🌮✨
               </span>
-              <span className="italic text-gray-600">
+              <span className="italic text-gray-600 block w-full sm:inline sm:w-auto text-xs sm:text-sm mt-1 sm:mt-0">
                 (where the code is as hot as the salsa)
               </span>
             </p>
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 order-1 sm:order-2">
-              <div className="text-sm rounded-md py-2 px-4 bg-purple-100 text-gray-700 shadow-sm hover:shadow transition-shadow duration-300">
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 order-1 sm:order-2 w-full sm:w-auto">
+              <div className="text-xs sm:text-sm rounded-md py-2 px-3 sm:px-4 bg-purple-100 text-gray-700 shadow-sm hover:shadow transition-shadow duration-300 w-full sm:w-auto text-center">
                 For funding or to share valuable info:{' '}
                 <a
                   href="https://signal.me/#eu/espejelomar.01"
@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
                   Signal
                 </a>
               </div>
-              <div className="flex space-x-4">
+              <div className="flex space-x-4 justify-center">
                 <a
                   href="https://twitter.com/therestakewatch"
                   target="_blank"
@@ -60,18 +60,17 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-col space-y-3 text-sm text-center">
-            <p className="italic text-gray-500 flex items-center justify-center gap-2">
+          <div className="flex flex-col space-y-3 text-xs sm:text-sm text-center">
+            <p className="italic text-gray-500 flex flex-wrap items-center justify-center gap-2">
               <Coffee size={16} className="text-brown-600" />
-              Powered by excessive coffee and genuine love for decentralized
-              Ethereum
+              <span>Powered by excessive coffee and genuine love for decentralized Ethereum</span>
               <Heart size={16} className="text-red-500" />
             </p>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 px-2">
               Yes, we shamelessly borrowed the color palette from L2Beat. Those
               folks are absolute legends! 🙌
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1 px-2">
               Committed to making the restaking ecosystem as secure and
               transparent as possible.
             </p>
