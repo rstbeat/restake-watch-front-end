@@ -6,6 +6,7 @@ import {
   Coffee,
   Phone,
   ExternalLink,
+  FileText,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,6 +41,26 @@ const FeatureItem: React.FC<{
       <h3 className="text-md font-semibold text-[#1a202c]">{title}</h3>
       <p className="text-sm text-gray-600">{description}</p>
     </div>
+  </div>
+);
+
+// Publications component
+const PublicationItem: React.FC<{
+  title: string;
+  authors: string;
+  date: string;
+  url: string;
+}> = ({ title, authors, date, url }) => (
+  <div className="p-3 border border-purple-100 rounded-md hover:bg-purple-50 transition-colors">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+      <h4 className="text-md font-semibold text-[#1a202c] flex items-center">
+        {title}
+        <ExternalLink className="ml-2 h-3 w-3 text-gray-400" />
+      </h4>
+      <p className="text-xs text-gray-500 mt-1">
+        {authors} • {date}
+      </p>
+    </a>
   </div>
 );
 
@@ -103,6 +124,38 @@ const About: React.FC = () => {
           the broader ecosystem, providing critical insights needed to navigate
           the evolving world of restaking.
         </p>
+
+        {/* Team Publications Section */}
+        <div id="publications" className="mt-6">
+          <h3 className="text-lg font-semibold text-[#1a202c] mb-3 flex items-center">
+            <StyledIcon
+              icon={<FileText className="h-3 w-3" />}
+              gradientColors={['#3b82f6', '#06b6d4']}
+              size="h-7 w-7"
+            />
+            <span className="ml-2">Team Publications</span>
+          </h3>
+          <div className="space-y-3">
+            <PublicationItem
+              title="Fortify or Falter: A Comprehensive Restaking Risk Assessment"
+              authors="Omar Espejel"
+              date="February 2025"
+              url="https://hackmd.io/@espejelomar/H14XiPt51g"
+            />
+            <PublicationItem
+              title="Mirroring Risks: Lessons from Mainstream Finance in the Restaking Framework"
+              authors="Fabricio Mendoza, Omar Espejel"
+              date="November 2024"
+              url="https://drive.proton.me/urls/58SJCC8N3C#luXJeS5zVfAM"
+            />
+            <PublicationItem
+              title="A Hitchhiker's Guide to Restaking and Its Risks"
+              authors="Omar Espejel"
+              date="July 2024"
+              url="https://hackmd.io/@espejelomar/BkgcuG4MR"
+            />
+          </div>
+        </div>
 
         {/* New CTA Section */}
         <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-100">

@@ -14,14 +14,16 @@ const Footer: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 order-1 sm:order-2">
             <div className="text-sm rounded-md py-1 px-3 bg-purple-100 text-gray-700">
-              For funding or to share valuable info: <a
+              For funding or to share valuable info:{' '}
+              <a
                 href="https://signal.me/#eu/espejelomar.01"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-[#ab3bd2] hover:underline"
               >
                 espejelomar.01
-              </a> on Signal
+              </a>{' '}
+              on Signal
             </div>
             <div className="flex space-x-4">
               <a

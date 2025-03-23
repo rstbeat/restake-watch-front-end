@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Heart, X } from 'lucide-react';
+import { BookOpen, Heart, X, FileText } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -47,6 +47,18 @@ const Sidebar: React.FC<SidebarProps> = ({
         {children}
       </div>
       <nav className="flex flex-col space-y-4 mt-8 p-4">
+        <Link href="/#publications">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
+          >
+            <SmallStyledIcon
+              icon={<FileText className="h-2 w-2" />}
+              gradientColors={['#3b82f6', '#06b6d4']}
+            />
+            <span className="ml-2">Publications</span>
+          </Button>
+        </Link>
         <Link
           href="https://hackmd.io/@espejelomar/H14XiPt51g"
           target="_blank"
