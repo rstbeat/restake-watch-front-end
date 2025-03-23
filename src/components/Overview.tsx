@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Treemap,
   ResponsiveContainer,
@@ -44,7 +44,11 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '../components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
-import { fetchOperatorData, fetchETHPrice } from '../app/api/restake/restake';
+import {
+  fetchOperatorData,
+  fetchETHPrice,
+  fetchEthereumStats,
+} from '../app/api/restake/restake';
 
 interface OverviewProps {
   restakeData: any | null;
@@ -760,6 +764,10 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
   operatorData,
 }) => {
   const [ethPrice, setEthPrice] = useState<number>(0);
+  const [ethereumStats, setEthereumStats] = useState<{
+    totalEthSupply: number;
+    totalStEthSupply: number;
+  } | null>(null);
 
   // Format values for display
   const totalETHValue = operatorData?.totalETHRestaked || 0;
@@ -795,6 +803,45 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
     const interval = setInterval(getEthPrice, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Fetch Ethereum stats
+  useEffect(() => {
+    const getEthereumStats = async () => {
+      try {
+        const stats = await fetchEthereumStats();
+        setEthereumStats(stats);
+      } catch (error) {
+        console.error('Error fetching Ethereum stats:', error);
+      }
+    };
+
+    getEthereumStats();
+  }, []);
+
+  // Calculate restaked percentages if stats are available
+  const restakePercents = useMemo(() => {
+    if (!ethereumStats || !operatorData) return null;
+
+    // Get BeaconChain ETH and Lido from strategies
+    const beaconChainETH =
+      operatorData.totalRestakedAssetsPerStrategy?.['BeaconChain_ETH'] || 0;
+    const lidoETH = operatorData.totalRestakedAssetsPerStrategy?.['Lido'] || 0;
+
+    return {
+      ethPercent: (
+        (beaconChainETH / ethereumStats.totalEthSupply) *
+        100
+      ).toFixed(2),
+      stethPercent: ((lidoETH / ethereumStats.totalStEthSupply) * 100).toFixed(
+        2,
+      ),
+      combinedPercent: (
+        ((beaconChainETH + lidoETH) /
+          (ethereumStats.totalEthSupply + ethereumStats.totalStEthSupply)) *
+        100
+      ).toFixed(2),
+    };
+  }, [ethereumStats, operatorData]);
 
   // Get concentration data
   const operatorTopCount =
@@ -877,7 +924,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   size="h-9 w-9"
                 />
               }
-              description="ETH value of all restaked assets (includes Beacon Chain ETH, stETH, PEPE, EIGEN, etc.)"
+              description="ETH value of all restaked assets (includes Beacon Chain ETH, stETH, EIGEN, etc.)"
             />
             <MetricSummaryCard
               title="Active Operators"
@@ -905,188 +952,684 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
             />
           </div>
 
+          {/* Second row of metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <MetricSummaryCard
+              title="Top 5 Operators Control"
+              value={(() => {
+                // Fetch the raw data from the API response directly
+                if (!operatorData) return 'N/A';
+
+                // If we can access the raw operator data from the API response
+                const rawOperators = (operatorData as any).operatorData;
+                if (!rawOperators || !Array.isArray(rawOperators)) {
+                  // Fallback to estimate based on concentration metrics if raw data not available
+                  if (operatorData.concentrationMetrics?.top33PercentCount) {
+                    const topCount =
+                      operatorData.concentrationMetrics.top33PercentCount;
+                    return `~${topCount <= 5 ? 33 : Math.round((33 * 5) / topCount)}%`;
+                  }
+                  return 'N/A';
+                }
+
+                // Exactly match the calculation in OperatorOverview.tsx
+                return (
+                  rawOperators
+                    .sort(
+                      (a, b) =>
+                        (b['Market Share'] || 0) - (a['Market Share'] || 0),
+                    )
+                    .slice(0, 5)
+                    .reduce(
+                      (sum, op) => sum + (op['Market Share'] || 0) * 100,
+                      0,
+                    )
+                    .toFixed(1) + '%'
+                );
+              })()}
+              icon={
+                <StyledIcon
+                  icon={<ServerCog className="h-4 w-4" />}
+                  gradientColors={['#ef4444', '#f97316']}
+                  size="h-9 w-9"
+                />
+              }
+              description={(() => {
+                if (!operatorData?.totalETHRestaked)
+                  return 'Percentage of all restaked ETH controlled by the top 5 operators';
+
+                // Calculate percentage using the appropriate method
+                let percentage = 0;
+                const rawOperators = (operatorData as any).operatorData;
+
+                if (rawOperators && Array.isArray(rawOperators)) {
+                  // If we have raw data, calculate exactly
+                  percentage = rawOperators
+                    .sort(
+                      (a, b) =>
+                        (b['Market Share'] || 0) - (a['Market Share'] || 0),
+                    )
+                    .slice(0, 5)
+                    .reduce(
+                      (sum, op) => sum + (op['Market Share'] || 0) * 100,
+                      0,
+                    );
+                } else if (
+                  operatorData.concentrationMetrics?.top33PercentCount
+                ) {
+                  // Fallback to estimate
+                  const topCount =
+                    operatorData.concentrationMetrics.top33PercentCount;
+                  percentage =
+                    topCount <= 5 ? 33 : Math.round((33 * 5) / topCount);
+                }
+
+                // Calculate ETH value
+                const ethValue =
+                  (operatorData.totalETHRestaked * percentage) / 100;
+                const formattedETH = new Intl.NumberFormat('en-US').format(
+                  Math.round(ethValue),
+                );
+
+                // Calculate USD value if ETH price is available
+                const usdValue = ethPrice > 0 ? ethValue * ethPrice : 0;
+                const formattedUSD =
+                  usdValue > 0
+                    ? new Intl.NumberFormat('en-US').format(
+                        Math.round(usdValue),
+                      )
+                    : '';
+
+                return `${formattedETH} ETH${formattedUSD ? ` ($${formattedUSD})` : ''} controlled by the top 5 operators`;
+              })()}
+            />
+            <MetricSummaryCard
+              title="Top 20 Restakers Control"
+              value={(() => {
+                if (!restakeData?.stakerData) return 'N/A';
+
+                const percentage =
+                  restakeData.stakerData
+                    .slice(0, 20)
+                    .reduce(
+                      (sum, staker) => sum + (staker['Market Share'] || 0),
+                      0,
+                    ) * 100;
+
+                return `${percentage.toFixed(1)}%`;
+              })()}
+              icon={
+                <StyledIcon
+                  icon={<Wallet className="h-4 w-4" />}
+                  gradientColors={['#ef4444', '#f97316']}
+                  size="h-9 w-9"
+                />
+              }
+              description={(() => {
+                if (!restakeData?.stakerData || !operatorData?.totalETHRestaked)
+                  return 'Percentage of all restaked ETH controlled by the top 20 restaker wallets';
+
+                const percentage =
+                  restakeData.stakerData
+                    .slice(0, 20)
+                    .reduce(
+                      (sum, staker) => sum + (staker['Market Share'] || 0),
+                      0,
+                    ) * 100;
+
+                // Calculate ETH value
+                const ethValue =
+                  (operatorData.totalETHRestaked * percentage) / 100;
+                const formattedETH = new Intl.NumberFormat('en-US').format(
+                  Math.round(ethValue),
+                );
+
+                // Calculate USD value if ETH price is available
+                const usdValue = ethPrice > 0 ? ethValue * ethPrice : 0;
+                const formattedUSD =
+                  usdValue > 0
+                    ? new Intl.NumberFormat('en-US').format(
+                        Math.round(usdValue),
+                      )
+                    : '';
+
+                return `${formattedETH} ETH${formattedUSD ? ` ($${formattedUSD})` : ''} controlled by the top 20 wallets`;
+              })()}
+            />
+            <MetricSummaryCard
+              title="Strategy Count"
+              value={
+                operatorData?.totalRestakedAssetsPerStrategy
+                  ? Object.keys(
+                      operatorData.totalRestakedAssetsPerStrategy,
+                    ).filter(
+                      (key) =>
+                        operatorData.totalRestakedAssetsPerStrategy[key] > 0,
+                    ).length
+                  : 'N/A'
+              }
+              icon={
+                <StyledIcon
+                  icon={<DollarSign className="h-4 w-4" />}
+                  gradientColors={['#8b5cf6', '#d946ef']}
+                  size="h-9 w-9"
+                />
+              }
+              description="Number of active strategies in the EigenLayer ecosystem"
+            />
+          </div>
+
+          {/* Third row of metrics - Ethereum ecosystem stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <MetricSummaryCard
+              title="ETH Restaked vs. Total Supply"
+              value={
+                restakePercents
+                  ? `${restakePercents.ethPercent}%`
+                  : 'Loading...'
+              }
+              icon={
+                <StyledIcon
+                  icon={<Network className="h-4 w-4" />}
+                  gradientColors={['#10b981', '#3b82f6']}
+                  size="h-9 w-9"
+                />
+              }
+              description={`${
+                operatorData?.totalRestakedAssetsPerStrategy?.[
+                  'BeaconChain_ETH'
+                ]
+                  ? new Intl.NumberFormat('en-US').format(
+                      Math.round(
+                        operatorData.totalRestakedAssetsPerStrategy[
+                          'BeaconChain_ETH'
+                        ],
+                      ),
+                    )
+                  : '?'
+              } 
+                ETH restaked out of ${
+                  ethereumStats?.totalEthSupply
+                    ? new Intl.NumberFormat('en-US').format(
+                        Math.round(ethereumStats.totalEthSupply),
+                      )
+                    : '?'
+                } 
+                total ETH in circulation`}
+            />
+            <MetricSummaryCard
+              title="stETH Restaked vs. Total Supply"
+              value={
+                restakePercents
+                  ? `${restakePercents.stethPercent}%`
+                  : 'Loading...'
+              }
+              icon={
+                <StyledIcon
+                  icon={<Wallet className="h-4 w-4" />}
+                  gradientColors={['#3b82f6', '#06b6d4']}
+                  size="h-9 w-9"
+                />
+              }
+              description={`${
+                operatorData?.totalRestakedAssetsPerStrategy?.['Lido']
+                  ? new Intl.NumberFormat('en-US').format(
+                      Math.round(
+                        operatorData.totalRestakedAssetsPerStrategy['Lido'],
+                      ),
+                    )
+                  : '?'
+              } 
+                stETH restaked out of ${
+                  ethereumStats?.totalStEthSupply
+                    ? new Intl.NumberFormat('en-US').format(
+                        Math.round(ethereumStats.totalStEthSupply),
+                      )
+                    : '?'
+                } 
+                total stETH in circulation`}
+            />
+            <MetricSummaryCard
+              title="Combined Ecosystem Impact"
+              value={
+                restakePercents
+                  ? `${restakePercents.combinedPercent}%`
+                  : 'Loading...'
+              }
+              icon={
+                <StyledIcon
+                  icon={<ServerCog className="h-4 w-4" />}
+                  gradientColors={['#8b5cf6', '#3b82f6']}
+                  size="h-9 w-9"
+                />
+              }
+              description={`Percentage of combined ETH and stETH in circulation restaked in EigenLayer (${operatorData?.totalETHRestaked ? formattedETH : '?'} out of ${
+                ethereumStats
+                  ? new Intl.NumberFormat('en-US').format(
+                      Math.round(
+                        ethereumStats.totalEthSupply +
+                          ethereumStats.totalStEthSupply,
+                      ),
+                    )
+                  : '?'
+              } total)`}
+            />
+          </div>
+
           {/* Critical Risk Metrics Alert */}
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-            <h3 className="text-base font-bold text-red-800 mb-3 flex items-center">
-              <SmallStyledIcon
-                icon={<AlertCircle className="h-3 w-3" />}
-                gradientColors={['#ef4444', '#f97316']}
-              />
-              <span className="ml-2">Critical Risk Metrics</span>
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-start">
-                <div className="shrink-0 mr-2">
-                  <SmallStyledIcon
-                    icon={<AlertCircle className="h-3 w-3" />}
-                    gradientColors={['#ef4444', '#f97316']}
-                  />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Left column - Risk Alert */}
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+              <h3 className="text-base font-bold text-red-800 mb-3 flex items-center">
+                <SmallStyledIcon
+                  icon={<AlertCircle className="h-3 w-3" />}
+                  gradientColors={['#ef4444', '#f97316']}
+                />
+                <span className="ml-2">Critical Risk Metrics</span>
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <div className="shrink-0 mr-2">
+                    <SmallStyledIcon
+                      icon={<AlertCircle className="h-3 w-3" />}
+                      gradientColors={['#ef4444', '#f97316']}
+                    />
+                  </div>
+                  <p className="text-sm text-red-800">
+                    <span className="font-bold">Governance Risk:</span>{' '}
+                    EigenLayer relies on a 9-of-13 community multisig that can
+                    execute IMMEDIATE upgrades without a timelock.
+                  </p>
                 </div>
-                <p className="text-sm text-red-800">
-                  <span className="font-bold">Governance Risk:</span> EigenLayer
-                  relies on a 9-of-13 community multisig that can execute
-                  IMMEDIATE upgrades without a timelock.
-                </p>
+                <div className="flex items-start">
+                  <div className="shrink-0 mr-2">
+                    <SmallStyledIcon
+                      icon={<AlertCircle className="h-3 w-3" />}
+                      gradientColors={['#ef4444', '#f97316']}
+                    />
+                  </div>
+                  <p className="text-sm text-red-800">
+                    <span className="font-bold">Operator Concentration:</span>{' '}
+                    Just {operatorTopCount} operators control 33% of restaked
+                    ETH. Their compromise or collusion could trigger a cascading
+                    effect.
+                  </p>
+                </div>
+                <div className="flex items-start">
+                  <div className="shrink-0 mr-2">
+                    <SmallStyledIcon
+                      icon={<AlertCircle className="h-3 w-3" />}
+                      gradientColors={['#ef4444', '#f97316']}
+                    />
+                  </div>
+                  <p className="text-sm text-red-800">
+                    <span className="font-bold">Major Operator Risk:</span>{' '}
+                    Between P2P ({formattedP2PShare}%) and Node Monster (
+                    {formattedNodeMonsterShare}%), these two professional
+                    operators control{' '}
+                    <span className="font-bold">{formattedCombinedShare}%</span>{' '}
+                    of total restaked assets.
+                  </p>
+                </div>
+                <div className="flex items-start">
+                  <div className="shrink-0 mr-2">
+                    <SmallStyledIcon
+                      icon={<AlertCircle className="h-3 w-3" />}
+                      gradientColors={['#ef4444', '#f97316']}
+                    />
+                  </div>
+                  <p className="text-sm text-red-800">
+                    <span className="font-bold">Restaker Concentration:</span>{' '}
+                    The top {restakerTopCount} individual restakers control 33%
+                    of all restaked assets.
+                  </p>
+                </div>
+                <div className="flex items-start">
+                  <div className="shrink-0 mr-2">
+                    <SmallStyledIcon
+                      icon={<AlertCircle className="h-3 w-3" />}
+                      gradientColors={['#ef4444', '#f97316']}
+                    />
+                  </div>
+                  <p className="text-sm text-red-800">
+                    <span className="font-bold">Strategy Risk:</span> Multiple
+                    strategies have critical concentration where a small number
+                    of operators control a significant percentage of assets.
+                    This puts{' '}
+                    {ethPrice > 0 &&
+                    operatorData?.totalRestakedAssetsPerStrategy
+                      ? ((value) => {
+                          if (value >= 1_000_000_000) {
+                            return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                          } else if (value >= 1_000_000) {
+                            return `$${(value / 1_000_000).toFixed(1)}M+`;
+                          } else {
+                            return `$${Math.round(value).toLocaleString()}`;
+                          }
+                        })(
+                          Object.values(
+                            operatorData.totalRestakedAssetsPerStrategy,
+                          ).reduce((sum, val) => sum + val, 0) *
+                            0.3 *
+                            ethPrice,
+                        )
+                      : '?'}{' '}
+                    worth of assets at risk from operator collusion or
+                    compromise.
+                  </p>
+                </div>
               </div>
-              <div className="flex items-start">
-                <div className="shrink-0 mr-2">
-                  <SmallStyledIcon
-                    icon={<AlertCircle className="h-3 w-3" />}
-                    gradientColors={['#ef4444', '#f97316']}
-                  />
+            </div>
+
+            {/* Right column - Visual Risk Dashboard */}
+            <div className="bg-gray-50 border border-gray-200 p-4 rounded-md">
+              <h3 className="text-base font-bold text-gray-800 mb-3 flex items-center">
+                <SmallStyledIcon
+                  icon={<Info className="h-3 w-3" />}
+                  gradientColors={['#3b82f6', '#06b6d4']}
+                />
+                <span className="ml-2">Risk Dashboard</span>
+              </h3>
+
+              {/* Governance Risk */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Governance Risk
+                  </span>
+                  <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-red-100 text-red-800">
+                    Critical
+                  </span>
                 </div>
-                <p className="text-sm text-red-800">
-                  <span className="font-bold">Operator Concentration:</span>{' '}
-                  Just {operatorTopCount} operators control 33% of restaked ETH.
-                  Their compromise or collusion could trigger a cascading
-                  effect.
-                </p>
-              </div>
-              <div className="flex items-start">
-                <div className="shrink-0 mr-2">
-                  <SmallStyledIcon
-                    icon={<AlertCircle className="h-3 w-3" />}
-                    gradientColors={['#ef4444', '#f97316']}
-                  />
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-red-500 h-2.5 rounded-full"
+                    style={{ width: '90%' }}
+                  ></div>
                 </div>
-                <p className="text-sm text-red-800">
-                  <span className="font-bold">Major Operator Risk:</span>{' '}
-                  Between P2P ({formattedP2PShare}%) and Node Monster (
-                  {formattedNodeMonsterShare}%), these two professional
-                  operators control{' '}
-                  <span className="font-bold">{formattedCombinedShare}%</span>{' '}
-                  of total restaked assets.
-                </p>
-              </div>
-              <div className="flex items-start">
-                <div className="shrink-0 mr-2">
-                  <SmallStyledIcon
-                    icon={<AlertCircle className="h-3 w-3" />}
-                    gradientColors={['#ef4444', '#f97316']}
-                  />
-                </div>
-                <p className="text-sm text-red-800">
-                  <span className="font-bold">Restaker Concentration:</span> The
-                  top {restakerTopCount} individual restakers control 33% of all
-                  restaked assets.
-                </p>
-              </div>
-              <div className="flex items-start">
-                <div className="shrink-0 mr-2">
-                  <SmallStyledIcon
-                    icon={<AlertCircle className="h-3 w-3" />}
-                    gradientColors={['#ef4444', '#f97316']}
-                  />
-                </div>
-                <p className="text-sm text-red-800">
-                  <span className="font-bold">Whale Concentration:</span> Just
-                  20 whale addresses control{' '}
-                  {restakeData?.stakerData && (
-                    <span className="font-bold">
-                      {(
-                        restakeData.stakerData
-                          .slice(0, 20)
-                          .reduce(
-                            (sum: number, staker: any) =>
-                              sum +
-                              (staker['ETH Equivalent Value'] || 0) * ethPrice,
-                            0,
-                          ) * 100
-                      ).toFixed(1)}
-                      %
-                    </span>
-                  )}{' '}
-                  of all restaked assets, creating significant centralization
-                  risk.
-                </p>
-              </div>
-              <div className="flex items-start">
-                <div className="shrink-0 mr-2">
-                  <SmallStyledIcon
-                    icon={<AlertCircle className="h-3 w-3" />}
-                    gradientColors={['#ef4444', '#f97316']}
-                  />
-                </div>
-                <p className="text-sm text-red-800">
-                  <span className="font-bold">
-                    Limited Permissionless Participation:
-                  </span>{' '}
-                  Only 2 out of 19 AVSs allow operators to secure them without
-                  whitelisting.
-                </p>
               </div>
 
-              {/* Strategy Risks */}
-              {operatorData?.strategyConcentrationMetrics && (
-                <>
-                  <div className="flex items-start">
-                    <div className="shrink-0 mr-2">
-                      <SmallStyledIcon
-                        icon={<AlertCircle className="h-3 w-3" />}
-                        gradientColors={['#ef4444', '#f97316']}
-                      />
-                    </div>
-                    <p className="text-sm text-red-800">
-                      <span className="font-bold">Strategy Concentration:</span>{' '}
-                      {
-                        Object.entries(
+              {/* Operator Concentration */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Operator Concentration
+                  </span>
+                  <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-orange-100 text-orange-800">
+                    High
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-orange-500 h-2.5 rounded-full"
+                    style={{
+                      width: `${Math.min(operatorData?.concentrationMetrics?.herfindahlIndex ? operatorData.concentrationMetrics.herfindahlIndex * 100 * 3 : 0, 100)}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Restaker Concentration */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Restaker Concentration
+                  </span>
+                  <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-yellow-100 text-yellow-800">
+                    Moderate
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-yellow-500 h-2.5 rounded-full"
+                    style={{
+                      width: `${Math.min(restakeData?.concentrationMetrics?.herfindahlIndex ? restakeData.concentrationMetrics.herfindahlIndex * 100 * 3 : 0, 100)}%`,
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Strategy Concentration */}
+              <div className="mb-3">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Strategy Concentration
+                  </span>
+                  <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-red-100 text-red-800">
+                    Critical
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-red-500 h-2.5 rounded-full"
+                    style={{ width: '85%' }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Permissionless Participation */}
+              <div>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Permissionless Participation
+                  </span>
+                  <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-red-100 text-red-800">
+                    Limited
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-red-500 h-2.5 rounded-full"
+                    style={{ width: '10%' }}
+                  ></div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Only 2 out of 19 AVSs allow operators without whitelisting
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom section - Strategy breakdown */}
+          <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+            <h3 className="text-base font-bold text-gray-800 mb-3 flex items-center">
+              <SmallStyledIcon
+                icon={<DollarSign className="h-3 w-3" />}
+                gradientColors={['#8b5cf6', '#d946ef']}
+              />
+              <span className="ml-2">Strategy Risk Summary</span>
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Critical Concentration Strategies */}
+              <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-semibold text-red-800">
+                    Critical Concentration
+                  </h4>
+                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-red-100 text-red-800">
+                    {operatorData?.strategyConcentrationMetrics
+                      ? Object.entries(
                           operatorData.strategyConcentrationMetrics,
                         ).filter(
                           ([_, metrics]) =>
                             (metrics as any).top5HoldersPercentage > 75,
                         ).length
-                      }{' '}
-                      strategies have critical operator concentration with top 5
-                      operators controlling 75%+ of assets.
-                    </p>
-                  </div>
-
-                  <div className="flex items-start">
-                    <div className="shrink-0 mr-2">
-                      <SmallStyledIcon
-                        icon={<AlertCircle className="h-3 w-3" />}
-                        gradientColors={['#ef4444', '#f97316']}
-                      />
-                    </div>
-                    <p className="text-sm text-red-800">
-                      <span className="font-bold">
-                        High-Risk Strategy Assets:
-                      </span>{' '}
-                      {ethPrice > 0 &&
-                      operatorData.totalRestakedAssetsPerStrategy
-                        ? ((value) => {
-                            if (value >= 1_000_000_000) {
-                              return `$${(value / 1_000_000_000).toFixed(1)}B+`;
-                            } else if (value >= 1_000_000) {
-                              return `$${(value / 1_000_000).toFixed(1)}M+`;
-                            } else {
-                              return `$${Math.round(value).toLocaleString()}`;
-                            }
-                          })(
-                            Object.entries(
-                              operatorData.strategyConcentrationMetrics,
-                            )
-                              .filter(
-                                ([key, metrics]) =>
-                                  (metrics as any).top5HoldersPercentage > 75,
-                              )
-                              .reduce(
-                                (sum: number, [key, _]) =>
-                                  sum +
-                                  (operatorData
-                                    .totalRestakedAssetsPerStrategy?.[key] ||
-                                    0),
-                                0,
-                              ) * ethPrice,
+                      : 0}{' '}
+                    Strategies
+                  </span>
+                </div>
+                <p className="text-xs text-red-700 mb-2">
+                  Top 5 operators control 75%+ of assets in these strategies
+                </p>
+                <div className="text-sm font-bold text-red-800">
+                  {ethPrice > 0 &&
+                  operatorData?.totalRestakedAssetsPerStrategy &&
+                  operatorData?.strategyConcentrationMetrics
+                    ? ((value) => {
+                        if (value >= 1_000_000_000) {
+                          return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                        } else if (value >= 1_000_000) {
+                          return `$${(value / 1_000_000).toFixed(1)}M+`;
+                        } else {
+                          return `$${Math.round(value).toLocaleString()}`;
+                        }
+                      })(
+                        Object.entries(
+                          operatorData.strategyConcentrationMetrics,
+                        )
+                          .filter(
+                            ([key, metrics]) =>
+                              (metrics as any).top5HoldersPercentage > 75,
                           )
-                        : ''}{' '}
-                      currently in strategies with extreme operator
-                      concentration.
-                    </p>
-                  </div>
-                </>
-              )}
+                          .reduce(
+                            (sum: number, [key, _]) =>
+                              sum +
+                              (operatorData.totalRestakedAssetsPerStrategy?.[
+                                key
+                              ] || 0),
+                            0,
+                          ) * ethPrice,
+                      )
+                    : 'N/A'}{' '}
+                  at risk
+                </div>
+              </div>
+
+              {/* Moderate Concentration Strategies */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-semibold text-yellow-800">
+                    Moderate Concentration
+                  </h4>
+                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-yellow-100 text-yellow-800">
+                    {operatorData?.strategyConcentrationMetrics
+                      ? Object.entries(
+                          operatorData.strategyConcentrationMetrics,
+                        ).filter(
+                          ([_, metrics]) =>
+                            (metrics as any).top5HoldersPercentage <= 75 &&
+                            (metrics as any).top5HoldersPercentage > 50,
+                        ).length
+                      : 0}{' '}
+                    Strategies
+                  </span>
+                </div>
+                <p className="text-xs text-yellow-700 mb-2">
+                  Top 5 operators control 50-75% of assets in these strategies
+                </p>
+                <div className="text-sm font-bold text-yellow-800">
+                  {ethPrice > 0 &&
+                  operatorData?.totalRestakedAssetsPerStrategy &&
+                  operatorData?.strategyConcentrationMetrics
+                    ? ((value) => {
+                        if (value >= 1_000_000_000) {
+                          return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                        } else if (value >= 1_000_000) {
+                          return `$${(value / 1_000_000).toFixed(1)}M+`;
+                        } else {
+                          return `$${Math.round(value).toLocaleString()}`;
+                        }
+                      })(
+                        Object.entries(
+                          operatorData.strategyConcentrationMetrics,
+                        )
+                          .filter(
+                            ([key, metrics]) =>
+                              (metrics as any).top5HoldersPercentage <= 75 &&
+                              (metrics as any).top5HoldersPercentage > 50,
+                          )
+                          .reduce(
+                            (sum: number, [key, _]) =>
+                              sum +
+                              (operatorData.totalRestakedAssetsPerStrategy?.[
+                                key
+                              ] || 0),
+                            0,
+                          ) * ethPrice,
+                      )
+                    : 'N/A'}{' '}
+                  managed
+                </div>
+              </div>
+
+              {/* Healthy Distribution Strategies */}
+              <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-semibold text-green-800">
+                    Healthy Distribution
+                  </h4>
+                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-green-100 text-green-800">
+                    {operatorData?.strategyConcentrationMetrics
+                      ? Object.entries(
+                          operatorData.strategyConcentrationMetrics,
+                        ).filter(
+                          ([_, metrics]) =>
+                            (metrics as any).top5HoldersPercentage <= 50,
+                        ).length
+                      : 0}{' '}
+                    Strategies
+                  </span>
+                </div>
+                <p className="text-xs text-green-700 mb-2">
+                  Top 5 operators control less than 50% of assets in these
+                  strategies
+                </p>
+                <div className="text-sm font-bold text-green-800">
+                  {ethPrice > 0 &&
+                  operatorData?.totalRestakedAssetsPerStrategy &&
+                  operatorData?.strategyConcentrationMetrics
+                    ? ((value) => {
+                        if (value >= 1_000_000_000) {
+                          return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                        } else if (value >= 1_000_000) {
+                          return `$${(value / 1_000_000).toFixed(1)}M+`;
+                        } else {
+                          return `$${Math.round(value).toLocaleString()}`;
+                        }
+                      })(
+                        Object.entries(
+                          operatorData.strategyConcentrationMetrics,
+                        )
+                          .filter(
+                            ([key, metrics]) =>
+                              (metrics as any).top5HoldersPercentage <= 50,
+                          )
+                          .reduce(
+                            (sum: number, [key, _]) =>
+                              sum +
+                              (operatorData.totalRestakedAssetsPerStrategy?.[
+                                key
+                              ] || 0),
+                            0,
+                          ) * ethPrice,
+                      )
+                    : 'N/A'}{' '}
+                  secured
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* Call to action */}
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-md p-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-blue-800 mb-1">
+                Want to help improve EigenLayer's risk profile?
+              </h3>
+              <p className="text-xs text-blue-600">
+                Stake with smaller operators or become an operator yourself to
+                increase network decentralization.
+              </p>
+            </div>
+            <a
+              href="https://docs.eigenlayer.xyz/overview/readme"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center"
+            >
+              Learn More <ExternalLink className="ml-1 h-3 w-3" />
+            </a>
           </div>
         </CardContent>
       </Card>
@@ -1776,7 +2319,7 @@ const StakeDistributionChart: React.FC<StakeDistributionChartProps> = ({
                 Just {top33PercentCount} {entityType} control 33% of all restake
               </span>
               <InfoTooltip
-                content={`Only ${top33PercentCount} ${entityType} control one-third of all restaked ETH, indicating high concentration.`}
+                content={`Only ${top33PercentCount} {entityType} control one-third of all restaked ETH, indicating high concentration.`}
               />
             </div>
           )}

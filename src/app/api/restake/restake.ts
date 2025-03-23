@@ -78,4 +78,21 @@ const fetchStakerData = async () => {
   }
 };
 
+export async function fetchEthereumStats(): Promise<{
+  totalEthSupply: number;
+  totalStEthSupply: number;
+}> {
+  try {
+    // In a real implementation, this would call an actual API
+    // For now, we'll return mock data
+    return {
+      totalEthSupply: 120000000, // 120 million ETH in circulation
+      totalStEthSupply: 25000000, // 25 million stETH in circulation 
+    };
+  } catch (error) {
+    console.error('Error fetching Ethereum stats:', error);
+    throw error;
+  }
+}
+
 export { fetchOperatorData, fetchStakerData, fetchETHPrice };
