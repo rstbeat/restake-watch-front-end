@@ -49,6 +49,7 @@ import {
   fetchETHPrice,
   fetchEthereumStats,
 } from '../app/api/restake/restake';
+import { Skeleton } from '../components/ui/skeleton';
 
 interface OverviewProps {
   restakeData: any | null;
@@ -735,7 +736,7 @@ const ExpandableSection: React.FC<{
 // Key metrics summary card
 const MetricSummaryCard: React.FC<{
   title: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   icon: React.ReactNode;
   description?: string;
   usdValue?: string;
@@ -1128,7 +1129,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               value={
                 restakePercents
                   ? `${restakePercents.ethPercent}%`
-                  : 'Loading...'
+                  : <Skeleton className="h-6 w-16 rounded inline-block" />
               }
               icon={
                 <StyledIcon
@@ -1164,7 +1165,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               value={
                 restakePercents
                   ? `${restakePercents.stethPercent}%`
-                  : 'Loading...'
+                  : <Skeleton className="h-6 w-16 rounded inline-block" />
               }
               icon={
                 <StyledIcon
@@ -1196,7 +1197,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               value={
                 restakePercents
                   ? `${restakePercents.combinedPercent}%`
-                  : 'Loading...'
+                  : <Skeleton className="h-6 w-16 rounded inline-block" />
               }
               icon={
                 <StyledIcon

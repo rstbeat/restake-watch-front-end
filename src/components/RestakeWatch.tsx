@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from './ui/skeleton';
 import Link from 'next/link';
 import Image from 'next/image';
 import Sidebar from './Sidebar';
@@ -325,13 +326,12 @@ const RestakeWatch: React.FC = () => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {activePlatform === 'eigenlayer' && (
-                <div className="mb-4 text-sm">
-                  <p>
-                    Last updated:{' '}
-                    {operatorData?.lastUpdated
-                      ? formatDate(operatorData.lastUpdated)
-                      : 'Loading...'}
-                  </p>
+                <div className="mb-4 text-sm flex items-center">
+                  <span className="mr-1">Last updated:</span>
+                  {operatorData?.lastUpdated
+                    ? <span>{formatDate(operatorData.lastUpdated)}</span>
+                    : <Skeleton className="h-4 w-24 rounded" />
+                  }
                 </div>
               )}
 
