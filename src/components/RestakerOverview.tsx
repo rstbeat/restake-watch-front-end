@@ -195,16 +195,28 @@ const RestakerOverview: React.FC = () => {
         {stakerData && stakerData.length > 0 && (
           <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
             <p className="text-red-700 font-medium">
-              Top 20 whale addresses control {stakerData
+              Top 20 whale addresses control{' '}
+              {stakerData
                 .slice(0, 20)
-                .reduce((sum: number, staker) => sum + parseFloat(staker.amountRestaked), 0)
-                .toFixed(1)}% of all restaked assets
+                .reduce(
+                  (sum: number, staker) =>
+                    sum + parseFloat(staker.amountRestaked),
+                  0,
+                )
+                .toFixed(1)}
+              % of all restaked assets
             </p>
             <p className="text-sm text-red-600 mt-1">
-              The largest restaker alone holds {stakerData[0]?.amountRestaked}% of the network, creating significant centralization risk
+              The largest restaker alone holds {stakerData[0]?.amountRestaked}%
+              of the network, creating significant centralization risk
             </p>
             <p className="text-sm text-red-600 mt-1">
-              {stakerData.filter(staker => parseFloat(staker.amountRestaked) > 1).length} individual addresses control more than 1% of restaked assets each
+              {
+                stakerData.filter(
+                  (staker) => parseFloat(staker.amountRestaked) > 1,
+                ).length
+              }{' '}
+              individual addresses control more than 1% of restaked assets each
             </p>
           </div>
         )}
