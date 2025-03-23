@@ -57,12 +57,7 @@ const PublicationItem: React.FC<{
   url: string;
 }> = ({ title, authors, date, url }) => (
   <div className="p-4 border border-purple-100 rounded-md hover:bg-purple-50 transition-all duration-300 transform hover:-translate-y-1 hover:border-purple-300 hover:shadow-md">
-    <a 
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block"
-    >
+    <a href={url} target="_blank" rel="noopener noreferrer" className="block">
       <h4 className="text-md font-semibold text-[#1a202c] flex items-center">
         {title}
         <ExternalLink className="ml-2 h-3 w-3 text-gray-400" />
@@ -90,10 +85,13 @@ const About: React.FC = () => {
             />
           </div>
           <div>
-            <h2 className="text-3xl font-bold text-[#1a202c] mb-1">About restake.watch</h2>
+            <h2 className="text-3xl font-bold text-[#1a202c] mb-1">
+              About restake.watch
+            </h2>
             <p className="text-gray-600 max-w-2xl">
-              The premier analytics platform for the restaking ecosystem, providing comprehensive 
-              monitoring and risk assessment of operators, restaking protocols, and AVSs.
+              The premier analytics platform for the restaking ecosystem,
+              providing comprehensive monitoring and risk assessment of
+              operators, restaking protocols, and AVSs.
             </p>
           </div>
         </div>
@@ -101,11 +99,26 @@ const About: React.FC = () => {
       <CardContent className="px-0 pt-0">
         <Tabs defaultValue="mission" className="w-full">
           <TabsList className="w-full justify-start px-6 pt-2 bg-white border-b">
-            <TabsTrigger value="mission" className="data-[state=active]:bg-purple-50">Mission</TabsTrigger>
-            <TabsTrigger value="features" className="data-[state=active]:bg-purple-50">Features</TabsTrigger>
-            <TabsTrigger value="publications" className="data-[state=active]:bg-purple-50">Publications</TabsTrigger>
+            <TabsTrigger
+              value="mission"
+              className="data-[state=active]:bg-purple-50"
+            >
+              Mission
+            </TabsTrigger>
+            <TabsTrigger
+              value="features"
+              className="data-[state=active]:bg-purple-50"
+            >
+              Features
+            </TabsTrigger>
+            <TabsTrigger
+              value="publications"
+              className="data-[state=active]:bg-purple-50"
+            >
+              Publications
+            </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="mission" className="p-6 space-y-4">
             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-5 rounded-lg mb-6">
               <h3 className="text-xl font-semibold text-[#1a202c] mb-3 flex items-center">
@@ -117,17 +130,26 @@ const About: React.FC = () => {
                 <span className="ml-2">Our Mission</span>
               </h3>
               <p className="text-gray-700 mb-3">
-                Restake Watch is dedicated to bringing transparency to the restaking ecosystem by providing objective, data-driven analysis of restaking protocols, operators, and AVSs. We strive to be the trusted source of information for users navigating the complexities of restaking.
+                Restake Watch is dedicated to bringing transparency to the
+                restaking ecosystem by providing objective, data-driven analysis
+                of restaking protocols, operators, and AVSs. We strive to be the
+                trusted source of information for users navigating the
+                complexities of restaking.
               </p>
               <p className="text-gray-700">
-                As the restaking space evolves, our mission is to shine a light on critical metrics and risks that may otherwise go unnoticed, empowering users to make informed decisions and encouraging protocols to implement best practices.
+                As the restaking space evolves, our mission is to shine a light
+                on critical metrics and risks that may otherwise go unnoticed,
+                empowering users to make informed decisions and encouraging
+                protocols to implement best practices.
               </p>
             </div>
-            
+
             <div className="border-l-4 border-purple-300 pl-4 py-2 italic text-gray-600">
-              "The restaking ecosystem is growing rapidly but lacks transparent, objective analysis. Restake Watch fills this critical gap with comprehensive monitoring and risk assessment."
+              "The restaking ecosystem is growing rapidly but lacks transparent,
+              objective analysis. Restake Watch fills this critical gap with
+              comprehensive monitoring and risk assessment."
             </div>
-            
+
             <div className="flex flex-col md:flex-row gap-4 mt-6">
               <div className="flex-1 p-5 rounded-lg border border-gray-100 hover:border-purple-200 transition-all duration-300 hover:shadow-md">
                 <h4 className="font-semibold text-[#1a202c] mb-2 flex items-center">
@@ -137,19 +159,28 @@ const About: React.FC = () => {
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-start">
                     <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span><strong>Objectivity:</strong> We provide unbiased analysis based solely on data and technical assessment</span>
+                    <span>
+                      <strong>Objectivity:</strong> We provide unbiased analysis
+                      based solely on data and technical assessment
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span><strong>Transparency:</strong> Our methodologies are open and we explain our reasoning</span>
+                    <span>
+                      <strong>Transparency:</strong> Our methodologies are open
+                      and we explain our reasoning
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span><strong>Independence:</strong> We remain independent from the protocols we analyze</span>
+                    <span>
+                      <strong>Independence:</strong> We remain independent from
+                      the protocols we analyze
+                    </span>
                   </li>
                 </ul>
               </div>
-              
+
               <div className="flex-1 p-5 rounded-lg border border-gray-100 hover:border-purple-200 transition-all duration-300 hover:shadow-md">
                 <h4 className="font-semibold text-[#1a202c] mb-2 flex items-center">
                   <TrendingUp className="h-4 w-4 mr-2 text-blue-500" />
@@ -158,21 +189,30 @@ const About: React.FC = () => {
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-start">
                     <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span>Helped users safeguard millions in assets through risk identification</span>
+                    <span>
+                      Helped users safeguard millions in assets through risk
+                      identification
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span>Prompted improvements in protocol transparency and risk disclosures</span>
+                    <span>
+                      Prompted improvements in protocol transparency and risk
+                      disclosures
+                    </span>
                   </li>
                   <li className="flex items-start">
                     <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1.5 mr-2 flex-shrink-0"></span>
-                    <span>Established industry standards for analyzing restaking risks</span>
+                    <span>
+                      Established industry standards for analyzing restaking
+                      risks
+                    </span>
                   </li>
                 </ul>
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="features" className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FeatureItem
@@ -220,14 +260,19 @@ const About: React.FC = () => {
                 description="Supported by an Ethereum Foundation grant, we're committed to enhancing monitoring capabilities and advancing best practices in the restaking ecosystem."
               />
             </div>
-            
+
             <div className="mt-6 p-5 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg">
               <p className="text-gray-700">
-                Restake Watch is committed to serving the best interests of users and the broader ecosystem, providing critical insights needed to navigate the evolving world of restaking. We continuously improve our methodologies and expand our coverage to ensure comprehensive analysis of this rapidly developing space.
+                Restake Watch is committed to serving the best interests of
+                users and the broader ecosystem, providing critical insights
+                needed to navigate the evolving world of restaking. We
+                continuously improve our methodologies and expand our coverage
+                to ensure comprehensive analysis of this rapidly developing
+                space.
               </p>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="publications" id="publications" className="p-6">
             <h3 className="text-xl font-semibold text-[#1a202c] mb-4 flex items-center">
               <StyledIcon
@@ -237,7 +282,7 @@ const About: React.FC = () => {
               />
               <span className="ml-2">Team Publications</span>
             </h3>
-            
+
             <div className="space-y-4">
               <PublicationItem
                 title="Fortify or Falter: A Comprehensive Restaking Risk Assessment"
@@ -267,7 +312,10 @@ const About: React.FC = () => {
             Get in Touch
           </h3>
           <p className="text-sm text-gray-700 mb-4">
-            Have additional information, insights, or concerns about restaking protocols? We're actively seeking funding and looking for whistleblowers or anyone with valuable knowledge to improve our monitoring.
+            Have additional information, insights, or concerns about restaking
+            protocols? We're actively seeking funding and looking for
+            whistleblowers or anyone with valuable knowledge to improve our
+            monitoring.
           </p>
           <a
             href="https://signal.me/#eu/espejelomar.01"

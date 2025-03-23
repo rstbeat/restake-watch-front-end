@@ -8,13 +8,21 @@ const Footer: React.FC = () => {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-center sm:text-left order-2 sm:order-1 flex flex-wrap items-center justify-center sm:justify-start gap-1">
             <span>Made with un chingo de</span>
-            <span role="img" aria-label="heart" className="text-red-500 animate-pulse">
+            <span
+              role="img"
+              aria-label="heart"
+              className="text-red-500 animate-pulse"
+            >
               ❤️
             </span>
             <span>from</span>
             <span className="font-medium">CDMX</span>
-            <span role="img" aria-label="taco and sparkles" className="mx-1">🌮✨</span>
-            <span className="italic text-gray-600">(where the code is as hot as the salsa)</span>
+            <span role="img" aria-label="taco and sparkles" className="mx-1">
+              🌮✨
+            </span>
+            <span className="italic text-gray-600">
+              (where the code is as hot as the salsa)
+            </span>
           </p>
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 order-1 sm:order-2">
             <div className="text-sm rounded-md py-1 px-3 bg-purple-100 text-gray-700">
