@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   AlertTriangle,
@@ -7,6 +9,12 @@ import {
   Phone,
   Menu,
   DollarSign,
+  Search,
+  Home,
+  Users,
+  BarChart3,
+  Layers,
+  Info,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -62,6 +70,9 @@ const RestakeWatch: React.FC = () => {
 
   const [isSetModalOpen, setOpen] = useState(false);
 
+  const [scrolled, setScrolled] = useState(false);
+  const [visibleSection, setVisibleSection] = useState('overview');
+
   // Backers data for the carousel
   const backersData = [
     {
@@ -87,6 +98,28 @@ const RestakeWatch: React.FC = () => {
         const rect = aboutRef.current.getBoundingClientRect();
         const isVisible = rect.top <= window.innerHeight && rect.bottom >= 0;
         aboutRef.current.style.opacity = isVisible ? '1' : '0';
+      }
+
+      setScrolled(window.scrollY > 50);
+
+      const sections = [
+        'overview',
+        'operators',
+        'restakers',
+        'strategies',
+        'about',
+      ];
+      const currentSection = sections.find((section) => {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          return rect.top <= 150 && rect.bottom >= 150;
+        }
+        return false;
+      });
+
+      if (currentSection) {
+        setVisibleSection(currentSection);
       }
     };
 
@@ -205,6 +238,14 @@ const RestakeWatch: React.FC = () => {
     );
   };
 
+  const navigateToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      setActiveTab(sectionId);
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#e6e7ec] text-[#171717] font-bold">
       <div className="flex flex-1">
@@ -227,9 +268,9 @@ const RestakeWatch: React.FC = () => {
           </Select>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col overflow-hidden md:ml-48">
+        <div className="flex-1 flex flex-col md:ml-48">
           {showBanner && (
-            <div className="bg-gradient-to-r from-purple-50 via-purple-100 to-indigo-50 backdrop-blur-sm text-gray-700 py-3 border-b border-purple-200 shadow-sm transition-all duration-300 ease-in-out">
+            <div className="bg-gradient-to-r from-purple-50 via-purple-100 to-indigo-50 backdrop-blur-sm text-gray-700 py-3 border-b border-purple-200 shadow-sm transition-all duration-300 ease-in-out z-20">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
                 <div className="flex items-center space-x-3">
                   <div className="p-1.5 bg-white bg-opacity-60 rounded-full shadow-sm">
@@ -258,87 +299,189 @@ const RestakeWatch: React.FC = () => {
             </div>
           )}
 
-          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e6e7ec] text-[#171717]">
-            <div className="bg-[#e6e7ec] text-[#171717] py-4 border-b border-gray-200">
+          <header
+            className={`sticky top-0 z-30 bg-[#e6e7ec] transition-all duration-300 ease-in-out ${
+              scrolled ? 'shadow-md' : ''
+            }`}
+          >
+            <div
+              className={`bg-[#e6e7ec] text-[#171717] py-4 border-b border-gray-200 transition-all duration-300 ${
+                scrolled ? 'py-2' : 'py-4'
+              }`}
+            >
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center w-full justify-between">
-                  <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl mb-1">
-                      <span className="bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] bg-clip-text text-transparent drop-shadow-sm">
+                  <div className="flex items-center">
+                    <div>
+                      <h1
+                        className={`font-extrabold tracking-tight bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] bg-clip-text text-transparent drop-shadow-sm transition-all duration-300 ${
+                          scrolled ? 'text-2xl' : 'text-3xl sm:text-4xl mb-1'
+                        }`}
+                      >
                         RestakeWatch
-                      </span>
-                    </h1>
-                    <p className="text-base sm:text-lg font-bold">
-                      The{' '}
-                      <span className="font-extrabold text-[#ab3bd2] underline decoration-2 underline-offset-2">
-                        L2Beat
-                      </span>{' '}
-                      of the Restaking Ecosystem
-                    </p>
-                  </div>
-                  <div className="hidden lg:flex items-center space-x-4">
-                    <div className="flex items-center px-3 py-1 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-md border border-purple-100">
-                      <div className="flex items-center mr-2">
-                        <div className="relative h-5 w-5 mr-1">
-                          <Image
-                            src="/ethereum-logo.png"
-                            alt="Ethereum Foundation"
-                            fill
-                            className="object-contain"
-                            sizes="20px"
-                            priority
-                          />
-                        </div>
-                        <div className="relative h-5 w-5">
-                          <Image
-                            src="/obol-logo.png"
-                            alt="Obol Collective"
-                            fill
-                            className="object-contain"
-                            sizes="20px"
-                            priority
-                          />
-                        </div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-800">
-                        ESP &amp; Obol Backed
-                      </span>
+                      </h1>
+                      <p
+                        className={`font-bold transition-all duration-300 ${
+                          scrolled
+                            ? 'text-sm hidden md:block'
+                            : 'text-base sm:text-lg'
+                        }`}
+                      >
+                        The{' '}
+                        <span className="font-extrabold text-[#ab3bd2] underline decoration-2 underline-offset-2">
+                          L2Beat
+                        </span>{' '}
+                        of the Restaking Ecosystem
+                      </p>
                     </div>
-                    <a
-                      href="https://twitter.com/therestakewatch"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] text-white hover:shadow-md transition-all duration-200"
-                      aria-label="Twitter"
-                    >
-                      <Twitter size={16} />
-                    </a>
+
+                    {scrolled && (
+                      <div className="hidden md:flex ml-8 space-x-1">
+                        <button
+                          onClick={() => navigateToSection('overview')}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                            visibleSection === 'overview'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <Home className="h-4 w-4 mr-1.5" />
+                          Overview
+                        </button>
+                        <button
+                          onClick={() => navigateToSection('operators')}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                            visibleSection === 'operators'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <Users className="h-4 w-4 mr-1.5" />
+                          Operators
+                        </button>
+                        <button
+                          onClick={() => navigateToSection('restakers')}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                            visibleSection === 'restakers'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <Layers className="h-4 w-4 mr-1.5" />
+                          Restakers
+                        </button>
+                        <button
+                          onClick={() => navigateToSection('strategies')}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                            visibleSection === 'strategies'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <BarChart3 className="h-4 w-4 mr-1.5" />
+                          Strategies
+                        </button>
+                        <button
+                          onClick={() => navigateToSection('about')}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 flex items-center ${
+                            visibleSection === 'about'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          <Info className="h-4 w-4 mr-1.5" />
+                          About
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="hidden lg:flex items-center space-x-4">
+                    {scrolled && (
+                      <button className="text-gray-500 hover:text-[#ab3bd2] transition-colors duration-200">
+                        <Search className="h-5 w-5" />
+                      </button>
+                    )}
+
+                    {!scrolled && (
+                      <>
+                        <div className="flex items-center px-3 py-1 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-md border border-purple-100">
+                          <div className="flex items-center mr-2">
+                            <div className="relative h-5 w-5 mr-1">
+                              <Image
+                                src="/ethereum-logo.png"
+                                alt="Ethereum Foundation"
+                                fill
+                                className="object-contain"
+                                sizes="20px"
+                                priority
+                              />
+                            </div>
+                            <div className="relative h-5 w-5">
+                              <Image
+                                src="/obol-logo.png"
+                                alt="Obol Collective"
+                                fill
+                                className="object-contain"
+                                sizes="20px"
+                                priority
+                              />
+                            </div>
+                          </div>
+                          <span className="text-xs font-medium text-gray-800">
+                            ESP &amp; Obol Backed
+                          </span>
+                        </div>
+                        <a
+                          href="https://twitter.com/therestakewatch"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] text-white hover:shadow-md transition-all duration-200"
+                          aria-label="Twitter"
+                        >
+                          <Twitter size={16} />
+                        </a>
+                      </>
+                    )}
+
                     <a
                       href="https://signal.me/#eu/espejelomar.01"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200"
+                      className={`inline-flex items-center bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 ${
+                        scrolled ? 'px-3 py-1.5 text-xs' : 'px-4 py-2'
+                      }`}
                     >
-                      <DollarSign className="mr-1.5 h-4 w-4" /> Funding &
-                      Insights
+                      <DollarSign
+                        className={scrolled ? 'mr-1 h-3 w-3' : 'mr-1.5 h-4 w-4'}
+                      />
+                      {scrolled ? 'Funding' : 'Funding & Insights'}
                     </a>
-                    <Button
-                      size="sm"
-                      className="bg-[#06b6d4] text-white hover:bg-[#0891b2] shadow-sm hover:shadow-md transition-all duration-200"
-                      onClick={() => {
-                        const aboutSection = document.getElementById('about');
-                        if (aboutSection) {
-                          aboutSection.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }}
-                    >
-                      Learn More
-                      <ChevronRight className="ml-2 h-4 w-4" />
-                    </Button>
+
+                    {!scrolled && (
+                      <Button
+                        size="sm"
+                        className="bg-[#06b6d4] text-white hover:bg-[#0891b2] shadow-sm hover:shadow-md transition-all duration-200"
+                        onClick={() => {
+                          const aboutSection = document.getElementById('about');
+                          if (aboutSection) {
+                            aboutSection.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                      >
+                        Learn More
+                        <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
 
                   <div className="block md:hidden">
                     <div className="flex items-center space-x-2">
+                      {scrolled && (
+                        <button className="text-gray-500 hover:text-[#ab3bd2] transition-colors duration-200">
+                          <Search className="h-4 w-4" />
+                        </button>
+                      )}
                       <a
                         href="https://signal.me/#eu/espejelomar.01"
                         target="_blank"
@@ -360,26 +503,92 @@ const RestakeWatch: React.FC = () => {
               </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              {activePlatform === 'eigenlayer' && (
-                <div className="mb-4 text-sm flex items-center">
-                  <span className="mr-1">Last updated:</span>
-                  {operatorData?.lastUpdated ? (
-                    <span>{formatDate(operatorData.lastUpdated)}</span>
-                  ) : (
-                    <Skeleton className="h-4 w-24 rounded" />
-                  )}
-                </div>
-              )}
+            {activePlatform === 'eigenlayer' && (
+              <div className="bg-white border-b border-gray-200 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                  <div className="flex items-center justify-between h-12">
+                    <div className="flex items-center space-x-2 text-sm">
+                      <span className="text-gray-600">
+                        Platform:{' '}
+                        <span className="font-medium text-[#ab3bd2]">
+                          EigenLayer
+                        </span>
+                      </span>
+                      <span className="text-gray-400">|</span>
+                      <div className="flex items-center">
+                        <span className="text-gray-600 mr-1">
+                          Last updated:
+                        </span>
+                        {operatorData?.lastUpdated ? (
+                          <span className="text-gray-800">
+                            {formatDate(operatorData.lastUpdated)}
+                          </span>
+                        ) : (
+                          <Skeleton className="h-4 w-24 rounded" />
+                        )}
+                      </div>
+                    </div>
 
+                    <div className="hidden md:flex space-x-6">
+                      <button
+                        onClick={() => setActiveTab('overview')}
+                        className={`text-sm py-3 font-medium border-b-2 transition-colors duration-200 ${
+                          activeTab === 'overview'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                        }`}
+                      >
+                        Overview
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('operators')}
+                        className={`text-sm py-3 font-medium border-b-2 transition-colors duration-200 ${
+                          activeTab === 'operators'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                        }`}
+                      >
+                        Operators
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('restakers')}
+                        className={`text-sm py-3 font-medium border-b-2 transition-colors duration-200 ${
+                          activeTab === 'restakers'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                        }`}
+                      >
+                        Restakers
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('strategies')}
+                        className={`text-sm py-3 font-medium border-b-2 transition-colors duration-200 ${
+                          activeTab === 'strategies'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                        }`}
+                      >
+                        Strategies
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </header>
+
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#e6e7ec] text-[#171717]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {/* Backers Carousel */}
               <div className="mb-6">
                 <BackersCarousel backers={backersData} />
               </div>
 
-              {renderContent()}
+              <div id="overview">{renderContent()}</div>
 
-              <Roadmap />
+              <div id="roadmap">
+                <Roadmap />
+              </div>
 
               <div id="about" ref={aboutRef}>
                 <About />
