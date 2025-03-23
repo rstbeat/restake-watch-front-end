@@ -4,7 +4,7 @@ import {
   X,
   Twitter,
   ChevronRight,
-  MessageCircle,
+  Phone,
   Menu,
   DollarSign,
 } from 'lucide-react';
@@ -245,16 +245,16 @@ const RestakeWatch: React.FC = () => {
                       <Twitter size={20} />
                     </a>
                     <a
-                      href="https://t.me/espejelomar"
+                      href="https://signal.me/#eu/espejelomar.01"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[#000000] hover:text-[#ab3bd2] transition-colors"
-                      aria-label="Telegram"
+                      aria-label="Signal"
                     >
-                      <MessageCircle size={20} />
+                      <Phone size={20} />
                     </a>
                     <a
-                      href="https://t.me/espejelomar"
+                      href="https://signal.me/#eu/espejelomar.01"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-3 py-1 bg-purple-100 text-[#ab3bd2] hover:bg-purple-200 rounded-md transition-colors"
@@ -279,7 +279,7 @@ const RestakeWatch: React.FC = () => {
                   <div className="block md:hidden">
                     <div className="flex items-center space-x-2">
                       <a
-                        href="https://t.me/espejelomar"
+                        href="https://signal.me/#eu/espejelomar.01"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center px-2 py-1 bg-purple-100 text-[#ab3bd2] text-xs hover:bg-purple-200 rounded-md transition-colors"

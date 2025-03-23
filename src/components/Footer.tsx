@@ -1,5 +1,5 @@
 import React from 'react';
-import { Twitter, MessageCircle } from 'lucide-react';
+import { Twitter, Phone } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -14,16 +14,14 @@ const Footer: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 order-1 sm:order-2">
             <div className="text-sm rounded-md py-1 px-3 bg-purple-100 text-gray-700">
-              For funding or to share valuable info:{' '}
-              <a
-                href="https://t.me/espejelomar"
+              For funding or to share valuable info: <a
+                href="https://signal.me/#eu/espejelomar.01"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-[#ab3bd2] hover:underline"
               >
-                @espejelomar
-              </a>{' '}
-              on Telegram
+                espejelomar.01
+              </a> on Signal
             </div>
             <div className="flex space-x-4">
               <a
@@ -36,13 +34,13 @@ const Footer: React.FC = () => {
                 <Twitter size={24} />
               </a>
               <a
-                href="https://t.me/espejelomar"
+                href="https://signal.me/#eu/espejelomar.01"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-[#ab3bd2] transition-colors"
-                aria-label="Telegram"
+                aria-label="Signal"
               >
-                <MessageCircle size={24} />
+                <Phone size={24} />
               </a>
             </div>
           </div>

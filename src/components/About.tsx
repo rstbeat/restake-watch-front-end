@@ -4,7 +4,7 @@ import {
   BarChart2,
   DollarSign,
   Coffee,
-  MessageCircle,
+  Phone,
   ExternalLink,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
@@ -116,13 +116,13 @@ const About: React.FC = () => {
             monitoring.
           </p>
           <a
-            href="https://t.me/espejelomar"
+            href="https://signal.me/#eu/espejelomar.01"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center px-4 py-2 bg-[#ab3bd2] text-white rounded-md hover:bg-[#922fb8] transition-colors"
           >
-            <MessageCircle className="mr-2 h-4 w-4" />
-            Contact @espejelomar on Telegram
+            <Phone className="mr-2 h-4 w-4" />
+            Contact espejelomar.01 on Signal
             <ExternalLink className="ml-2 h-3 w-3" />
           </a>
         </div>
