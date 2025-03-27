@@ -21,7 +21,7 @@ const nextConfig = {
             beforeFiles: [
                 {
                     source: "/restake/:path*",
-                    destination: "https://d2ekevhtqyh8ay.cloudfront.net/:path*",
+                    destination: "https://eigenlayer.restakeapi.com/:path*",
                 },
             ],
         };
