@@ -27,7 +27,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { fetchOperatorData } from '../app/api/restake/restake';
+import { fetchOperatorData, fetchETHPrice } from '../app/api/restake/restake';
 import { OperatorDataFormated } from '../app/interface/operatorData.interface';
 
 const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
@@ -107,6 +107,7 @@ const OperatorOverview: React.FC = () => {
   const [filteredMarketShare, setFilteredMarketShare] = useState<number | null>(
     null,
   );
+  const [ethPrice, setEthPrice] = useState<number>(0);
 
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
@@ -142,6 +143,23 @@ const OperatorOverview: React.FC = () => {
       fetchOperatorDataCallback();
     }
   }, [operatorData, fetchOperatorDataCallback]);
+
+  useEffect(() => {
+    const getEthPrice = async () => {
+      try {
+        const price = await fetchETHPrice();
+        setEthPrice(price);
+      } catch (error) {
+        console.error('Error fetching ETH price:', error);
+      }
+    };
+
+    getEthPrice();
+
+    // Refresh price every 5 minutes
+    const interval = setInterval(getEthPrice, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const professionalOperators = useMemo(() => {
     if (!operatorData) return [];
@@ -327,6 +345,29 @@ const OperatorOverview: React.FC = () => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
+  // Format USD value with appropriate suffix
+  const formatUSDValue = (value: number): string => {
+    if (value >= 1_000_000_000) {
+      return `$${(value / 1_000_000_000).toFixed(1)}B`;
+    } else if (value >= 1_000_000) {
+      return `$${(value / 1_000_000).toFixed(1)}M`;
+    } else {
+      return `$${Math.round(value).toLocaleString()}`;
+    }
+  };
+
+  // Helper function to extract numeric value from formatted ETH string
+  const extractETHValue = (ethString: string): number => {
+    // Convert notations like "849K" to their numeric values
+    const value = ethString.replace(/[^0-9.]/g, '');
+    const multiplier = 
+      ethString.includes('K') ? 1_000 : 
+      ethString.includes('M') ? 1_000_000 : 
+      ethString.includes('B') ? 1_000_000_000 : 1;
+    
+    return parseFloat(value) * multiplier;
+  };
+
   const renderFilterControls = () => (
     <div className="mb-6">
       <div className="relative flex-grow mb-4">
@@ -471,9 +512,10 @@ const OperatorOverview: React.FC = () => {
                 onClick={() => handleSort('ethRestaked')}
                 className="font-semibold"
               >
-                Total Assets (ETH)
+                Total Assets Value (ETH/USD)
                 <SortIcon column="ethRestaked" />
               </Button>
+              <InfoTooltip content="Total value of all assets managed by this operator, converted to ETH equivalent" />
             </TableHead>
             <TableHead className="text-center">
               DVT Status
@@ -593,8 +635,15 @@ const OperatorOverview: React.FC = () => {
                       </div>
                     </TableCell>
 
-                    <TableCell className="text-center font-medium">
-                      {row.ethRestaked} ETH
+                    <TableCell className="text-center">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{row.ethRestaked} ETH</span>
+                        {ethPrice > 0 && (
+                          <span className="text-xs text-gray-500">
+                            {formatUSDValue(extractETHValue(row.ethRestaked) * ethPrice)}
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
 
                     <TableCell className="text-center">
@@ -659,6 +708,14 @@ const OperatorOverview: React.FC = () => {
                                 </span>{' '}
                                 {row.ethRestaked}
                               </p>
+                              {ethPrice > 0 && (
+                                <p>
+                                  <span className="text-gray-600">
+                                    USD Value:
+                                  </span>{' '}
+                                  {formatUSDValue(extractETHValue(row.ethRestaked) * ethPrice)}
+                                </p>
+                              )}
                             </div>
                             <div className="bg-white p-3 rounded border border-gray-200">
                               <h5 className="font-medium text-gray-800 mb-2">

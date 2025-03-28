@@ -358,9 +358,9 @@ const StrategyOverview: React.FC = () => {
   // Format USD value with appropriate suffix
   const formatUSDValue = (value: number): string => {
     if (value >= 1_000_000_000) {
-      return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+      return `$${(value / 1_000_000_000).toFixed(1)}B`;
     } else if (value >= 1_000_000) {
-      return `$${(value / 1_000_000).toFixed(1)}M+`;
+      return `$${(value / 1_000_000).toFixed(1)}M`;
     } else {
       return `$${Math.round(value).toLocaleString()}`;
     }
@@ -466,9 +466,10 @@ const StrategyOverview: React.FC = () => {
                 onClick={() => handleSort('assets')}
                 className="font-semibold"
               >
-                Total Assets
+                Total Assets Value (ETH/USD)
                 <SortIcon column="assets" />
               </Button>
+              <InfoTooltip content="Total value of all assets managed by this strategy, converted to ETH equivalent" />
             </TableHead>
             <TableHead>
               Operators
