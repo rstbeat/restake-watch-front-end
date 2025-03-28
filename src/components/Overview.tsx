@@ -127,62 +127,6 @@ const RiskAssessment = () => {
   );
 };
 
-const CompactNotes = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <Card className="mt-4 border-l-4 border-l-purple-500" glassEffect="medium">
-      <CardHeader className="pb-2">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-between w-full text-left text-sm font-bold text-purple-700 hover:text-purple-900 focus:outline-none"
-        >
-          <span>Important Notes and Disclaimers</span>
-          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-        </button>
-      </CardHeader>
-      {isOpen && (
-        <CardContent>
-          <div className="text-sm text-gray-700 space-y-3">
-            <p>
-              <strong>1. EIGEN Token and Other Strategies:</strong> The value
-              and distribution of the EIGEN token and other strategies are not
-              yet factored into these metrics. This requires further research to
-              understand how their distribution may rebalance the concentration
-              of stake.
-            </p>
-
-            <p>
-              <strong>2. ETH Value Conversion:</strong> Tokens from strategies
-              pegged to the ETH value like stETH or swETH are considered 1:1
-              with the ETH price, which is not the case. In a future iteration,
-              we will account for this discrepancy.
-            </p>
-
-            <p>
-              <strong>3. Data Source:</strong> Currently, the metrics are
-              derived from data in the EigenLayer Delegation Manager smart
-              contract. Future iterations will incorporate data from additional
-              smart contracts for a more comprehensive analysis.
-            </p>
-
-            <p>
-              <strong>4. Future Enhancements:</strong> The Restake Watch project
-              is continuously evolving. Upcoming updates will include:
-            </p>
-            <ul className="list-disc pl-5 space-y-1">
-              <li>Additional concentration metrics</li>
-              <li>Withdrawal times from operators</li>
-              <li>Presence and distribution of validators (DVT)</li>
-              <li>Others!</li>
-            </ul>
-          </div>
-        </CardContent>
-      )}
-    </Card>
-  );
-};
-
 interface MetricCardProps {
   icon: LucideIcon;
   label: string;
@@ -3254,7 +3198,6 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     <div className="space-y-6">
       {/* <RiskAssessment /> */}
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
-      <CompactNotes />
 
       {/* Add Strategies Overview component with ethPrice */}
       {strategiesData && (
