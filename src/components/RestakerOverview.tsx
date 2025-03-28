@@ -28,12 +28,20 @@ import { Input } from '@/components/ui/input';
 import { fetchStakerData, fetchETHPrice } from '../app/api/restake/restake';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
+interface StrategyData {
+  strategy_name: string;
+  token_name: string;
+  token_amount: number;
+  token_value_eth: number;
+}
+
 interface RestakerData {
   restakerAddress: string;
   amountRestaked: string;
   ethRestaked: string;
   numberOfStrategies: number;
   mostUsedStrategies: string;
+  strategies?: StrategyData[];
 }
 
 const Badge: React.FC<{ color: string; text: string }> = ({ color, text }) => {
@@ -113,18 +121,23 @@ const RestakerOverview: React.FC = () => {
       setIsLoadingStakerData(true);
       const data = await fetchStakerData();
       const stakerDataResponse =
-        data?.stakerData?.map((data: any) => ({
-          restakerAddress: data['Staker Address'] || '',
-          amountRestaked: Number((data['Market Share'] || 0) * 100).toFixed(1),
-          ethRestaked: new Intl.NumberFormat('en-US', {
-            notation: 'compact',
-            compactDisplay: 'short',
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 2,
-          }).format(Number(data['ETH Equivalent Value'] || 0)),
-          numberOfStrategies: data['Number of Strategies'] || 0,
-          mostUsedStrategies: data['Most Used Strategy'] || 'N/A',
-        })) || [];
+        data?.stakerData?.map((data: any) => {
+          return {
+            restakerAddress: data['Staker Address'] || '',
+            amountRestaked: Number((data['Market Share'] || 0) * 100).toFixed(
+              1,
+            ),
+            ethRestaked: new Intl.NumberFormat('en-US', {
+              notation: 'compact',
+              compactDisplay: 'short',
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 2,
+            }).format(Number(data['ETH Equivalent Value'] || 0)),
+            numberOfStrategies: data['Number of Strategies'] || 0,
+            mostUsedStrategies: data['Most Used Strategy'] || 'N/A',
+            strategies: data['strategies'] || [],
+          };
+        }) || [];
       setStakerData(stakerDataResponse);
     } catch (error) {
       console.error('An error occurred while fetching staker data', error);
@@ -293,6 +306,15 @@ const RestakerOverview: React.FC = () => {
     return parseFloat(value) * multiplier;
   };
 
+  // Helper function to format strategy value display
+  const formatStrategyValue = (value: number): string => {
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}K ETH`;
+    } else {
+      return `${value.toFixed(2)} ETH`;
+    }
+  };
+
   const renderFilterControls = () => (
     <div className="mb-6">
       <div className="relative flex-grow mb-4">
@@ -355,9 +377,21 @@ const RestakerOverview: React.FC = () => {
     <div className="overflow-x-auto max-h-[70vh] border rounded-lg shadow-sm">
       <Table>
         <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
-          <TableRow>
-            <TableHead className="w-[50px] text-center">#</TableHead>
+          <TableRow className="border-b-2 border-purple-200">
+            <TableHead className="w-[50px] text-center">
+              <span className="text-purple-700">#</span>
+            </TableHead>
+
+            <TableHead className="w-[50px] text-center">
+              <div className="flex justify-center">
+                <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded-full">
+                  Details
+                </span>
+              </div>
+            </TableHead>
+
             <TableHead className="text-center">Restaker Address</TableHead>
+
             <TableHead className="text-center">
               <Button
                 variant="ghost"
@@ -381,7 +415,6 @@ const RestakerOverview: React.FC = () => {
             </TableHead>
             <TableHead className="text-center">Strategies</TableHead>
             <TableHead className="text-center">Most Used Strategy</TableHead>
-            <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -408,6 +441,22 @@ const RestakerOverview: React.FC = () => {
                   >
                     <TableCell className="font-semibold text-center">
                       {(currentPage - 1) * itemsPerPage + index + 1}
+                    </TableCell>
+
+                    <TableCell className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleRowExpansion(row.restakerAddress)}
+                        className="p-1 h-8 w-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 hover:text-purple-800 transition-colors border border-purple-200"
+                        title="Click for details"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
                     </TableCell>
 
                     <TableCell>
@@ -509,89 +558,163 @@ const RestakerOverview: React.FC = () => {
                     <TableCell className="text-center">
                       {row.mostUsedStrategies}
                     </TableCell>
-
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleRowExpansion(row.restakerAddress)}
-                        className="p-0 h-8 w-8"
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </TableCell>
                   </TableRow>
 
                   {isExpanded && (
-                    <TableRow className="bg-gray-50 border-t-0">
-                      <TableCell colSpan={7} className="p-4">
-                        <div className="text-sm">
-                          <h4 className="font-semibold mb-2 text-gray-700">
-                            Restaker Details
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">
-                                Address Information
-                              </h5>
-                              <p>
-                                <span className="text-gray-600">
-                                  Full Address:
-                                </span>{' '}
-                                {row.restakerAddress}
-                              </p>
-                              <p>
-                                <span className="text-gray-600">
-                                  Market Share:
-                                </span>{' '}
-                                {row.amountRestaked}% of total restaked ETH
-                              </p>
-                              <p>
-                                <span className="text-gray-600">
-                                  ETH Restaked:
-                                </span>{' '}
-                                {row.ethRestaked}
-                              </p>
-                              {ethPrice > 0 && (
-                                <p>
-                                  <span className="text-gray-600">
-                                    USD Value:
+                    <TableRow className="bg-purple-50 border-t-0">
+                      <TableCell colSpan={8} className="p-0">
+                        <div className="p-4 border-t-2 border-purple-200">
+                          <div className="text-sm">
+                            <h4 className="font-semibold mb-3 text-purple-700 flex items-center">
+                              <Info className="h-4 w-4 mr-2" />
+                              Restaker Details
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                              <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+                                <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                                  Address Information
+                                </h5>
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    Full Address:
                                   </span>{' '}
-                                  {formatUSDValue(
-                                    extractETHValue(row.ethRestaked) * ethPrice,
-                                  )}
+                                  <span className="font-mono bg-gray-50 px-1 rounded">
+                                    {row.restakerAddress}
+                                  </span>
                                 </p>
-                              )}
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    Market Share:
+                                  </span>{' '}
+                                  <span className="font-semibold">
+                                    {row.amountRestaked}%
+                                  </span>{' '}
+                                  of total restaked ETH
+                                </p>
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    ETH Restaked:
+                                  </span>{' '}
+                                  <span className="font-semibold">
+                                    {row.ethRestaked}
+                                  </span>
+                                </p>
+                                {ethPrice > 0 && (
+                                  <p className="py-1">
+                                    <span className="text-gray-600 font-medium">
+                                      USD Value:
+                                    </span>{' '}
+                                    <span className="font-semibold">
+                                      {formatUSDValue(
+                                        extractETHValue(row.ethRestaked) *
+                                          ethPrice,
+                                      )}
+                                    </span>
+                                  </p>
+                                )}
+                              </div>
+                              <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+                                <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                                  Strategy Usage
+                                </h5>
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    Total Strategies:
+                                  </span>{' '}
+                                  <span className="font-semibold">
+                                    {row.numberOfStrategies}
+                                  </span>
+                                </p>
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    Most Used Strategy:
+                                  </span>{' '}
+                                  <span className="font-semibold">
+                                    {row.mostUsedStrategies}
+                                  </span>
+                                </p>
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    Address Type:
+                                  </span>{' '}
+                                  <Badge
+                                    color={
+                                      parseFloat(row.amountRestaked) > 1
+                                        ? 'blue'
+                                        : 'gray'
+                                    }
+                                    text={
+                                      parseFloat(row.amountRestaked) > 1
+                                        ? 'Whale'
+                                        : 'Retail'
+                                    }
+                                  />
+                                </p>
+                              </div>
                             </div>
-                            <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">
-                                Strategy Usage
-                              </h5>
-                              <p>
-                                <span className="text-gray-600">
-                                  Total Strategies:
-                                </span>{' '}
-                                {row.numberOfStrategies}
-                              </p>
-                              <p>
-                                <span className="text-gray-600">
-                                  Most Used Strategy:
-                                </span>{' '}
-                                {row.mostUsedStrategies}
-                              </p>
-                              <p>
-                                <span className="text-gray-600">
-                                  Address Type:
-                                </span>{' '}
-                                {parseFloat(row.amountRestaked) > 1
-                                  ? 'Whale'
-                                  : 'Retail'}
-                              </p>
-                            </div>
+
+                            {/* Add new section for all strategies with improved styling */}
+                            {row.strategies && row.strategies.length > 0 && (
+                              <div className="mt-4">
+                                <h5 className="font-medium text-gray-800 mb-3 border-b pb-2 flex items-center">
+                                  <Wallet className="h-4 w-4 mr-2 text-blue-600" />
+                                  All Strategies With Assets
+                                </h5>
+                                <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                    {row.strategies
+                                      .sort(
+                                        (a, b) =>
+                                          b.token_value_eth - a.token_value_eth,
+                                      )
+                                      .map((strategy, idx) => (
+                                        <div
+                                          key={idx}
+                                          className="flex justify-between items-center p-3 bg-gray-50 rounded-md hover:bg-blue-50 transition-colors border border-gray-200"
+                                        >
+                                          <div className="flex flex-col">
+                                            <span className="font-medium text-gray-800">
+                                              {strategy.strategy_name}
+                                            </span>
+                                            <span className="text-xs text-gray-500">
+                                              {strategy.token_name}
+                                            </span>
+                                          </div>
+                                          <div className="flex flex-col items-end">
+                                            <Badge
+                                              color={
+                                                strategy.token_value_eth > 10000
+                                                  ? 'blue'
+                                                  : strategy.token_value_eth >
+                                                      1000
+                                                    ? 'green'
+                                                    : 'gray'
+                                              }
+                                              text={`${new Intl.NumberFormat(
+                                                'en-US',
+                                                {
+                                                  notation: 'compact',
+                                                  maximumFractionDigits: 1,
+                                                },
+                                              ).format(
+                                                strategy.token_amount,
+                                              )} ${strategy.token_name}`}
+                                            />
+                                            {ethPrice > 0 && (
+                                              <span className="text-xs text-gray-500 mt-1">
+                                                {formatUSDValue(
+                                                  strategy.token_value_eth *
+                                                    ethPrice,
+                                                )}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      ))}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </TableCell>

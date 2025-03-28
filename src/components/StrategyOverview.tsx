@@ -448,8 +448,17 @@ const StrategyOverview: React.FC = () => {
     <div className="overflow-x-auto max-h-[70vh] border rounded-lg shadow-sm">
       <Table>
         <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
-          <TableRow>
-            <TableHead className="w-[50px] text-center">#</TableHead>
+          <TableRow className="border-b-2 border-purple-200">
+            <TableHead className="w-[50px] text-center">
+              <span className="text-purple-700">#</span>
+            </TableHead>
+            <TableHead className="w-[50px] text-center">
+              <div className="flex justify-center">
+                <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded-full">
+                  Details
+                </span>
+              </div>
+            </TableHead>
             <TableHead>
               <Button
                 variant="ghost"
@@ -491,7 +500,6 @@ const StrategyOverview: React.FC = () => {
               <InfoTooltip content="Herfindahl-Hirschman Index measures market concentration (0-1). Higher values indicate more concentration." />
             </TableHead>
             <TableHead>Risk Level</TableHead>
-            <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -540,6 +548,21 @@ const StrategyOverview: React.FC = () => {
                   >
                     <TableCell className="font-semibold text-center">
                       {(currentPage - 1) * itemsPerPage + index + 1}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleRowExpansion(strategy.rawName)}
+                        className="p-1 h-8 w-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 hover:text-purple-800 transition-colors border border-purple-200"
+                        title="Click for details"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
                     </TableCell>
                     <TableCell className="font-medium">
                       {strategy.name}
@@ -642,128 +665,142 @@ const StrategyOverview: React.FC = () => {
                         );
                       })()}
                     </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleRowExpansion(strategy.rawName)}
-                        className="p-0 h-8 w-8"
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </TableCell>
                   </TableRow>
 
                   {isExpanded && (
-                    <TableRow className="bg-gray-50 border-t-0">
-                      <TableCell colSpan={8} className="p-4">
-                        <div className="text-sm">
-                          <h4 className="font-semibold mb-2 text-gray-700">
-                            Strategy Details
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">
-                                Asset Information
-                              </h5>
-                              <p>
-                                <span className="text-gray-600">
-                                  Strategy Name:
-                                </span>{' '}
-                                {strategy.name}
-                              </p>
-                              <p>
-                                <span className="text-gray-600">
-                                  Total ETH:
-                                </span>{' '}
-                                {strategy.assets.toLocaleString()}
-                              </p>
-                              {ethPrice > 0 && (
-                                <p>
-                                  <span className="text-gray-600">
-                                    USD Value:
+                    <TableRow className="bg-purple-50 border-t-0">
+                      <TableCell colSpan={9} className="p-0">
+                        <div className="p-4 border-t-2 border-purple-200">
+                          <div className="text-sm">
+                            <h4 className="font-semibold mb-3 text-purple-700 flex items-center">
+                              <Info className="h-4 w-4 mr-2" />
+                              Strategy Details
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+                                <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                                  Asset Information
+                                </h5>
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    Strategy Name:
                                   </span>{' '}
-                                  {formatUSDValue(strategy.assets * ethPrice)}
+                                  <span className="font-semibold">
+                                    {strategy.name}
+                                  </span>
                                 </p>
-                              )}
-                              <p>
-                                <span className="text-gray-600">
-                                  Network Share:
-                                </span>{' '}
-                                {(
-                                  (strategy.assets / totalETHValue) *
-                                  100
-                                ).toFixed(2)}
-                                % of total restaked ETH
-                              </p>
-                            </div>
-                            <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">
-                                Concentration Metrics
-                              </h5>
-                              {strategy.metrics ? (
-                                <>
-                                  <p>
-                                    <span className="text-gray-600">
-                                      Total Operators:
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    Total ETH:
+                                  </span>{' '}
+                                  <span className="font-semibold">
+                                    {strategy.assets.toLocaleString()}
+                                  </span>
+                                </p>
+                                {ethPrice > 0 && (
+                                  <p className="py-1">
+                                    <span className="text-gray-600 font-medium">
+                                      USD Value:
                                     </span>{' '}
-                                    {strategy.metrics.totalEntities}
-                                  </p>
-                                  <p>
-                                    <span className="text-gray-600">
-                                      Top 5 Operators Control:
-                                    </span>{' '}
-                                    <span
-                                      className={
-                                        strategy.metrics.top5HoldersPercentage >
-                                        75
-                                          ? 'text-red-600 font-semibold'
-                                          : ''
-                                      }
-                                    >
-                                      {strategy.metrics.top5HoldersPercentage.toFixed(
-                                        1,
-                                      )}
-                                      %
-                                    </span>
-                                  </p>
-                                  <p>
-                                    <span className="text-gray-600">
-                                      Herfindahl Index:
-                                    </span>{' '}
-                                    <span
-                                      className={
-                                        strategy.metrics.herfindahlIndex > 0.25
-                                          ? 'text-red-600 font-semibold'
-                                          : ''
-                                      }
-                                    >
-                                      {strategy.metrics.herfindahlIndex.toFixed(
-                                        4,
+                                    <span className="font-semibold">
+                                      {formatUSDValue(
+                                        strategy.assets * ethPrice,
                                       )}
                                     </span>
                                   </p>
-                                  <p>
-                                    <span className="text-gray-600">
-                                      Risk Assessment:
-                                    </span>{' '}
-                                    {riskLevel === 'critical'
-                                      ? 'High concentration risk'
-                                      : riskLevel === 'warning'
-                                        ? 'Moderate concentration risk'
-                                        : 'Well-distributed'}
-                                  </p>
-                                </>
-                              ) : (
-                                <p className="text-gray-500 italic">
-                                  Concentration metrics not available for this
-                                  strategy
+                                )}
+                                <p className="py-1">
+                                  <span className="text-gray-600 font-medium">
+                                    Network Share:
+                                  </span>{' '}
+                                  <span className="font-semibold">
+                                    {(
+                                      (strategy.assets / totalETHValue) *
+                                      100
+                                    ).toFixed(2)}
+                                    %
+                                  </span>{' '}
+                                  of total restaked ETH
                                 </p>
-                              )}
+                              </div>
+                              <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+                                <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                                  Concentration Metrics
+                                </h5>
+                                {strategy.metrics ? (
+                                  <>
+                                    <p className="py-1">
+                                      <span className="text-gray-600 font-medium">
+                                        Total Operators:
+                                      </span>{' '}
+                                      <span className="font-semibold">
+                                        {strategy.metrics.totalEntities}
+                                      </span>
+                                    </p>
+                                    <p className="py-1">
+                                      <span className="text-gray-600 font-medium">
+                                        Top 5 Operators Control:
+                                      </span>{' '}
+                                      <span
+                                        className={
+                                          strategy.metrics
+                                            .top5HoldersPercentage > 75
+                                            ? 'text-red-600 font-semibold'
+                                            : 'font-semibold'
+                                        }
+                                      >
+                                        {strategy.metrics.top5HoldersPercentage.toFixed(
+                                          1,
+                                        )}
+                                        %
+                                      </span>
+                                    </p>
+                                    <p className="py-1">
+                                      <span className="text-gray-600 font-medium">
+                                        Herfindahl Index:
+                                      </span>{' '}
+                                      <span
+                                        className={
+                                          strategy.metrics.herfindahlIndex >
+                                          0.25
+                                            ? 'text-red-600 font-semibold'
+                                            : 'font-semibold'
+                                        }
+                                      >
+                                        {strategy.metrics.herfindahlIndex.toFixed(
+                                          4,
+                                        )}
+                                      </span>
+                                    </p>
+                                    <p className="py-1">
+                                      <span className="text-gray-600 font-medium">
+                                        Risk Assessment:
+                                      </span>{' '}
+                                      <Badge
+                                        color={
+                                          riskLevel === 'critical'
+                                            ? 'red'
+                                            : riskLevel === 'warning'
+                                              ? 'yellow'
+                                              : 'green'
+                                        }
+                                        text={
+                                          riskLevel === 'critical'
+                                            ? 'High concentration risk'
+                                            : riskLevel === 'warning'
+                                              ? 'Moderate concentration risk'
+                                              : 'Well-distributed'
+                                        }
+                                      />
+                                    </p>
+                                  </>
+                                ) : (
+                                  <p className="text-gray-500 italic">
+                                    Concentration metrics not available for this
+                                    strategy
+                                  </p>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>

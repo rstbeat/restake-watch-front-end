@@ -30,6 +30,19 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 import { fetchOperatorData, fetchETHPrice } from '../app/api/restake/restake';
 import { OperatorDataFormated } from '../app/interface/operatorData.interface';
 
+// Add these new interfaces to help with strategy data
+interface StrategyData {
+  strategy_name: string;
+  token_name: string;
+  token_amount: number;
+  token_value_eth: number;
+}
+
+// Update the OperatorDataFormated interface with detailed strategies
+interface OperatorDataWithStrategies extends OperatorDataFormated {
+  strategies?: StrategyData[];
+}
+
 const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
   <Tooltip.Provider>
     <Tooltip.Root>
@@ -88,11 +101,11 @@ const StyledIcon: React.FC<{
 
 const OperatorOverview: React.FC = () => {
   const [operatorData, setOperatorData] = useState<
-    OperatorDataFormated[] | null
+    OperatorDataWithStrategies[] | null
   >(null);
   const [isLoadingOperatorData, setIsLoadingOperatorData] = useState(false);
   const [sortColumn, setSortColumn] =
-    useState<keyof OperatorDataFormated>('marketShared');
+    useState<keyof OperatorDataWithStrategies>('marketShared');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -113,22 +126,25 @@ const OperatorOverview: React.FC = () => {
     try {
       setIsLoadingOperatorData(true);
       const data = await fetchOperatorData();
-      const operatorDataResponse: OperatorDataFormated[] =
-        data?.operatorData?.map((item: any) => ({
-          operatorAddress: item['Operator Address'] || '',
-          operatorName: item['Operator Name'] || 'Unknown',
-          majorOperator: item['Major Operator'] || '',
-          marketShared: Number((item['Market Share'] || 0) * 100).toFixed(1),
-          ethRestaked: new Intl.NumberFormat('en-US', {
-            notation: 'compact',
-            compactDisplay: 'short',
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 2,
-          }).format(Number(item['ETH Equivalent Value'] || 0)),
-          numberOfStrategies: item['Number of Strategies'] || 0,
-          dvtTechnology: item['DVT Technology'] || 'None',
-          mostUsedStrategies: item['Most Used Strategies'] || [],
-        })) || [];
+      const operatorDataResponse: OperatorDataWithStrategies[] =
+        data?.operatorData?.map((item: any) => {
+          return {
+            operatorAddress: item['Operator Address'] || '',
+            operatorName: item['Operator Name'] || 'Unknown',
+            majorOperator: item['Major Operator'] || '',
+            marketShared: Number((item['Market Share'] || 0) * 100).toFixed(1),
+            ethRestaked: new Intl.NumberFormat('en-US', {
+              notation: 'compact',
+              compactDisplay: 'short',
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 2,
+            }).format(Number(item['ETH Equivalent Value'] || 0)),
+            numberOfStrategies: item['Number of Strategies'] || 0,
+            dvtTechnology: item['DVT Technology'] || 'None',
+            mostUsedStrategies: item['Most Used Strategies'] || [],
+            strategies: item['strategies'] || [],
+          };
+        }) || [];
       setOperatorData(operatorDataResponse);
     } catch (error) {
       console.error('An error occurred while fetching operator data', error);
@@ -315,7 +331,7 @@ const OperatorOverview: React.FC = () => {
     return Math.ceil(filteredAndSortedData.length / itemsPerPage);
   }, [filteredAndSortedData, itemsPerPage]);
 
-  const handleSort = (column: keyof OperatorDataFormated) => {
+  const handleSort = (column: keyof OperatorDataWithStrategies) => {
     if (column === sortColumn) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -324,7 +340,11 @@ const OperatorOverview: React.FC = () => {
     }
   };
 
-  const SortIcon = ({ column }: { column: keyof OperatorDataFormated }) => {
+  const SortIcon = ({
+    column,
+  }: {
+    column: keyof OperatorDataWithStrategies;
+  }) => {
     if (column !== sortColumn) return <ArrowUpDown className="ml-2 h-4 w-4" />;
     return sortDirection === 'asc' ? (
       <ChevronUp className="ml-2 h-4 w-4" />
@@ -369,6 +389,15 @@ const OperatorOverview: React.FC = () => {
           : 1;
 
     return parseFloat(value) * multiplier;
+  };
+
+  // Helper function to format strategy value display
+  const formatStrategyValue = (value: number): string => {
+    if (value >= 1000) {
+      return `${(value / 1000).toFixed(1)}K ETH`;
+    } else {
+      return `${value.toFixed(2)} ETH`;
+    }
   };
 
   const renderFilterControls = () => (
@@ -486,8 +515,17 @@ const OperatorOverview: React.FC = () => {
     <div className="overflow-x-auto max-h-[70vh] border rounded-lg shadow-sm">
       <Table>
         <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
-          <TableRow>
-            <TableHead className="w-[50px] text-center">#</TableHead>
+          <TableRow className="border-b-2 border-purple-200">
+            <TableHead className="w-[50px] text-center">
+              <span className="text-purple-700">#</span>
+            </TableHead>
+            <TableHead className="w-[50px] text-center">
+              <div className="flex justify-center">
+                <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded-full">
+                  Details
+                </span>
+              </div>
+            </TableHead>
             <TableHead className="text-center">
               <Button
                 variant="ghost"
@@ -535,7 +573,6 @@ const OperatorOverview: React.FC = () => {
               </Button>
               <InfoTooltip content="The professional operator this operator belongs to. Professional operators are established entities that manage significant amounts of staked ETH across multiple addresses." />
             </TableHead>
-            <TableHead className="w-[50px]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -567,11 +604,24 @@ const OperatorOverview: React.FC = () => {
                     <TableCell className="font-semibold text-center">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </TableCell>
-
+                    <TableCell className="text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleRowExpansion(row.operatorAddress)}
+                        className="p-1 h-8 w-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 hover:text-purple-800 transition-colors border border-purple-200"
+                        title="Click for details"
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </TableCell>
                     <TableCell className="font-medium">
                       {row.operatorName}
                     </TableCell>
-
                     <TableCell>
                       <div className="flex items-center justify-center">
                         <div className="font-mono text-sm px-3 py-1.5 bg-gray-100 rounded-l-md border border-r-0 border-gray-200 max-w-[180px] truncate">
@@ -598,7 +648,6 @@ const OperatorOverview: React.FC = () => {
                         </button>
                       </div>
                     </TableCell>
-
                     <TableCell>
                       <div className="flex flex-col items-center justify-center">
                         <div className="flex items-center mb-1 w-full max-w-[150px]">
@@ -637,7 +686,6 @@ const OperatorOverview: React.FC = () => {
                           )}
                       </div>
                     </TableCell>
-
                     <TableCell className="text-center">
                       <div className="flex flex-col">
                         <span className="font-medium">
@@ -652,7 +700,6 @@ const OperatorOverview: React.FC = () => {
                         )}
                       </div>
                     </TableCell>
-
                     <TableCell className="text-center">
                       {row.dvtTechnology !== 'None' ? (
                         <Badge color="green" text={row.dvtTechnology} />
@@ -660,7 +707,6 @@ const OperatorOverview: React.FC = () => {
                         <Badge color="gray" text="None" />
                       )}
                     </TableCell>
-
                     <TableCell className="text-center">
                       {row.majorOperator ? (
                         <Badge color="blue" text={row.majorOperator} />
@@ -668,98 +714,131 @@ const OperatorOverview: React.FC = () => {
                         <Badge color="gray" text="Independent" />
                       )}
                     </TableCell>
-
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleRowExpansion(row.operatorAddress)}
-                        className="p-0 h-8 w-8"
-                      >
-                        {isExpanded ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </TableCell>
                   </TableRow>
 
                   {isExpanded && (
-                    <TableRow className="bg-gray-50 border-t-0">
-                      <TableCell colSpan={8} className="p-4">
-                        <div className="text-sm">
-                          <h4 className="font-semibold mb-2 text-gray-700">
-                            Additional Information
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">
-                                Operator Details
-                              </h5>
-                              <p>
-                                <span className="text-gray-600">
-                                  Full Address:
-                                </span>{' '}
-                                {row.operatorAddress}
-                              </p>
-                              <p>
-                                <span className="text-gray-600">
-                                  Market Share:
-                                </span>{' '}
-                                {row.marketShared}% of total restaked ETH
-                              </p>
-                              <p>
-                                <span className="text-gray-600">
-                                  ETH Restaked:
-                                </span>{' '}
-                                {row.ethRestaked}
-                              </p>
-                              {ethPrice > 0 && (
-                                <p>
-                                  <span className="text-gray-600">
-                                    USD Value:
-                                  </span>{' '}
-                                  {formatUSDValue(
-                                    extractETHValue(row.ethRestaked) * ethPrice,
-                                  )}
-                                </p>
-                              )}
-                            </div>
-                            <div className="bg-white p-3 rounded border border-gray-200">
-                              <h5 className="font-medium text-gray-800 mb-2">
-                                Most Used Strategies
-                              </h5>
-                              {row.mostUsedStrategies &&
-                              row.mostUsedStrategies.length > 0 ? (
-                                <div className="space-y-2">
-                                  {row.mostUsedStrategies
-                                    .slice(0, 3)
-                                    .map((strategy: any, idx: number) => (
-                                      <div
-                                        key={idx}
-                                        className="flex justify-between items-center p-1 border-b border-gray-100"
-                                      >
-                                        <span>
-                                          {strategy.name || 'Unknown Strategy'}
+                    <TableRow className="bg-purple-50 border-t-0">
+                      <TableCell colSpan={9} className="p-0">
+                        <div className="p-4 border-t-2 border-purple-200">
+                          <div className="text-sm">
+                            <h4 className="font-semibold mb-3 text-purple-700 flex items-center">
+                              <Info className="h-4 w-4 mr-2" />
+                              Additional Information
+                            </h4>
+                            <div className="grid grid-cols-1 gap-4 mb-4">
+                              <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+                                <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                                  Operator Details
+                                </h5>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <p className="py-1">
+                                      <span className="text-gray-600 font-medium">
+                                        Full Address:
+                                      </span>{' '}
+                                      <span className="font-mono bg-gray-50 px-1 rounded">
+                                        {row.operatorAddress}
+                                      </span>
+                                    </p>
+                                    <p className="py-1">
+                                      <span className="text-gray-600 font-medium">
+                                        Market Share:
+                                      </span>{' '}
+                                      <span className="font-semibold">
+                                        {row.marketShared}%
+                                      </span>{' '}
+                                      of total restaked ETH
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="py-1">
+                                      <span className="text-gray-600 font-medium">
+                                        ETH Restaked:
+                                      </span>{' '}
+                                      <span className="font-semibold">
+                                        {row.ethRestaked}
+                                      </span>
+                                    </p>
+                                    {ethPrice > 0 && (
+                                      <p className="py-1">
+                                        <span className="text-gray-600 font-medium">
+                                          USD Value:
+                                        </span>{' '}
+                                        <span className="font-semibold">
+                                          {formatUSDValue(
+                                            extractETHValue(row.ethRestaked) *
+                                              ethPrice,
+                                          )}
                                         </span>
-                                        <Badge
-                                          color="blue"
-                                          text={
-                                            strategy.percentage
-                                              ? `${strategy.percentage}%`
-                                              : 'N/A'
-                                          }
-                                        />
-                                      </div>
-                                    ))}
+                                      </p>
+                                    )}
+                                  </div>
                                 </div>
-                              ) : (
-                                <p className="text-gray-500 italic">
-                                  No strategy data available
-                                </p>
-                              )}
+                              </div>
                             </div>
+
+                            {/* Strategy section with improved styling */}
+                            {row.strategies && row.strategies.length > 0 && (
+                              <div className="mt-4">
+                                <h5 className="font-medium text-gray-800 mb-3 border-b pb-2 flex items-center">
+                                  <BarChart3 className="h-4 w-4 mr-2 text-purple-600" />
+                                  All Strategies With Assets
+                                </h5>
+                                <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                                    {row.strategies
+                                      .sort(
+                                        (a, b) =>
+                                          b.token_value_eth - a.token_value_eth,
+                                      )
+                                      .map((strategy, idx) => (
+                                        <div
+                                          key={idx}
+                                          className="flex justify-between items-center p-3 bg-gray-50 rounded-md hover:bg-purple-50 transition-colors border border-gray-200"
+                                        >
+                                          <div className="flex flex-col">
+                                            <span className="font-medium text-gray-800">
+                                              {strategy.strategy_name}
+                                            </span>
+                                            <span className="text-xs text-gray-500">
+                                              {strategy.token_name}
+                                            </span>
+                                          </div>
+                                          <div className="flex flex-col items-end">
+                                            <Badge
+                                              color={
+                                                strategy.token_value_eth > 10000
+                                                  ? 'blue'
+                                                  : strategy.token_value_eth >
+                                                      1000
+                                                    ? 'green'
+                                                    : 'gray'
+                                              }
+                                              text={`${new Intl.NumberFormat(
+                                                'en-US',
+                                                {
+                                                  notation: 'compact',
+                                                  maximumFractionDigits: 1,
+                                                },
+                                              ).format(
+                                                strategy.token_amount,
+                                              )} ${strategy.token_name}`}
+                                            />
+                                            {ethPrice > 0 && (
+                                              <span className="text-xs text-gray-500 mt-1">
+                                                {formatUSDValue(
+                                                  strategy.token_value_eth *
+                                                    ethPrice,
+                                                )}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      ))}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </TableCell>
