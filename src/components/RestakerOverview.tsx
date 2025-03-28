@@ -282,11 +282,14 @@ const RestakerOverview: React.FC = () => {
   const extractETHValue = (ethString: string): number => {
     // Convert notations like "849K" to their numeric values
     const value = ethString.replace(/[^0-9.]/g, '');
-    const multiplier = 
-      ethString.includes('K') ? 1_000 : 
-      ethString.includes('M') ? 1_000_000 : 
-      ethString.includes('B') ? 1_000_000_000 : 1;
-    
+    const multiplier = ethString.includes('K')
+      ? 1_000
+      : ethString.includes('M')
+        ? 1_000_000
+        : ethString.includes('B')
+          ? 1_000_000_000
+          : 1;
+
     return parseFloat(value) * multiplier;
   };
 
@@ -475,10 +478,14 @@ const RestakerOverview: React.FC = () => {
 
                     <TableCell className="text-center">
                       <div className="flex flex-col">
-                        <span className="font-medium">{row.ethRestaked} ETH</span>
+                        <span className="font-medium">
+                          {row.ethRestaked} ETH
+                        </span>
                         {ethPrice > 0 && (
                           <span className="text-xs text-gray-500">
-                            {formatUSDValue(extractETHValue(row.ethRestaked) * ethPrice)}
+                            {formatUSDValue(
+                              extractETHValue(row.ethRestaked) * ethPrice,
+                            )}
                           </span>
                         )}
                       </div>
@@ -554,7 +561,9 @@ const RestakerOverview: React.FC = () => {
                                   <span className="text-gray-600">
                                     USD Value:
                                   </span>{' '}
-                                  {formatUSDValue(extractETHValue(row.ethRestaked) * ethPrice)}
+                                  {formatUSDValue(
+                                    extractETHValue(row.ethRestaked) * ethPrice,
+                                  )}
                                 </p>
                               )}
                             </div>
