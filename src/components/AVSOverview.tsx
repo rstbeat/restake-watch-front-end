@@ -2125,7 +2125,7 @@ const AVSOverview: React.FC = () => {
                           );
 
                           // Create relationships based on the actual structure
-                          const adaptedRelationships = [];
+                          const adaptedRelationships: AVSRelationship[] = [];
                           let avsField = 'avs';
                           let operatorField = 'operator';
                           let strategyField = 'strategy';
