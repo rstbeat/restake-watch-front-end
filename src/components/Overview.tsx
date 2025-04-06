@@ -3367,18 +3367,6 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       </Card>
 
       {/* Replace Lorenz Curve with more intuitive Stake Distribution Chart */}
-      {operatorData?.concentrationMetrics?.lorenzCurve && (
-        <StakeDistributionChart
-          lorenzData={operatorData.concentrationMetrics.lorenzCurve}
-          title="Operator Stake Concentration"
-          description="This chart shows how assets (converted to ETH value) are concentrated among individual operator nodes (not operator groups), from largest to smallest. A steep initial curve indicates high concentration at the node level."
-          top33PercentCount={
-            operatorData.concentrationMetrics.top33PercentCount
-          }
-          entityType="operators"
-        />
-      )}
-
       {restakeData?.concentrationMetrics?.lorenzCurve && (
         <StakeDistributionChart
           lorenzData={restakeData.concentrationMetrics.lorenzCurve}
