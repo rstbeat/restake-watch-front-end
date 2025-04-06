@@ -1579,13 +1579,13 @@ const AVSOverview: React.FC = () => {
                           
                           // Get unique AVS addresses
                           const avsAddresses = validRecords.map((item: InitialDataItem) => item.avs);
-                          const uniqueAVSes = Array.from(new Set(avsAddresses));
+                          const uniqueAVSes = Array.from(new Set(avsAddresses)) as string[];
                           
                           console.log(`Found ${uniqueAVSes.length} unique AVS addresses`);
                           console.log('First 5 unique AVS addresses:', uniqueAVSes.slice(0, 5));
                           
                           // Create manual AVS aggregates
-                          const manualAggregates = uniqueAVSes.map((avsAddress: string) => {
+                          const manualAggregates = uniqueAVSes.map((avsAddress) => {
                             const avsRecords = validRecords.filter((item: InitialDataItem) => item.avs === avsAddress);
                             
                             const totalETH = avsRecords.reduce((sum: number, item: InitialDataItem) => 

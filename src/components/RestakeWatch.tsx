@@ -463,7 +463,7 @@ const RestakeWatch: React.FC = () => {
                       <DollarSign
                         className={scrolled ? 'mr-1 h-3 w-3' : 'mr-1.5 h-4 w-4'}
                       />
-                      {scrolled ? 'Funding' : 'Funding & Insights?'}
+                      {scrolled ? 'Funding' : 'Got Funding or Insights?'}
                     </a>
 
                     {!scrolled && (
