@@ -508,16 +508,31 @@ const AVSOverview: React.FC = () => {
         return matchesSearch && matchesSelectedAVS;
       })
       .sort((a, b) => {
-        const aValue = a[sortColumn];
-        const bValue = b[sortColumn];
+        // Type-safe way to check and access properties
+        type SortableKeys = keyof AVSRelationship;
         
-        if (typeof aValue === 'number' && typeof bValue === 'number') {
-          return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+        // Check if sortColumn is a valid key in AVSRelationship
+        const isValidKey = (key: string): key is SortableKeys => {
+          return key in a;
+        };
+        
+        if (isValidKey(sortColumn)) {
+          const aValue = a[sortColumn];
+          const bValue = b[sortColumn];
+          
+          if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+          }
+          
+          return sortDirection === 'asc' 
+            ? String(aValue).localeCompare(String(bValue))
+            : String(bValue).localeCompare(String(aValue));
         }
         
+        // Fallback sorting by address if sortColumn is not a valid key
         return sortDirection === 'asc' 
-          ? String(aValue).localeCompare(String(bValue))
-          : String(bValue).localeCompare(String(aValue));
+          ? a.avsAddress.localeCompare(b.avsAddress)
+          : b.avsAddress.localeCompare(a.avsAddress);
       });
   }, [relationships, searchTerm, selectedAVS, sortColumn, sortDirection]);
 

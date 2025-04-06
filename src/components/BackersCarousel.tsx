@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -20,9 +20,9 @@ const BackersCarousel: React.FC<BackersCarouselProps> = ({ backers }) => {
   const [autoplay, setAutoplay] = useState(true);
   const autoplayIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setActiveIndex((current) => (current + 1) % backers.length);
-  };
+  }, [backers.length]);
 
   const prevSlide = () => {
     setActiveIndex(
