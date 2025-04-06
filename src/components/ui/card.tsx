@@ -6,22 +6,26 @@ const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     glassEffect?: 'none' | 'light' | 'medium' | 'strong';
+    hoverEffect?: boolean;
+    gradientBorder?: boolean;
   }
->(({ className, glassEffect = 'none', ...props }, ref) => {
-  // Glassmorphism classes based on intensity
+>(({ className, glassEffect = 'none', hoverEffect = false, gradientBorder = false, ...props }, ref) => {
+  // Enhanced glassmorphism classes with modern effects
   const glassClasses = {
     none: '',
-    light: 'backdrop-blur-sm bg-white/70 border-white/20 hover:bg-white/80 transition-all duration-300',
-    medium: 'backdrop-blur-md bg-white/60 border-white/30 shadow-lg hover:bg-white/70 transition-all duration-300',
-    strong: 'backdrop-blur-xl bg-white/50 border-white/40 shadow-xl hover:bg-white/60 transition-all duration-300',
+    light: 'glass backdrop-blur-sm bg-white/70 border-white/20 transition-colors duration-300',
+    medium: 'glass backdrop-blur-md bg-white/60 border-white/30 shadow-lg transition-colors duration-300',
+    strong: 'glass backdrop-blur-xl bg-white/50 border-white/40 shadow-xl transition-colors duration-300',
   };
 
   return (
     <div
       ref={ref}
       className={cn(
-        'rounded-xl border bg-card text-card-foreground shadow',
+        'rounded-xl border bg-card text-card-foreground shadow transition-all duration-300',
         glassEffect !== 'none' && glassClasses[glassEffect],
+        hoverEffect && 'glass-hover animate-scale',
+        gradientBorder && 'gradient-border',
         className,
       )}
       {...props}
@@ -48,7 +52,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn('font-semibold leading-none tracking-tight', className)}
+    className={cn('font-semibold leading-none tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-light', className)}
     {...props}
   />
 ));
