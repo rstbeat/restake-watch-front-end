@@ -44,6 +44,17 @@ interface RestakerData {
   strategies?: StrategyData[];
 }
 
+// Define the structure for the items in the initial fetched data
+interface InitialDataItem {
+  'Staker Address'?: string;
+  'Market Share'?: number;
+  'ETH Equivalent Value'?: number;
+  'Number of Strategies'?: number;
+  'Most Used Strategy'?: string;
+  strategies?: any[];
+  // Add other potential fields if known
+}
+
 const Badge: React.FC<{ color: string; text: string }> = ({ color, text }) => {
   const colorClasses: { [key: string]: string } = {
     red: 'bg-red-500 text-white border-2 border-red-600 shadow-md',
@@ -121,7 +132,7 @@ const RestakerOverview: React.FC = () => {
       setIsLoadingStakerData(true);
       const data = await fetchStakerData();
       const stakerDataResponse =
-        data?.stakerData?.map((data: any) => {
+        data?.stakerData?.map((data: InitialDataItem) => {
           return {
             restakerAddress: data['Staker Address'] || '',
             amountRestaked: Number((data['Market Share'] || 0) * 100).toFixed(
@@ -230,6 +241,9 @@ const RestakerOverview: React.FC = () => {
       .sort((a, b) => {
         const aValue = a[sortColumn];
         const bValue = b[sortColumn];
+
+        if (aValue === undefined || bValue === undefined) return 0;
+
         if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
         return 0;

@@ -124,6 +124,7 @@ interface InitialDataItem {
   usd?: number | null;
   status_date?: string | null;
   // Add other potential fields if known, otherwise keep it minimal
+  [key: string]: any; // Add index signature to allow dynamic property access
 }
 
 const AVSOverview: React.FC = () => {
@@ -2164,7 +2165,7 @@ const AVSOverview: React.FC = () => {
                           }
 
                           // Adapt each record to our relationship structure
-                          data.data.forEach((record) => {
+                          data.data.forEach((record: InitialDataItem) => {
                             try {
                               adaptedRelationships.push({
                                 avsAddress: record[avsField] || avsToTry,

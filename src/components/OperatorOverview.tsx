@@ -180,7 +180,7 @@ const OperatorOverview: React.FC = () => {
   const professionalOperators = useMemo(() => {
     if (!operatorData) return [];
     const operatorsSet = new Set<string>();
-    operatorData.forEach((operator) => {
+    operatorData.forEach((operator: OperatorDataWithStrategies) => {
       if (operator.majorOperator) {
         operatorsSet.add(operator.majorOperator);
       }
@@ -297,6 +297,10 @@ const OperatorOverview: React.FC = () => {
       .sort((a, b) => {
         const aValue = a[sortColumn];
         const bValue = b[sortColumn];
+
+        // Add null checks
+        if (aValue === undefined || bValue === undefined) return 0;
+
         if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
         return 0;
