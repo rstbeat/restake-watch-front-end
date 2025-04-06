@@ -48,7 +48,7 @@ const BackersCarousel: React.FC<BackersCarouselProps> = ({ backers }) => {
         clearInterval(autoplayIntervalRef.current);
       }
     };
-  }, [autoplay, backers.length]);
+  }, [autoplay, backers.length, nextSlide]);
 
   const handleMouseEnter = () => {
     setAutoplay(false);
@@ -60,7 +60,9 @@ const BackersCarousel: React.FC<BackersCarouselProps> = ({ backers }) => {
 
   const handleMouseLeave = () => {
     setAutoplay(true);
-    autoplayIntervalRef.current = setInterval(nextSlide, 5000);
+    if (!autoplayIntervalRef.current) {
+      autoplayIntervalRef.current = setInterval(nextSlide, 5000);
+    }
   };
 
   return (

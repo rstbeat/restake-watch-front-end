@@ -11,6 +11,9 @@ import {
   ChevronRight,
   FileDown,
   Network,
+  HelpCircle,
+  Loader2,
+  ExternalLink,
 } from 'lucide-react';
 import {
   Table,
@@ -111,6 +114,18 @@ interface AVSAggregate {
   latestStatusDate: string;
 }
 
+// Define the structure for the items in the initial fetched data
+interface InitialDataItem {
+  avs?: string | null;
+  operator?: string | null;
+  strategy?: string | null;
+  shares?: number | string | null; // Allow string as it might come from API like that initially
+  eth?: number | null;
+  usd?: number | null;
+  status_date?: string | null;
+  // Add other potential fields if known, otherwise keep it minimal
+}
+
 const AVSOverview: React.FC = () => {
   const [avsData, setAVSData] = useState<AVSDataItem[] | null>(null);
   const [isLoadingAVSData, setIsLoadingAVSData] = useState(false);
@@ -134,7 +149,7 @@ const AVSOverview: React.FC = () => {
       
       // Instead of using full=true, we'll fetch per AVS to get complete data
       // First get a list of all AVS addresses
-      let allRelationships = [];
+      let allRelationships: AVSRelationship[] = []; // Explicitly type the array
       
       // First try to get some initial data to find AVS addresses
       const initialUrl = 'https://eigenlayer.restakeapi.com/aoss/?date_start=2025-01-01&date_end=2025-12-31';
@@ -163,30 +178,30 @@ const AVSOverview: React.FC = () => {
       console.log(`Initial API returned ${initialData.data.length} records`);
       
       // Extract unique AVS addresses
-      const avsSet = new Set();
-      initialData.data.forEach(item => {
+      const avsSet = new Set<string>(); // Specify Set type
+      initialData.data.forEach((item: InitialDataItem) => { // Add type annotation here
         if (item && item.avs && typeof item.avs === 'string') {
           avsSet.add(item.avs);
         }
       });
       
-      const avsAddresses = Array.from(avsSet) as string[];
+      const avsAddresses = Array.from(avsSet); // Type inferred as string[]
       console.log(`Found ${avsAddresses.length} unique AVS addresses`);
       
       // Process the initial data
-      const initialTransformedData = initialData.data
-        .filter(item => item && item.avs && item.operator && item.strategy)
-        .map(item => ({
-          avsAddress: item.avs,
-          operatorAddress: item.operator,
-          strategyAddress: item.strategy,
+      const initialTransformedData = initialData.data // Keep type inference for map result
+        .filter((item: InitialDataItem) => item && item.avs && item.operator && item.strategy) 
+        .map((item: InitialDataItem) => ({ // Keep type inference for map result
+          avsAddress: item.avs!, 
+          operatorAddress: item.operator!, 
+          strategyAddress: item.strategy!, 
           shares: typeof item.shares === 'number' ? item.shares : 0,
           ethValue: typeof item.eth === 'number' ? item.eth : 0,
           usdValue: typeof item.usd === 'number' ? item.usd : 0,
           statusDate: item.status_date || 'Unknown'
         }));
       
-      allRelationships = [...initialTransformedData];
+      allRelationships = [...initialTransformedData]; // Assign correctly typed data
       console.log(`Transformed ${initialTransformedData.length} initial relationships`);
       
       // Now fetch data for each AVS separately to get complete data
@@ -224,12 +239,12 @@ const AVSOverview: React.FC = () => {
             console.log(`Received ${avsData.data.length} relationships for AVS ${avsAddress}`);
             
             // Transform this AVS's data
-            const avsTransformedData = avsData.data
-              .filter(item => item && item.avs && item.operator && item.strategy)
-              .map(item => ({
-                avsAddress: item.avs,
-                operatorAddress: item.operator,
-                strategyAddress: item.strategy,
+            const avsTransformedData = avsData.data // Keep type inference for map result
+              .filter((item: InitialDataItem) => item && item.avs && item.operator && item.strategy) 
+              .map((item: InitialDataItem) => ({ // Keep type inference for map result
+                avsAddress: item.avs!, 
+                operatorAddress: item.operator!, 
+                strategyAddress: item.strategy!, 
                 shares: typeof item.shares === 'number' ? item.shares : 0,
                 ethValue: typeof item.eth === 'number' ? item.eth : 0,
                 usdValue: typeof item.usd === 'number' ? item.usd : 0,
@@ -272,57 +287,82 @@ const AVSOverview: React.FC = () => {
       
       allRelationships.forEach(rel => {
         try {
-          if (!rel.avsAddress || typeof rel.avsAddress !== 'string') {
-            console.warn('Skipping relationship with invalid AVS address:', rel);
+          // Ensure rel and its key properties are valid
+          if (!rel || typeof rel.avsAddress !== 'string' || !rel.avsAddress) {
+            console.warn('Skipping relationship with invalid or missing AVS address:', rel);
             failedAggregations++;
             return;
           }
           
-          const existing = avsMap.get(rel.avsAddress);
+          const avsAddressKey = rel.avsAddress; // Use a clearly typed variable
+          const existing = avsMap.get(avsAddressKey);
           
+          // Ensure values used for calculations are numbers
+          const ethValue = typeof rel.ethValue === 'number' ? rel.ethValue : 0;
+          const usdValue = typeof rel.usdValue === 'number' ? rel.usdValue : 0;
+          const operatorAddress = typeof rel.operatorAddress === 'string' ? rel.operatorAddress : null;
+          const strategyAddress = typeof rel.strategyAddress === 'string' ? rel.strategyAddress : null;
+          const statusDate = typeof rel.statusDate === 'string' ? rel.statusDate : 'Unknown';
+
           if (existing) {
             // Add to existing aggregate
-            existing.totalETH += typeof rel.ethValue === 'number' ? rel.ethValue : 0;
-            existing.totalUSD += typeof rel.usdValue === 'number' ? rel.usdValue : 0;
+            existing.totalETH += ethValue;
+            existing.totalUSD += usdValue;
             
-            // Add operator if unique
-            if (rel.operatorAddress && !existing.uniqueOperators.includes(rel.operatorAddress)) {
-              existing.uniqueOperators.push(rel.operatorAddress);
+            // Add operator if unique and valid
+            if (operatorAddress && !existing.uniqueOperators.includes(operatorAddress)) {
+              existing.uniqueOperators.push(operatorAddress);
             }
             
-            // Add strategy if unique
-            if (rel.strategyAddress && !existing.uniqueStrategies.includes(rel.strategyAddress)) {
-              existing.uniqueStrategies.push(rel.strategyAddress);
+            // Add strategy if unique and valid
+            if (strategyAddress && !existing.uniqueStrategies.includes(strategyAddress)) {
+              existing.uniqueStrategies.push(strategyAddress);
             }
             
-            // Add relationship
-            existing.relationships.push(rel);
+            // Add relationship (ensure rel itself matches AVSRelationship)
+            existing.relationships.push({
+              ...rel,
+              avsAddress: avsAddressKey, // Ensure correct type
+              operatorAddress: operatorAddress || 'Unknown', // Handle potential null
+              strategyAddress: strategyAddress || 'Unknown', // Handle potential null
+              ethValue: ethValue,
+              usdValue: usdValue,
+              statusDate: statusDate
+            });
             
             // Update latest status date if newer
-            if (rel.statusDate) {
-              const currentDate = new Date(existing.latestStatusDate);
-              const newDate = new Date(rel.statusDate);
+            if (statusDate && statusDate !== 'Unknown') {
+              const currentDate = existing.latestStatusDate !== 'Unknown' ? new Date(existing.latestStatusDate) : new Date(0); // Handle 'Unknown'
+              const newDate = new Date(statusDate);
               if (newDate > currentDate) {
-                existing.latestStatusDate = rel.statusDate;
+                existing.latestStatusDate = statusDate;
               }
             }
             successfulAggregations++;
           } else {
-            // Create new aggregate
-            if (!rel.operatorAddress || !rel.strategyAddress) {
-              console.warn('Skipping relationship with missing operator or strategy:', rel);
+            // Create new aggregate - ensure operator/strategy are valid strings
+            if (!operatorAddress || !strategyAddress) {
+              console.warn('Skipping relationship for new aggregate due to missing operator or strategy:', rel);
               failedAggregations++;
               return;
             }
             
-            avsMap.set(rel.avsAddress, {
-              avsAddress: rel.avsAddress,
-              totalETH: typeof rel.ethValue === 'number' ? rel.ethValue : 0,
-              totalUSD: typeof rel.usdValue === 'number' ? rel.usdValue : 0,
-              uniqueOperators: [rel.operatorAddress],
-              uniqueStrategies: [rel.strategyAddress],
-              relationships: [rel],
-              latestStatusDate: rel.statusDate || 'Unknown'
+            avsMap.set(avsAddressKey, {
+              avsAddress: avsAddressKey, // Use the typed key
+              totalETH: ethValue,
+              totalUSD: usdValue,
+              uniqueOperators: [operatorAddress], // Known to be string here
+              uniqueStrategies: [strategyAddress], // Known to be string here
+              relationships: [{
+                ...rel,
+                 avsAddress: avsAddressKey, // Ensure correct type
+                 operatorAddress: operatorAddress, // Known to be string
+                 strategyAddress: strategyAddress, // Known to be string
+                 ethValue: ethValue,
+                 usdValue: usdValue,
+                 statusDate: statusDate
+              }],
+              latestStatusDate: statusDate
             });
             successfulAggregations++;
           }
@@ -333,11 +373,11 @@ const AVSOverview: React.FC = () => {
       });
       
       // Convert Map to Array
-      const avsAggregates = Array.from(avsMap.values()) as AVSAggregate[];
+      const avsAggregates = Array.from(avsMap.values()); // Keep TS inference
       console.log(`Created ${avsAggregates.length} AVS aggregates`);
       console.log(`Aggregation stats: ${successfulAggregations} successful, ${failedAggregations} failed`);
       
-      setAvsAggregates(avsAggregates);
+      setAvsAggregates(avsAggregates); // This should now work if types align
       setAVSData(initialData.data); // Keep original data format for reference
       
     } catch (error) {
