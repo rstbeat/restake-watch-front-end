@@ -38,6 +38,7 @@ import Footer from './Footer';
 import Roadmap from './Roadmap';
 import About from './About';
 import BackersCarousel from './BackersCarousel';
+import AVSOverview from './AVSOverview';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchStakerData, fetchOperatorData } from '../app/api/restake/restake';
 
@@ -255,6 +256,12 @@ const RestakeWatch: React.FC = () => {
           >
             Strategies
           </TabsTrigger>
+          <TabsTrigger
+            value="avs"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+          >
+            AVS
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent
@@ -283,6 +290,13 @@ const RestakeWatch: React.FC = () => {
           className={`space-y-6 transition-opacity duration-300 ease-in-out ${tabChanged && activeTab === 'strategies' ? 'opacity-0 animate-in fade-in-0' : 'opacity-100'}`}
         >
           {StrategyOverview && <StrategyOverview />}
+        </TabsContent>
+
+        <TabsContent
+          value="avs"
+          className={`space-y-6 transition-opacity duration-300 ease-in-out ${tabChanged && activeTab === 'avs' ? 'opacity-0 animate-in fade-in-0' : 'opacity-100'}`}
+        >
+          {AVSOverview && <AVSOverview />}
         </TabsContent>
       </Tabs>
     );
@@ -570,6 +584,16 @@ const RestakeWatch: React.FC = () => {
                       >
                         Strategies
                       </button>
+                      <button
+                        onClick={() => handleTabChange('avs')}
+                        className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
+                          activeTab === 'avs'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                        }`}
+                      >
+                        AVS
+                      </button>
                     </div>
 
                     <div className="md:hidden flex overflow-x-auto pb-1 pt-1">
@@ -613,6 +637,16 @@ const RestakeWatch: React.FC = () => {
                           }`}
                         >
                           Strategies
+                        </button>
+                        <button
+                          onClick={() => handleTabChange('avs')}
+                          className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
+                            activeTab === 'avs'
+                              ? 'bg-[#ab3bd2] text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          AVS
                         </button>
                       </div>
                     </div>

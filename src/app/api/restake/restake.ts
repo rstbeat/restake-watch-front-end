@@ -78,7 +78,7 @@ const fetchStakerData = async () => {
   }
 };
 
-export async function fetchEthereumStats(): Promise<{
+async function fetchEthereumStats(): Promise<{
   totalEthSupply: number;
   totalStEthSupply: number;
 }> {
@@ -95,4 +95,39 @@ export async function fetchEthereumStats(): Promise<{
   }
 }
 
-export { fetchOperatorData, fetchStakerData, fetchETHPrice };
+/**
+ * Fetches AVS relationship data from the "/aoss" endpoint.
+ * 
+ * @param filters - Optional filters for avs, operator, strategy, token, date_start, date_end
+ * @returns A Promise that resolves to the fetched data. If an error occurs, null is returned.
+ */
+const fetchAVSData = async (filters?: {
+  avs?: string | string[];
+  operator?: string | string[];
+  strategy?: string | string[];
+  token?: 'eth' | 'usd';
+  date_start?: string;
+  date_end?: string;
+  full?: boolean;
+}) => {
+  try {
+    // Use the cached endpoint by default
+    const response = await axios.get('https://eigenlayer.restakeapi.com/aoss', {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        ...filters,
+        // If no filters are provided, use full=true to get all data
+        full: filters && Object.keys(filters).length === 0 ? true : filters?.full,
+      },
+    });
+    
+    return response.data;
+  } catch (err: unknown) {
+    console.error('Error fetching AVS data:', err);
+    return null;
+  }
+};
+
+export { fetchOperatorData, fetchStakerData, fetchETHPrice, fetchEthereumStats, fetchAVSData };
