@@ -59,7 +59,7 @@ const About: React.FC = () => {
               About restake.watch
             </h2>
             <p className="text-sm text-gray-600">
-              The premier analytics platform for the restaking ecosystem.
+              The analytics platform for the restaking ecosystem.
             </p>
           </div>
         </div>

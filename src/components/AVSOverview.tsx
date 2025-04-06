@@ -1566,7 +1566,7 @@ const AVSOverview: React.FC = () => {
                           console.log('First 3 records from API:', data.data.slice(0, 3));
                           
                           // Check for valid AVS fields in records
-                          const validRecords = data.data.filter(item => 
+                          const validRecords = data.data.filter((item: InitialDataItem) => 
                             item && typeof item.avs === 'string' && item.avs.length > 0
                           );
                           
@@ -1578,41 +1578,41 @@ const AVSOverview: React.FC = () => {
                           }
                           
                           // Get unique AVS addresses
-                          const avsAddresses = validRecords.map(item => item.avs);
+                          const avsAddresses = validRecords.map((item: InitialDataItem) => item.avs);
                           const uniqueAVSes = Array.from(new Set(avsAddresses));
                           
                           console.log(`Found ${uniqueAVSes.length} unique AVS addresses`);
                           console.log('First 5 unique AVS addresses:', uniqueAVSes.slice(0, 5));
                           
                           // Create manual AVS aggregates
-                          const manualAggregates = uniqueAVSes.map(avsAddress => {
-                            const avsRecords = validRecords.filter(item => item.avs === avsAddress);
+                          const manualAggregates = uniqueAVSes.map((avsAddress: string) => {
+                            const avsRecords = validRecords.filter((item: InitialDataItem) => item.avs === avsAddress);
                             
-                            const totalETH = avsRecords.reduce((sum, item) => 
+                            const totalETH = avsRecords.reduce((sum: number, item: InitialDataItem) => 
                               sum + (typeof item.eth === 'number' ? item.eth : 0), 0
                             );
                             
-                            const totalUSD = avsRecords.reduce((sum, item) => 
+                            const totalUSD = avsRecords.reduce((sum: number, item: InitialDataItem) => 
                               sum + (typeof item.usd === 'number' ? item.usd : 0), 0
                             );
                             
                             const uniqueOperators = Array.from(new Set(
                               avsRecords
-                                .filter(item => typeof item.operator === 'string')
-                                .map(item => item.operator)
-                            ));
+                                .filter((item: InitialDataItem) => typeof item.operator === 'string')
+                                .map((item: InitialDataItem) => item.operator as string)
+                            )) as string[];
                             
                             const uniqueStrategies = Array.from(new Set(
                               avsRecords
-                                .filter(item => typeof item.strategy === 'string')
-                                .map(item => item.strategy)
-                            ));
+                                .filter((item: InitialDataItem) => typeof item.strategy === 'string')
+                                .map((item: InitialDataItem) => item.strategy as string)
+                            )) as string[];
                             
                             // Transform records to relationships
-                            const relationships = avsRecords.map(item => ({
-                              avsAddress: item.avs,
-                              operatorAddress: item.operator,
-                              strategyAddress: item.strategy,
+                            const relationships = avsRecords.map((item: InitialDataItem): AVSRelationship => ({
+                              avsAddress: item.avs as string,
+                              operatorAddress: typeof item.operator === 'string' ? item.operator : 'Unknown',
+                              strategyAddress: typeof item.strategy === 'string' ? item.strategy : 'Unknown',
                               shares: typeof item.shares === 'number' ? item.shares : 0,
                               ethValue: typeof item.eth === 'number' ? item.eth : 0,
                               usdValue: typeof item.usd === 'number' ? item.usd : 0,
@@ -1627,7 +1627,7 @@ const AVSOverview: React.FC = () => {
                               uniqueStrategies,
                               relationships,
                               latestStatusDate: avsRecords[0]?.status_date || 'Unknown'
-                            };
+                            } as AVSAggregate;
                           });
                           
                           console.log(`Created ${manualAggregates.length} debug aggregates`);
