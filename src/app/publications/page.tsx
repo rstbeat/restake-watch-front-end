@@ -79,6 +79,12 @@ export default function Publications() {
         <CardContent className="p-6">
           <div className="space-y-4">
             <PublicationItem
+              title="Restaking Networks Risk Evaluation"
+              authors="Tokensight and P2P"
+              date="April 3, 2025"
+              url="https://paragraph.com/@tokensightxyz/restaking-networks-risk-evaluation"
+            />
+            <PublicationItem
               title="Fortify or Falter: A Comprehensive Restaking Risk Assessment"
               authors="Omar Espejel"
               date="February 2025"
