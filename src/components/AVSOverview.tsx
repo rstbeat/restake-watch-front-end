@@ -599,7 +599,9 @@ const AVSOverview: React.FC = () => {
                 <InfoTooltip content="Penalty for signing two different blocks or messages for the same slot or task" />
               </div>
               <div className="flex items-center">
-                {renderSlashingIndicator(avs.slashingConditions.commitmentBreach)}
+                {renderSlashingIndicator(
+                  avs.slashingConditions.commitmentBreach,
+                )}
                 <span className="text-sm">Commitment Breach</span>
                 <InfoTooltip content="Penalty for failing to fulfill a prior commitment (e.g., data availability, task execution, promised transactions)" />
               </div>
@@ -614,7 +616,9 @@ const AVSOverview: React.FC = () => {
                 <InfoTooltip content="Penalty for malicious behavior during Distributed Key Generation processes, relevant for TSS/MPC-based AVSs" />
               </div>
               <div className="flex items-center">
-                {renderSlashingIndicator(avs.slashingConditions.failureToSettle)}
+                {renderSlashingIndicator(
+                  avs.slashingConditions.failureToSettle,
+                )}
                 <span className="text-sm">Failure to Settle</span>
                 <InfoTooltip content="Penalty for failing to settle transaction batches or preconfirmations on Layer 1" />
               </div>
@@ -757,37 +761,42 @@ const AVSOverview: React.FC = () => {
           All AVSs by Category/Type
         </h2>
         <p className="text-sm text-gray-600 mb-4">
-          Displaying all Actively Validated Services in the ecosystem with
-          their operator permission models and slashing conditions
+          Displaying all Actively Validated Services in the ecosystem with their
+          operator permission models and slashing conditions
         </p>
 
         <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
           <p className="text-red-700 font-medium">
-            AVSs implement various slashing conditions that directly impact
-            the security of your staked ETH
+            AVSs implement various slashing conditions that directly impact the
+            security of your staked ETH
           </p>
           <p className="text-sm text-red-600 mt-1">
-            The Permission Model indicates whether an AVS allows any operator to secure it (Permissionless) or
-            restricts operators through whitelisting (Whitelisted)
+            The Permission Model indicates whether an AVS allows any operator to
+            secure it (Permissionless) or restricts operators through
+            whitelisting (Whitelisted)
           </p>
           <p className="text-sm text-red-600 mt-1">
-            Different implementation statuses and slashing conditions affect overall risk profile.
-            Always research thoroughly before restaking to an AVS.
+            Different implementation statuses and slashing conditions affect
+            overall risk profile. Always research thoroughly before restaking to
+            an AVS.
           </p>
         </div>
 
         <div className="bg-purple-50 p-4 rounded-lg mb-6 border border-purple-200">
           <p className="text-purple-700 font-medium">
-            The EigenLayer ecosystem's security depends on both how operators are permitted to join
-            (Permissioning) and what penalties they face for misconduct (Slashing)
+            The EigenLayer ecosystem's security depends on both how operators
+            are permitted to join (Permissioning) and what penalties they face
+            for misconduct (Slashing)
           </p>
           <p className="text-sm text-purple-600 mt-1">
-            Permissioning models range from fully permissionless (anyone can join) to strictly whitelisted 
-            (selected operators only), directly affecting decentralization
+            Permissioning models range from fully permissionless (anyone can
+            join) to strictly whitelisted (selected operators only), directly
+            affecting decentralization
           </p>
           <p className="text-sm text-purple-600 mt-1">
-            Slashing conditions define what behaviors result in penalties for operators, providing 
-            protection against malicious or negligent actions
+            Slashing conditions define what behaviors result in penalties for
+            operators, providing protection against malicious or negligent
+            actions
           </p>
         </div>
 
@@ -1005,7 +1014,9 @@ const AVSOverview: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
                   disabled={currentPage === 1}
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
@@ -1032,18 +1043,25 @@ const AVSOverview: React.FC = () => {
               <p className="font-medium mb-2">AVS risk assessment guide:</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>
-                  <strong>Permissioning models:</strong> Whitelisted AVSs have centralized control over which
-                  operators can participate, while permissionless AVSs allow any
-                  operator meeting technical requirements.
+                  <strong>Permissioning models:</strong> Whitelisted AVSs have
+                  centralized control over which operators can participate,
+                  while permissionless AVSs allow any operator meeting technical
+                  requirements.
                 </li>
                 <li>
-                  <strong>Implementation status:</strong> Indicates maturity level. Mainnet active services have undergone more testing but may have higher stakes at risk.
+                  <strong>Implementation status:</strong> Indicates maturity
+                  level. Mainnet active services have undergone more testing but
+                  may have higher stakes at risk.
                 </li>
                 <li>
-                  <strong>Slashing conditions:</strong> Define what behaviors trigger penalties, impacting the AVS's security and reliability.
+                  <strong>Slashing conditions:</strong> Define what behaviors
+                  trigger penalties, impacting the AVS's security and
+                  reliability.
                 </li>
                 <li>
-                  <strong>Risk assessment:</strong> Consider all three factors when evaluating an AVS's overall risk profile and suitability for your restaking strategy.
+                  <strong>Risk assessment:</strong> Consider all three factors
+                  when evaluating an AVS's overall risk profile and suitability
+                  for your restaking strategy.
                 </li>
               </ul>
             </div>
