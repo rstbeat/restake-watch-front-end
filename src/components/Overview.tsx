@@ -894,8 +894,17 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <MetricSummaryCard
               title="Total Restaked Value (ETH)"
-              value={formattedETH}
-              usdValue={formattedUSD}
+              value={
+                operatorData?.totalETHRestaked ? (
+                  formattedETH
+                ) : (
+                  <Skeleton className="h-7 w-28 rounded" />
+                )
+              }
+              usdValue={
+                formattedUSD ||
+                (ethPrice > 0 ? <Skeleton className="h-5 w-20 rounded" /> : '')
+              }
               icon={
                 <StyledIcon
                   icon={<Wallet className="h-4 w-4" />}
@@ -907,7 +916,13 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
             />
             <MetricSummaryCard
               title="Active Operators"
-              value={formattedOperators}
+              value={
+                operatorData?.activeEntities ? (
+                  formattedOperators
+                ) : (
+                  <Skeleton className="h-7 w-16 rounded" />
+                )
+              }
               icon={
                 <StyledIcon
                   icon={<Users className="h-4 w-4" />}
@@ -919,7 +934,13 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
             />
             <MetricSummaryCard
               title="Active Restakers"
-              value={formattedRestakers}
+              value={
+                restakeData?.activeRestakers ? (
+                  formattedRestakers
+                ) : (
+                  <Skeleton className="h-7 w-16 rounded" />
+                )
+              }
               icon={
                 <StyledIcon
                   icon={<Network className="h-4 w-4" />}
@@ -937,7 +958,8 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               title="Top 5 Operators Control"
               value={(() => {
                 // Fetch the raw data from the API response directly
-                if (!operatorData) return 'N/A';
+                if (!operatorData)
+                  return <Skeleton className="h-7 w-16 rounded" />;
 
                 // If we can access the raw operator data from the API response
                 const rawOperators = (operatorData as any).operatorData;
@@ -1025,7 +1047,8 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
             <MetricSummaryCard
               title="Top 20 Restakers Control"
               value={(() => {
-                if (!restakeData?.stakerData) return 'N/A';
+                if (!restakeData?.stakerData)
+                  return <Skeleton className="h-7 w-16 rounded" />;
 
                 const percentage =
                   restakeData.stakerData
@@ -1078,16 +1101,18 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
             <MetricSummaryCard
               title="Strategy Count"
               value={
-                operatorData?.totalRestakedAssetsPerStrategy
-                  ? Object.keys(
-                      operatorData.totalRestakedAssetsPerStrategy,
-                    ).filter(
-                      (key) =>
-                        operatorData?.totalRestakedAssetsPerStrategy?.[key] !==
-                          undefined &&
-                        operatorData?.totalRestakedAssetsPerStrategy?.[key] > 0,
-                    ).length
-                  : 'N/A'
+                operatorData?.totalRestakedAssetsPerStrategy ? (
+                  Object.keys(
+                    operatorData.totalRestakedAssetsPerStrategy,
+                  ).filter(
+                    (key) =>
+                      operatorData?.totalRestakedAssetsPerStrategy?.[key] !==
+                        undefined &&
+                      operatorData?.totalRestakedAssetsPerStrategy?.[key] > 0,
+                  ).length
+                ) : (
+                  <Skeleton className="h-7 w-12 rounded" />
+                )
               }
               icon={
                 <StyledIcon
@@ -1108,7 +1133,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 restakePercents ? (
                   `${restakePercents.ethPercent}%`
                 ) : (
-                  <Skeleton className="h-6 w-16 rounded inline-block" />
+                  <Skeleton className="h-7 w-20 rounded inline-block" />
                 )
               }
               icon={
@@ -1146,7 +1171,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 restakePercents ? (
                   `${restakePercents.stethPercent}%`
                 ) : (
-                  <Skeleton className="h-6 w-16 rounded inline-block" />
+                  <Skeleton className="h-7 w-20 rounded inline-block" />
                 )
               }
               icon={
@@ -1180,7 +1205,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 restakePercents ? (
                   `${restakePercents.combinedPercent}%`
                 ) : (
-                  <Skeleton className="h-6 w-16 rounded inline-block" />
+                  <Skeleton className="h-7 w-20 rounded inline-block" />
                 )
               }
               icon={
@@ -1237,9 +1262,14 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </div>
                   <p className="text-sm text-red-800">
                     <span className="font-bold">Operator Concentration:</span>{' '}
-                    Just {operatorTopCount} operators control 33% of restaked
-                    ETH. Their compromise or collusion could trigger a cascading
-                    effect.
+                    Just{' '}
+                    {operatorTopCount !== '?' ? (
+                      operatorTopCount
+                    ) : (
+                      <Skeleton className="h-4 w-6 rounded-sm inline-block bg-red-200" />
+                    )}{' '}
+                    operators control 33% of restaked ETH. Their compromise or
+                    collusion could trigger a cascading effect.
                   </p>
                 </div>
                 <div className="flex items-start">
@@ -1251,10 +1281,27 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </div>
                   <p className="text-sm text-red-800">
                     <span className="font-bold">Major Operator Risk:</span>{' '}
-                    Between P2P ({formattedP2PShare}%) and Node Monster (
-                    {formattedNodeMonsterShare}%), these two professional
-                    operators control{' '}
-                    <span className="font-bold">{formattedCombinedShare}%</span>{' '}
+                    Between P2P (
+                    {p2pShare ? (
+                      formattedP2PShare
+                    ) : (
+                      <Skeleton className="h-4 w-8 rounded-sm inline-block bg-red-200" />
+                    )}
+                    %) and Node Monster (
+                    {nodeMonsterShare ? (
+                      formattedNodeMonsterShare
+                    ) : (
+                      <Skeleton className="h-4 w-8 rounded-sm inline-block bg-red-200" />
+                    )}
+                    %), these two professional operators control{' '}
+                    <span className="font-bold">
+                      {combinedShare ? (
+                        formattedCombinedShare
+                      ) : (
+                        <Skeleton className="h-4 w-8 rounded-sm inline-block bg-red-200" />
+                      )}
+                      %
+                    </span>{' '}
                     of total restaked assets.
                   </p>
                 </div>
@@ -1267,8 +1314,13 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </div>
                   <p className="text-sm text-red-800">
                     <span className="font-bold">Restaker Concentration:</span>{' '}
-                    The top {restakerTopCount} individual restakers control 33%
-                    of all restaked assets.
+                    The top{' '}
+                    {restakerTopCount !== '?' ? (
+                      restakerTopCount
+                    ) : (
+                      <Skeleton className="h-4 w-6 rounded-sm inline-block bg-red-200" />
+                    )}{' '}
+                    individual restakers control 33% of all restaked assets.
                   </p>
                 </div>
                 <div className="flex items-start">
@@ -1284,23 +1336,25 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     of operators control a significant percentage of assets.
                     This puts{' '}
                     {ethPrice > 0 &&
-                    operatorData?.totalRestakedAssetsPerStrategy
-                      ? ((value) => {
-                          if (value >= 1_000_000_000) {
-                            return `$${(value / 1_000_000_000).toFixed(1)}B+`;
-                          } else if (value >= 1_000_000) {
-                            return `$${(value / 1_000_000).toFixed(1)}M+`;
-                          } else {
-                            return `$${Math.round(value).toLocaleString()}`;
-                          }
-                        })(
-                          Object.values(
-                            operatorData.totalRestakedAssetsPerStrategy,
-                          ).reduce((sum, val) => sum + val, 0) *
-                            0.3 *
-                            ethPrice,
-                        )
-                      : '?'}{' '}
+                    operatorData?.totalRestakedAssetsPerStrategy ? (
+                      ((value) => {
+                        if (value >= 1_000_000_000) {
+                          return `$${(value / 1_000_000_000).toFixed(1)}B+`;
+                        } else if (value >= 1_000_000) {
+                          return `$${(value / 1_000_000).toFixed(1)}M+`;
+                        } else {
+                          return `$${Math.round(value).toLocaleString()}`;
+                        }
+                      })(
+                        Object.values(
+                          operatorData.totalRestakedAssetsPerStrategy,
+                        ).reduce((sum: number, val: any) => sum + val, 0) *
+                          0.3 *
+                          ethPrice,
+                      )
+                    ) : (
+                      <Skeleton className="h-4 w-16 rounded-sm inline-block bg-red-200" />
+                    )}{' '}
                     worth of assets at risk from operator collusion or
                     compromise.
                   </p>
@@ -1350,7 +1404,9 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   <div
                     className="bg-orange-500 h-2.5 rounded-full"
                     style={{
-                      width: `${Math.min(operatorData?.concentrationMetrics?.herfindahlIndex ? operatorData.concentrationMetrics.herfindahlIndex * 100 * 3 : 0, 100)}%`,
+                      width: operatorData?.concentrationMetrics?.herfindahlIndex
+                        ? `${Math.min(operatorData.concentrationMetrics.herfindahlIndex * 100 * 3, 100)}%`
+                        : '0%',
                     }}
                   ></div>
                 </div>
@@ -1370,7 +1426,9 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   <div
                     className="bg-yellow-500 h-2.5 rounded-full"
                     style={{
-                      width: `${Math.min(restakeData?.concentrationMetrics?.herfindahlIndex ? restakeData.concentrationMetrics.herfindahlIndex * 100 * 3 : 0, 100)}%`,
+                      width: restakeData?.concentrationMetrics?.herfindahlIndex
+                        ? `${Math.min(restakeData.concentrationMetrics.herfindahlIndex * 100 * 3, 100)}%`
+                        : '0%',
                     }}
                   ></div>
                 </div>
@@ -1387,10 +1445,14 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div
-                    className="bg-red-500 h-2.5 rounded-full"
-                    style={{ width: '85%' }}
-                  ></div>
+                  {operatorData?.strategyConcentrationMetrics ? (
+                    <div
+                      className="bg-red-500 h-2.5 rounded-full"
+                      style={{ width: '85%' }}
+                    ></div>
+                  ) : (
+                    <div className="bg-gray-300 h-2.5 rounded-full animate-pulse"></div>
+                  )}
                 </div>
               </div>
 
