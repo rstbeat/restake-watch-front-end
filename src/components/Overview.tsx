@@ -717,7 +717,7 @@ const MetricSummaryCard: React.FC<{
   value: string | number | React.ReactNode;
   icon: React.ReactNode;
   description?: string;
-  usdValue?: string;
+  usdValue?: string | React.ReactNode;
 }> = ({ title, value, icon, description, usdValue }) => (
   <div className="rounded-lg border border-purple-100 p-5 shadow-md hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/70">
     <div className="flex items-center mb-3">
@@ -728,7 +728,11 @@ const MetricSummaryCard: React.FC<{
       <p className="text-2xl font-bold text-gray-900">{value}</p>
       {usdValue && (
         <p className="text-md font-normal text-gray-600 mt-1">
-          (${usdValue} USD)
+          {typeof usdValue === 'string' ? (
+            `($${usdValue} USD)`
+          ) : (
+            <>(${usdValue} USD)</>
+          )}
         </p>
       )}
     </div>
