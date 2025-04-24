@@ -332,7 +332,7 @@ const RestakeWatch: React.FC = () => {
           </Select>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col md:ml-48 w-full">
+        <div className="flex-1 flex flex-col md:ml-40 w-full">
           {showBanner && (
             <div className="bg-gradient-to-r from-purple-50/90 via-purple-100/90 to-indigo-50/90 backdrop-blur-lg text-gray-700 py-3 border-b border-purple-200/50 shadow-sm transition-all duration-300 ease-in-out z-20">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -373,7 +373,7 @@ const RestakeWatch: React.FC = () => {
                 scrolled ? 'py-2' : 'py-4'
               }`}
             >
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center w-full justify-between">
                   <div className="flex items-center">
                     <div>
@@ -657,7 +657,7 @@ const RestakeWatch: React.FC = () => {
           </header>
 
           <main className="flex-1 bg-[#e6e7ec] text-[#171717]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {/* Backers Carousel */}
               <div className="mb-6">
                 <h3 className="text-xl font-bold text-[#171717] mb-2">

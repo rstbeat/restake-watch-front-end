@@ -40,9 +40,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         <Image
           src="/restake-watch-logo.png"
           alt="Restake Watch Logo"
-          width={180} // Increased from 120 to 180 (50% bigger)
-          height={60} // Adjusted proportionally
-          className="h-15 w-auto mb-6" // Changed from h-10 to h-15 for 50% increase
+          width={150} // Reduced from 180 to 150
+          height={50} // Adjusted proportionally
+          className="h-12 w-auto mb-6" // Reduced from h-15 to h-12
         />
         {children}
       </div>
@@ -107,13 +107,13 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex fixed h-screen w-48 bg-[#e6e7ec] text-[#000000] font-bold">
+      <div className="hidden md:flex fixed h-screen w-40 bg-[#e6e7ec] text-[#000000] font-bold">
         <SidebarContent />
       </div>
 
       {/* Mobile Sidebar */}
       <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-        <SheetContent side="left" className="w-48 p-0">
+        <SheetContent side="left" className="w-40 p-0">
           <SidebarContent />
         </SheetContent>
       </Sheet>
