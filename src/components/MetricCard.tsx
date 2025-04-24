@@ -29,13 +29,17 @@ const MetricCard: React.FC<MetricCardProps> = ({
   const statusColor =
     value !== null ? getStatusColor(value, thresholds) : 'bg-gray-300';
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 transition-all duration-300 hover:shadow-lg">
-      <h3 className="text-lg font-semibold mb-3 text-gray-800">{title}</h3>
+    <div className="bg-white p-3 sm:p-4 md:p-6 rounded-lg shadow-md border border-gray-200 transition-all duration-300 hover:shadow-lg">
+      <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-gray-800">
+        {title}
+      </h3>
       <div className="flex items-center justify-between">
-        <span className="text-3xl font-bold text-gray-900">
+        <span className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
           {format(value)}
         </span>
-        <div className={`w-4 h-4 rounded-full ${statusColor}`}></div>
+        <div
+          className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full ${statusColor}`}
+        ></div>
       </div>
     </div>
   );

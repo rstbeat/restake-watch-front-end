@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   icons: {
     icon: '/favicon.ico',
   },
+  viewport:
+    'width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes',
 };
 
 export default function RootLayout({
@@ -24,8 +26,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${poppins.variable} antialiased`}>{children}</body>
+    <html lang="en" className="touch-manipulation">
+      <body className={`${poppins.variable} antialiased text-sm sm:text-base`}>
+        {children}
+      </body>
     </html>
   );
 }

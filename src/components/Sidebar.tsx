@@ -36,21 +36,21 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-[#e6e7ec] text-[#000000] font-bold relative pb-14">
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <Image
           src="/restake-watch-logo.png"
           alt="Restake Watch Logo"
-          width={150} // Reduced from 180 to 150
-          height={50} // Adjusted proportionally
-          className="h-12 w-auto mb-6" // Reduced from h-15 to h-12
+          width={150}
+          height={50}
+          className="h-10 sm:h-12 w-auto mb-4 sm:mb-6"
         />
         {children}
       </div>
-      <nav className="flex flex-col space-y-4 mt-8 p-4">
+      <nav className="flex flex-col space-y-3 sm:space-y-4 mt-6 sm:mt-8 p-3 sm:p-4">
         <Link href="/publications">
           <Button
             variant="ghost"
-            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
+            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2] text-xs sm:text-sm"
           >
             <SmallStyledIcon
               icon={<FileText className="h-2 w-2" />}
@@ -66,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <Button
             variant="ghost"
-            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
+            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2] text-xs sm:text-sm"
           >
             <SmallStyledIcon
               icon={<BookOpen className="h-2 w-2" />}
@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <Button
             variant="ghost"
-            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2]"
+            className="w-full justify-start text-[#000000] font-bold hover:bg-[#ab3bd2] text-xs sm:text-sm"
           >
             <SmallStyledIcon
               icon={<Heart className="h-2 w-2" />}
@@ -95,11 +95,11 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       <Button
         size="sm"
-        className="md:hidden w-24 self-center absolute bottom-2  bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
+        className="md:hidden w-20 sm:w-24 text-xs sm:text-sm self-center absolute bottom-2 bg-[#ab3bd2] text-white hover:bg-[#922fb8]"
         onClick={() => setIsMobileOpen(false)}
       >
         Close
-        <X className="ml-2 h-4 w-4" />
+        <X className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
       </Button>
     </div>
   );
@@ -113,7 +113,10 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Mobile Sidebar */}
       <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
-        <SheetContent side="left" className="w-40 p-0">
+        <SheetContent
+          side="left"
+          className="w-[75vw] max-w-[250px] sm:w-40 p-0"
+        >
           <SidebarContent />
         </SheetContent>
       </Sheet>

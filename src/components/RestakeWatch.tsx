@@ -231,34 +231,34 @@ const RestakeWatch: React.FC = () => {
         onValueChange={handleTabChange}
         className="space-y-6"
       >
-        <TabsList className="bg-white rounded-lg shadow-md">
+        <TabsList className="bg-white rounded-lg shadow-md overflow-x-auto flex whitespace-nowrap w-full">
           <TabsTrigger
             value="overview"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="operators"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Operators
           </TabsTrigger>
           <TabsTrigger
             value="restakers"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Restakers
           </TabsTrigger>
           <TabsTrigger
             value="strategies"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Strategies
           </TabsTrigger>
           <TabsTrigger
             value="avs"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             AVS
           </TabsTrigger>
@@ -334,13 +334,13 @@ const RestakeWatch: React.FC = () => {
 
         <div className="flex-1 flex flex-col md:ml-40 w-full">
           {showBanner && (
-            <div className="bg-gradient-to-r from-purple-50/90 via-purple-100/90 to-indigo-50/90 backdrop-blur-lg text-gray-700 py-3 border-b border-purple-200/50 shadow-sm transition-all duration-300 ease-in-out z-20">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                <div className="flex items-center space-x-3 overflow-x-auto whitespace-nowrap">
-                  <div className="p-1.5 bg-white/80 backdrop-blur-sm rounded-full shadow-sm flex-shrink-0">
-                    <AlertTriangle className="h-4 w-4 text-[#ab3bd2]" />
+            <div className="bg-gradient-to-r from-purple-50/90 via-purple-100/90 to-indigo-50/90 backdrop-blur-lg text-gray-700 py-2 sm:py-3 border-b border-purple-200/50 shadow-sm transition-all duration-300 ease-in-out z-20">
+              <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex justify-between items-center">
+                <div className="flex items-center space-x-2 sm:space-x-3 overflow-x-auto whitespace-nowrap">
+                  <div className="p-1 sm:p-1.5 bg-white/80 backdrop-blur-sm rounded-full shadow-sm flex-shrink-0">
+                    <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-[#ab3bd2]" />
                   </div>
-                  <span className="font-medium text-sm sm:text-base">
+                  <span className="font-medium text-xs sm:text-sm md:text-base">
                     New paper release:{' '}
                     <Link
                       href="/publications"
@@ -355,9 +355,9 @@ const RestakeWatch: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowBanner(false)}
-                  className="rounded-full h-7 w-7 p-0 text-gray-500 hover:text-[#ab3bd2] hover:bg-white/80 hover:backdrop-blur-sm transition-all duration-200 flex-shrink-0"
+                  className="rounded-full h-6 w-6 sm:h-7 sm:w-7 p-0 ml-1 text-gray-500 hover:text-[#ab3bd2] hover:bg-white/80 hover:backdrop-blur-sm transition-all duration-200 flex-shrink-0"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 </Button>
               </div>
             </div>
@@ -500,10 +500,11 @@ const RestakeWatch: React.FC = () => {
                       </a>
                       <Button
                         size="sm"
-                        className="p-1.5 h-auto bg-[#ab3bd2] text-white hover:bg-[#922fb8] shadow-sm hover:shadow-md transition-all duration-200"
+                        variant="ghost"
+                        className="p-1 hover:bg-gray-100 rounded-md"
                         onClick={() => setIsMobileSidebarOpen(true)}
                       >
-                        <Menu className="h-4 w-4" />
+                        <Menu className="h-5 w-5 text-gray-700" />
                       </Button>
                     </div>
                   </div>
