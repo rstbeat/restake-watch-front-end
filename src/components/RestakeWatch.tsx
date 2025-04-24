@@ -666,7 +666,9 @@ const RestakeWatch: React.FC = () => {
                     Proudly Backed By:
                   </h3>
                   <a
-                    href="#"
+                    href="https://signal.me/#eu/espejelomar.01"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-xs font-medium text-[#ab3bd2] hover:text-[#922fb8] transition-colors duration-200 flex items-center"
                   >
                     Become a partner
