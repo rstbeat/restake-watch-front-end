@@ -13,6 +13,7 @@ import {
   ChevronsUpDown,
   BarChart3,
   FileDown,
+  ExternalLink,
 } from 'lucide-react';
 import {
   Table,
@@ -217,41 +218,6 @@ const OperatorOverview: React.FC = () => {
       ...prev,
       [address]: !prev[address],
     }));
-  };
-
-  const exportToCsv = () => {
-    if (!operatorData) return;
-
-    // Define CSV headers and create CSV content
-    const headers = [
-      'Name',
-      'Address',
-      'Market Share',
-      'ETH Restaked',
-      'DVT',
-      'Professional Operator',
-    ];
-    const csvContent = [
-      headers.join(','),
-      ...operatorData.map((row) =>
-        [
-          `"${row.operatorName}"`,
-          `"${row.operatorAddress}"`,
-          `${row.marketShared}%`,
-          row.ethRestaked,
-          `"${row.dvtTechnology}"`,
-          `"${row.majorOperator || 'Independent'}"`,
-        ].join(','),
-      ),
-    ].join('\n');
-
-    // Create download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'operator_data.csv');
-    link.click();
   };
 
   const filteredAndSortedData = useMemo(() => {
@@ -502,15 +468,17 @@ const OperatorOverview: React.FC = () => {
           )}
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={exportToCsv}
-          className="ml-auto"
-        >
-          <FileDown className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
+        <div className="flex items-center text-sm text-gray-600 ml-auto">
+          <ExternalLink className="h-4 w-4 mr-1 text-purple-600" />
+          <a 
+            href="https://signal.me/#eu/espejelomar.01" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:text-purple-700 transition-colors"
+          >
+            Need data export? Contact us on Signal
+          </a>
+        </div>
       </div>
     </div>
   );

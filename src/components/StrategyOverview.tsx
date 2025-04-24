@@ -9,6 +9,7 @@ import {
   ChevronRight,
   FileDown,
   Info,
+  ExternalLink,
 } from 'lucide-react';
 import {
   Table,
@@ -184,52 +185,6 @@ const StrategyOverview: React.FC = () => {
       ...prev,
       [name]: !prev[name],
     }));
-  };
-
-  // Export to CSV function
-  const exportToCsv = () => {
-    if (!strategiesWithData.length) return;
-
-    // Define CSV headers and create CSV content
-    const headers = [
-      'Strategy',
-      'Total Assets (ETH)',
-      'USD Value',
-      'Operators',
-      'Top 5 Operators %',
-      'Herfindahl Index',
-      'Risk Level',
-    ];
-    const csvContent = [
-      headers.join(','),
-      ...strategiesWithData.map((strategy) => {
-        const riskLevel = getConcentrationRiskLevel(strategy.metrics);
-        const riskBadge = getRiskBadge(riskLevel);
-        return [
-          `"${strategy.name}"`,
-          strategy.assets.toLocaleString(),
-          ethPrice > 0
-            ? `$${(strategy.assets * ethPrice).toLocaleString()}`
-            : 'N/A',
-          strategy.metrics?.totalEntities || 'N/A',
-          strategy.metrics
-            ? `${strategy.metrics.top5HoldersPercentage.toFixed(1)}%`
-            : 'N/A',
-          strategy.metrics
-            ? strategy.metrics.herfindahlIndex.toFixed(4)
-            : 'N/A',
-          riskBadge.text,
-        ].join(',');
-      }),
-    ].join('\n');
-
-    // Create download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'strategy_data.csv');
-    link.click();
   };
 
   // Function to determine risk level based on concentration metrics
@@ -435,10 +390,17 @@ const StrategyOverview: React.FC = () => {
           </Button>
         </div>
 
-        <Button variant="outline" size="sm" onClick={exportToCsv}>
-          <FileDown className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
+        <div className="flex items-center text-sm text-gray-600">
+          <ExternalLink className="h-4 w-4 mr-1 text-purple-600" />
+          <a 
+            href="https://signal.me/#eu/espejelomar.01" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:text-purple-700 transition-colors"
+          >
+            Need data export? Contact us on Signal
+          </a>
+        </div>
       </div>
     </div>
   );

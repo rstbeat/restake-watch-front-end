@@ -13,6 +13,7 @@ import {
   Wallet,
   FileDown,
   Info,
+  ExternalLink,
 } from 'lucide-react';
 import {
   Table,
@@ -188,37 +189,6 @@ const RestakerOverview: React.FC = () => {
     }));
   };
 
-  const exportToCsv = () => {
-    if (!stakerData) return;
-
-    const headers = [
-      'Address',
-      'Market Share',
-      'ETH Restaked',
-      'Strategies',
-      'Most Used Strategy',
-    ];
-    const csvContent = [
-      headers.join(','),
-      ...stakerData.map((row) =>
-        [
-          `"${row.restakerAddress}"`,
-          `${row.amountRestaked}%`,
-          row.ethRestaked,
-          row.numberOfStrategies,
-          `"${row.mostUsedStrategies}"`,
-        ].join(','),
-      ),
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'restaker_data.csv');
-    link.click();
-  };
-
   const filteredAndSortedData = useMemo(() => {
     if (!stakerData) return null;
     return [...stakerData]
@@ -379,10 +349,17 @@ const RestakerOverview: React.FC = () => {
           </Button>
         </div>
 
-        <Button variant="outline" size="sm" onClick={exportToCsv}>
-          <FileDown className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
+        <div className="flex items-center text-sm text-gray-600">
+          <ExternalLink className="h-4 w-4 mr-1 text-purple-600" />
+          <a 
+            href="https://signal.me/#eu/espejelomar.01" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:text-purple-700 transition-colors"
+          >
+            Need data export? Contact us on Signal
+          </a>
+        </div>
       </div>
     </div>
   );
