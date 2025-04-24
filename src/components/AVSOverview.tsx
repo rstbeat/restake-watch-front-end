@@ -622,6 +622,7 @@ const AVSOverview: React.FC = () => {
               <SelectItem value="Hybrid">Hybrid</SelectItem>
             </SelectContent>
           </Select>
+          <InfoTooltip content="Determines whether an AVS allows any operator to secure it (Permissionless) or restricts operators through whitelisting (Whitelisted)" />
         </div>
 
         <div className="flex items-center ml-4">
@@ -658,7 +659,8 @@ const AVSOverview: React.FC = () => {
             All AVSs by Category/Type
           </CardTitle>
           <p className="text-gray-600 text-sm mt-1">
-            Displaying all Actively Validated Services in the ecosystem
+            Displaying all Actively Validated Services in the ecosystem with
+            their operator permission models and slashing conditions
           </p>
         </CardHeader>
         <CardContent>
@@ -667,8 +669,11 @@ const AVSOverview: React.FC = () => {
             <AlertTitle>Important Risk Considerations</AlertTitle>
             <AlertDescription>
               AVSs implement various slashing conditions that directly impact
-              the security of your staked ETH. Different AVSs have different
-              permission models and implementation statuses that affect risk.
+              the security of your staked ETH. The{' '}
+              <strong>Permission Model</strong> indicates whether an AVS allows
+              any operator to secure it (Permissionless) or restricts operators
+              through whitelisting (Whitelisted). Different implementation
+              statuses and slashing conditions affect overall risk profile.
               Always research thoroughly before restaking to an AVS.
             </AlertDescription>
           </Alert>
@@ -719,8 +724,10 @@ const AVSOverview: React.FC = () => {
                           className="flex items-center font-bold"
                           onClick={() => handleSort('permissionModel')}
                         >
-                          Permission Model <SortIcon column="permissionModel" />
+                          Operator Permission Model{' '}
+                          <SortIcon column="permissionModel" />
                         </button>
+                        <InfoTooltip content="Controls which operators can secure the AVS - Whitelisted means restricted, Permissionless means open to all" />
                       </TableHead>
                       <TableHead>
                         <button
@@ -742,7 +749,7 @@ const AVSOverview: React.FC = () => {
                       <TableHead>
                         <span className="flex items-center font-bold">
                           Slashing Conditions
-                          <InfoTooltip content="Various conditions under which slashing can occur" />
+                          <InfoTooltip content="Conditions under which operator stakes can be penalized (slashed) for misconduct" />
                         </span>
                       </TableHead>
                     </TableRow>
