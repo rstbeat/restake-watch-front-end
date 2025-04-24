@@ -470,9 +470,9 @@ const OperatorOverview: React.FC = () => {
 
         <div className="flex items-center text-sm text-gray-600 ml-auto">
           <ExternalLink className="h-4 w-4 mr-1 text-purple-600" />
-          <a 
-            href="https://signal.me/#eu/espejelomar.01" 
-            target="_blank" 
+          <a
+            href="https://signal.me/#eu/espejelomar.01"
+            target="_blank"
             rel="noopener noreferrer"
             className="hover:text-purple-700 transition-colors"
           >
