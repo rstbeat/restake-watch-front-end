@@ -532,20 +532,28 @@ const AVSOverview: React.FC = () => {
               Specific Mechanism/Requirements
             </h4>
             <p className="text-sm mb-4">{avs.specificMechanism}</p>
-
-            <h4 className="font-semibold text-sm mb-2">Notable Changes</h4>
-            <p className="text-sm mb-4">{avs.notableChanges}</p>
+            <InfoTooltip content="The technical approach or requirements for operators to join and validate for this AVS, such as stake thresholds, hardware requirements, or registration processes" />
           </div>
 
           <div>
-            <h4 className="font-semibold text-sm mb-2">
-              Slashing Penalty Details
-            </h4>
-            <p className="text-sm mb-4">{avs.slashingPenaltyDetails}</p>
-
-            <h4 className="font-semibold text-sm mb-2">Notes</h4>
-            <p className="text-sm">{avs.slashingNotes}</p>
+            <h4 className="font-semibold text-sm mb-2">Notable Changes</h4>
+            <p className="text-sm mb-4">{avs.notableChanges}</p>
+            <InfoTooltip content="Recent updates, version changes, or roadmap developments for this AVS" />
           </div>
+        </div>
+
+        <div className="mt-4">
+          <h4 className="font-semibold text-sm mb-2">
+            Slashing Penalty Details
+          </h4>
+          <p className="text-sm mb-4">{avs.slashingPenaltyDetails}</p>
+          <InfoTooltip content="Specific details about the penalties applied when slashing conditions are triggered, such as percentage of stake lost" />
+        </div>
+
+        <div className="mt-4">
+          <h4 className="font-semibold text-sm mb-2">Notes</h4>
+          <p className="text-sm">{avs.slashingNotes}</p>
+          <InfoTooltip content="Additional context about the AVS's slashing model, implementation status, or special considerations" />
         </div>
 
         <div className="mt-4">
@@ -556,38 +564,50 @@ const AVSOverview: React.FC = () => {
             <div className="flex items-center">
               {renderSlashingIndicator(avs.slashingConditions.incorrectSig)}
               <span className="text-sm">Incorrect Signatures</span>
-              <InfoTooltip content="Penalty for signing incorrect or invalid data" />
+              <InfoTooltip content="Penalty for signing incorrect or invalid data, proofs, attestations, or checkpoints" />
             </div>
             <div className="flex items-center">
               {renderSlashingIndicator(avs.slashingConditions.doubleSigning)}
               <span className="text-sm">Double Signing</span>
-              <InfoTooltip content="Penalty for signing conflicting data or blocks" />
+              <InfoTooltip content="Penalty for signing two different blocks or messages for the same slot or task" />
             </div>
             <div className="flex items-center">
               {renderSlashingIndicator(avs.slashingConditions.commitmentBreach)}
               <span className="text-sm">Commitment Breach</span>
-              <InfoTooltip content="Penalty for breaking protocol commitments" />
+              <InfoTooltip content="Penalty for failing to fulfill a prior commitment (e.g., data availability, task execution, promised transactions)" />
             </div>
             <div className="flex items-center">
               {renderSlashingIndicator(avs.slashingConditions.inactivity)}
               <span className="text-sm">Inactivity</span>
-              <InfoTooltip content="Penalty for extended unavailability" />
+              <InfoTooltip content="Penalty for liveness failures, such as failing to participate or respond within required timeframes" />
             </div>
             <div className="flex items-center">
               {renderSlashingIndicator(avs.slashingConditions.dkgMalice)}
               <span className="text-sm">DKG Malice</span>
-              <InfoTooltip content="Penalty for malicious behavior during distributed key generation" />
+              <InfoTooltip content="Penalty for malicious behavior during Distributed Key Generation processes, relevant for TSS/MPC-based AVSs" />
             </div>
             <div className="flex items-center">
               {renderSlashingIndicator(avs.slashingConditions.failureToSettle)}
               <span className="text-sm">Failure to Settle</span>
-              <InfoTooltip content="Penalty for not processing settlements appropriately" />
+              <InfoTooltip content="Penalty for failing to settle transaction batches or preconfirmations on Layer 1" />
             </div>
             <div className="flex items-center">
               {renderSlashingIndicator(avs.slashingConditions.falseNegative)}
               <span className="text-sm">False Negative</span>
-              <InfoTooltip content="Penalty for incorrectly approving invalid data" />
+              <InfoTooltip content="Penalty for incorrectly approving or signing something that violates objective rules or policies" />
             </div>
+          </div>
+
+          <div className="mt-3 p-3 bg-gray-100 rounded-md">
+            <p className="text-xs text-gray-600 italic">
+              <strong>Note:</strong> The Permission Model and Slashing
+              Conditions are critical factors in assessing an AVS's security
+              profile. Whitelisted AVSs have centralized control over which
+              operators can participate, while permissionless AVSs allow any
+              operator meeting technical requirements. Slashing conditions
+              define what behaviors trigger penalties for operators, directly
+              impacting the AVS's ability to maintain security and reliability.
+            </p>
           </div>
         </div>
       </div>
@@ -622,7 +642,7 @@ const AVSOverview: React.FC = () => {
               <SelectItem value="Hybrid">Hybrid</SelectItem>
             </SelectContent>
           </Select>
-          <InfoTooltip content="Determines whether an AVS allows any operator to secure it (Permissionless) or restricts operators through whitelisting (Whitelisted)" />
+          <InfoTooltip content="Determines whether an AVS allows any operator to secure it (Permissionless) or restricts operators through whitelisting (Whitelisted). This affects decentralization and accessibility." />
         </div>
 
         <div className="flex items-center ml-4">
@@ -645,6 +665,7 @@ const AVSOverview: React.FC = () => {
               </SelectItem>
             </SelectContent>
           </Select>
+          <InfoTooltip content="The current deployment stage of the AVS - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
         </div>
       </div>
     </div>
@@ -677,6 +698,23 @@ const AVSOverview: React.FC = () => {
               Always research thoroughly before restaking to an AVS.
             </AlertDescription>
           </Alert>
+
+          <div className="bg-purple-50 p-4 rounded-lg mb-6 border border-purple-200">
+            <h3 className="text-sm font-bold text-purple-800 mb-1">
+              Why We Track This Information
+            </h3>
+            <p className="text-sm text-purple-700">
+              The EigenLayer ecosystem's security depends on both{' '}
+              <strong>how operators are permitted to join</strong>{' '}
+              (Permissioning) and{' '}
+              <strong>what penalties they face for misconduct</strong>{' '}
+              (Slashing). Permissioning models range from fully permissionless
+              (anyone can join) to strictly whitelisted (selected operators
+              only), directly affecting decentralization. Slashing conditions
+              define what behaviors result in penalties for operators, providing
+              protection against malicious or negligent actions.
+            </p>
+          </div>
 
           {renderFilterControls()}
 
@@ -727,7 +765,7 @@ const AVSOverview: React.FC = () => {
                           Operator Permission Model{' '}
                           <SortIcon column="permissionModel" />
                         </button>
-                        <InfoTooltip content="Controls which operators can secure the AVS - Whitelisted means restricted, Permissionless means open to all" />
+                        <InfoTooltip content="Controls which operators can secure the AVS - Whitelisted means restricted access requiring approval, Permissionless means open to all operators meeting objective criteria, Hybrid combines both approaches" />
                       </TableHead>
                       <TableHead>
                         <button
@@ -737,6 +775,7 @@ const AVSOverview: React.FC = () => {
                           Implementation Status{' '}
                           <SortIcon column="implementationStatus" />
                         </button>
+                        <InfoTooltip content="The current deployment stage of the AVS - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
                       </TableHead>
                       <TableHead>
                         <button
@@ -745,11 +784,12 @@ const AVSOverview: React.FC = () => {
                         >
                           Amount Managed <SortIcon column="amountManaged" />
                         </button>
+                        <InfoTooltip content="Total value of ETH (or equivalent) managed by this AVS, indicating its economic security and adoption" />
                       </TableHead>
                       <TableHead>
                         <span className="flex items-center font-bold">
                           Slashing Conditions
-                          <InfoTooltip content="Conditions under which operator stakes can be penalized (slashed) for misconduct" />
+                          <InfoTooltip content="Conditions under which operator stakes can be penalized (slashed) for misconduct. Red dots indicate active slashing conditions." />
                         </span>
                       </TableHead>
                     </TableRow>
