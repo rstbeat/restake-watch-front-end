@@ -69,13 +69,13 @@ const About: React.FC = () => {
           <TabsList className="w-full justify-start px-4 pt-1 bg-white border-b">
             <TabsTrigger
               value="mission"
-              className="text-sm data-[state=active]:bg-purple-50"
+              className="text-sm text-gray-500 data-[state=active]:bg-purple-50 data-[state=active]:text-purple-800 data-[state=active]:font-medium"
             >
               Mission
             </TabsTrigger>
             <TabsTrigger
               value="features"
-              className="text-sm data-[state=active]:bg-purple-50"
+              className="text-sm text-gray-500 data-[state=active]:bg-purple-50 data-[state=active]:text-purple-800 data-[state=active]:font-medium"
             >
               Features
             </TabsTrigger>
