@@ -658,12 +658,23 @@ const RestakeWatch: React.FC = () => {
 
           <main className="flex-1 bg-[#e6e7ec] text-[#171717]">
             <div className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              {/* Backers Carousel */}
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-[#171717] mb-2">
-                  Proudly Backed By:
-                </h3>
-                <BackersCarousel backers={backersData} />
+              {/* Backers Carousel - More subtle and compact version */}
+              <div className="mb-6 bg-gradient-to-r from-purple-50/60 to-indigo-50/60 rounded-lg p-4 shadow-sm border border-purple-100/30">
+                <div className="flex flex-row items-center justify-between mb-2">
+                  <h3 className="text-base font-bold text-[#ab3bd2]">
+                    Proudly Backed By:
+                  </h3>
+                  <a
+                    href="#"
+                    className="text-xs font-medium text-[#ab3bd2] hover:text-[#922fb8] transition-colors duration-200 flex items-center"
+                  >
+                    Become a partner
+                    <ChevronRight className="ml-1 h-3 w-3" />
+                  </a>
+                </div>
+                <div className="max-w-full">
+                  <BackersCarousel backers={backersData} />
+                </div>
               </div>
 
               <div
