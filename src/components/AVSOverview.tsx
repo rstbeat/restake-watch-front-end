@@ -16,6 +16,7 @@ import {
   BarChart3,
   FileDown,
   ExternalLink,
+  Layers,
 } from 'lucide-react';
 import {
   Table,
@@ -121,6 +122,25 @@ const parseCSV = (csvText: string): string[][] => {
 // Helper function to convert string to boolean
 const stringToBoolean = (value: string): boolean => {
   return value.toLowerCase() === 'true';
+};
+
+// StyledIcon component used across overview components
+const StyledIcon: React.FC<{
+  icon: React.ReactNode;
+  gradientColors: string[];
+  size?: string;
+}> = ({ icon, gradientColors, size = 'h-6 w-6' }) => {
+  return (
+    <div
+      className={`flex items-center justify-center rounded-full p-3 ${size}`}
+      style={{
+        background: `linear-gradient(135deg, ${gradientColors[0]} 0%, ${gradientColors[1]} 100%)`,
+        boxShadow: `0 4px 10px rgba(0, 0, 0, 0.08)`,
+      }}
+    >
+      <div className="text-white">{icon}</div>
+    </div>
+  );
 };
 
 // Tooltip component
@@ -523,91 +543,87 @@ const AVSOverview: React.FC = () => {
   };
 
   // Render expanded detail row
-  const renderExpandedDetails = (avs: AVSData) => {
+  const renderExpandedDetails = (avs: AVSData): React.ReactNode => {
     return (
-      <div className="p-4 bg-gray-50 border-t">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h4 className="font-semibold text-sm mb-2">
-              Specific Mechanism/Requirements
-            </h4>
-            <p className="text-sm mb-4">{avs.specificMechanism}</p>
-            <InfoTooltip content="The technical approach or requirements for operators to join and validate for this AVS, such as stake thresholds, hardware requirements, or registration processes" />
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-sm mb-2">Notable Changes</h4>
-            <p className="text-sm mb-4">{avs.notableChanges}</p>
-            <InfoTooltip content="Recent updates, version changes, or roadmap developments for this AVS" />
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <h4 className="font-semibold text-sm mb-2">
-            Slashing Penalty Details
+      <div className="p-4 border-t-2 border-purple-200">
+        <div className="text-sm">
+          <h4 className="font-semibold mb-3 text-purple-700 flex items-center">
+            <Info className="h-4 w-4 mr-2" />
+            AVS Details
           </h4>
-          <p className="text-sm mb-4">{avs.slashingPenaltyDetails}</p>
-          <InfoTooltip content="Specific details about the penalties applied when slashing conditions are triggered, such as percentage of stake lost" />
-        </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+              <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                Specific Mechanism/Requirements
+              </h5>
+              <p className="py-1">{avs.specificMechanism}</p>
+            </div>
 
-        <div className="mt-4">
-          <h4 className="font-semibold text-sm mb-2">Notes</h4>
-          <p className="text-sm">{avs.slashingNotes}</p>
-          <InfoTooltip content="Additional context about the AVS's slashing model, implementation status, or special considerations" />
-        </div>
-
-        <div className="mt-4">
-          <h4 className="font-semibold text-sm mb-2">
-            All Slashing Conditions
-          </h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="flex items-center">
-              {renderSlashingIndicator(avs.slashingConditions.incorrectSig)}
-              <span className="text-sm">Incorrect Signatures</span>
-              <InfoTooltip content="Penalty for signing incorrect or invalid data, proofs, attestations, or checkpoints" />
-            </div>
-            <div className="flex items-center">
-              {renderSlashingIndicator(avs.slashingConditions.doubleSigning)}
-              <span className="text-sm">Double Signing</span>
-              <InfoTooltip content="Penalty for signing two different blocks or messages for the same slot or task" />
-            </div>
-            <div className="flex items-center">
-              {renderSlashingIndicator(avs.slashingConditions.commitmentBreach)}
-              <span className="text-sm">Commitment Breach</span>
-              <InfoTooltip content="Penalty for failing to fulfill a prior commitment (e.g., data availability, task execution, promised transactions)" />
-            </div>
-            <div className="flex items-center">
-              {renderSlashingIndicator(avs.slashingConditions.inactivity)}
-              <span className="text-sm">Inactivity</span>
-              <InfoTooltip content="Penalty for liveness failures, such as failing to participate or respond within required timeframes" />
-            </div>
-            <div className="flex items-center">
-              {renderSlashingIndicator(avs.slashingConditions.dkgMalice)}
-              <span className="text-sm">DKG Malice</span>
-              <InfoTooltip content="Penalty for malicious behavior during Distributed Key Generation processes, relevant for TSS/MPC-based AVSs" />
-            </div>
-            <div className="flex items-center">
-              {renderSlashingIndicator(avs.slashingConditions.failureToSettle)}
-              <span className="text-sm">Failure to Settle</span>
-              <InfoTooltip content="Penalty for failing to settle transaction batches or preconfirmations on Layer 1" />
-            </div>
-            <div className="flex items-center">
-              {renderSlashingIndicator(avs.slashingConditions.falseNegative)}
-              <span className="text-sm">False Negative</span>
-              <InfoTooltip content="Penalty for incorrectly approving or signing something that violates objective rules or policies" />
+            <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+              <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                Notable Changes
+              </h5>
+              <p className="py-1">{avs.notableChanges}</p>
             </div>
           </div>
 
-          <div className="mt-3 p-3 bg-gray-100 rounded-md">
-            <p className="text-xs text-gray-600 italic">
-              <strong>Note:</strong> The Permission Model and Slashing
-              Conditions are critical factors in assessing an AVS's security
-              profile. Whitelisted AVSs have centralized control over which
-              operators can participate, while permissionless AVSs allow any
-              operator meeting technical requirements. Slashing conditions
-              define what behaviors trigger penalties for operators, directly
-              impacting the AVS's ability to maintain security and reliability.
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+              <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                Slashing Penalty Details
+              </h5>
+              <p className="py-1">{avs.slashingPenaltyDetails}</p>
+            </div>
+
+            <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+              <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+                Notes
+              </h5>
+              <p className="py-1">{avs.slashingNotes}</p>
+            </div>
+          </div>
+
+          <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+            <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
+              All Slashing Conditions
+            </h5>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+              <div className="flex items-center">
+                {renderSlashingIndicator(avs.slashingConditions.incorrectSig)}
+                <span className="text-sm">Incorrect Signatures</span>
+                <InfoTooltip content="Penalty for signing incorrect or invalid data, proofs, attestations, or checkpoints" />
+              </div>
+              <div className="flex items-center">
+                {renderSlashingIndicator(avs.slashingConditions.doubleSigning)}
+                <span className="text-sm">Double Signing</span>
+                <InfoTooltip content="Penalty for signing two different blocks or messages for the same slot or task" />
+              </div>
+              <div className="flex items-center">
+                {renderSlashingIndicator(avs.slashingConditions.commitmentBreach)}
+                <span className="text-sm">Commitment Breach</span>
+                <InfoTooltip content="Penalty for failing to fulfill a prior commitment (e.g., data availability, task execution, promised transactions)" />
+              </div>
+              <div className="flex items-center">
+                {renderSlashingIndicator(avs.slashingConditions.inactivity)}
+                <span className="text-sm">Inactivity</span>
+                <InfoTooltip content="Penalty for liveness failures, such as failing to participate or respond within required timeframes" />
+              </div>
+              <div className="flex items-center">
+                {renderSlashingIndicator(avs.slashingConditions.dkgMalice)}
+                <span className="text-sm">DKG Malice</span>
+                <InfoTooltip content="Penalty for malicious behavior during Distributed Key Generation processes, relevant for TSS/MPC-based AVSs" />
+              </div>
+              <div className="flex items-center">
+                {renderSlashingIndicator(avs.slashingConditions.failureToSettle)}
+                <span className="text-sm">Failure to Settle</span>
+                <InfoTooltip content="Penalty for failing to settle transaction batches or preconfirmations on Layer 1" />
+              </div>
+              <div className="flex items-center">
+                {renderSlashingIndicator(avs.slashingConditions.falseNegative)}
+                <span className="text-sm">False Negative</span>
+                <InfoTooltip content="Penalty for incorrectly approving or signing something that violates objective rules or policies" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -628,45 +644,100 @@ const AVSOverview: React.FC = () => {
         />
       </div>
 
-      <div className="flex flex-wrap gap-3 mb-4">
+      <div className="flex flex-wrap gap-3 mb-4 justify-between">
         <div className="flex items-center">
           <h4 className="text-sm font-semibold mr-2">Permission Model:</h4>
-          <Select value={permissionFilter} onValueChange={setPermissionFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select permission model" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Models</SelectItem>
-              <SelectItem value="Whitelisted">Whitelisted</SelectItem>
-              <SelectItem value="Permissionless">Permissionless</SelectItem>
-              <SelectItem value="Hybrid">Hybrid</SelectItem>
-            </SelectContent>
-          </Select>
+          <Button
+            variant={permissionFilter === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setPermissionFilter('all')}
+            className="text-xs"
+          >
+            All
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPermissionFilter('Whitelisted')}
+            className={`text-xs ${permissionFilter === 'Whitelisted' ? 'bg-purple-100 border-purple-300 hover:bg-purple-200' : ''}`}
+          >
+            Whitelisted
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPermissionFilter('Permissionless')}
+            className={`text-xs ${permissionFilter === 'Permissionless' ? 'bg-green-100 border-green-300 hover:bg-green-200' : ''}`}
+          >
+            Permissionless
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPermissionFilter('Hybrid')}
+            className={`text-xs ${permissionFilter === 'Hybrid' ? 'bg-blue-100 border-blue-300 hover:bg-blue-200' : ''}`}
+          >
+            Hybrid
+          </Button>
           <InfoTooltip content="Determines whether an AVS allows any operator to secure it (Permissionless) or restricts operators through whitelisting (Whitelisted). This affects decentralization and accessibility." />
         </div>
 
-        <div className="flex items-center ml-4">
-          <h4 className="text-sm font-semibold mr-2">Implementation Status:</h4>
-          <Select
-            value={implementationFilter}
-            onValueChange={setImplementationFilter}
+        <div className="flex items-center text-sm text-gray-600">
+          <ExternalLink className="h-4 w-4 mr-1 text-purple-600" />
+          <a
+            href="https://signal.me/#eu/espejelomar.01"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-purple-700 transition-colors"
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="Mainnet Active">Mainnet Active</SelectItem>
-              <SelectItem value="Testnet Only">Testnet Only</SelectItem>
-              <SelectItem value="Planned">Planned</SelectItem>
-              <SelectItem value="Not Implemented">Not Implemented</SelectItem>
-              <SelectItem value="Inherited (Ethereum)">
-                Inherited (Ethereum)
-              </SelectItem>
-            </SelectContent>
-          </Select>
-          <InfoTooltip content="The current deployment stage of the AVS - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
+            Need data export? Contact us on Signal
+          </a>
         </div>
+      </div>
+
+      <div className="flex items-center">
+        <h4 className="text-sm font-semibold mr-2">Implementation Status:</h4>
+        <Button
+          variant={implementationFilter === 'all' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setImplementationFilter('all')}
+          className="text-xs"
+        >
+          All
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setImplementationFilter('Mainnet Active')}
+          className={`text-xs ${implementationFilter === 'Mainnet Active' ? 'bg-green-100 border-green-300 hover:bg-green-200' : ''}`}
+        >
+          Mainnet Active
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setImplementationFilter('Testnet Only')}
+          className={`text-xs ${implementationFilter === 'Testnet Only' ? 'bg-blue-100 border-blue-300 hover:bg-blue-200' : ''}`}
+        >
+          Testnet Only
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setImplementationFilter('Planned')}
+          className={`text-xs ${implementationFilter === 'Planned' ? 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200' : ''}`}
+        >
+          Planned
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setImplementationFilter('Not Implemented')}
+          className={`text-xs ${implementationFilter === 'Not Implemented' ? 'bg-gray-100 border-gray-300 hover:bg-gray-200' : ''}`}
+        >
+          Not Implemented
+        </Button>
+        <InfoTooltip content="The current deployment stage of the AVS - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
       </div>
     </div>
   );
@@ -674,273 +745,311 @@ const AVSOverview: React.FC = () => {
   // Main component render
   return (
     <div className="space-y-6">
-      <Card className="bg-white p-6 rounded-lg shadow-md">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl font-bold text-purple-600">
-            All AVSs by Category/Type
-          </CardTitle>
-          <p className="text-gray-600 text-sm mt-1">
-            Displaying all Actively Validated Services in the ecosystem with
-            their operator permission models and slashing conditions
-          </p>
-        </CardHeader>
-        <CardContent>
-          <Alert className="mb-6 bg-red-50 text-red-800 border-red-200">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Important Risk Considerations</AlertTitle>
-            <AlertDescription>
-              AVSs implement various slashing conditions that directly impact
-              the security of your staked ETH. The{' '}
-              <strong>Permission Model</strong> indicates whether an AVS allows
-              any operator to secure it (Permissionless) or restricts operators
-              through whitelisting (Whitelisted). Different implementation
-              statuses and slashing conditions affect overall risk profile.
-              Always research thoroughly before restaking to an AVS.
-            </AlertDescription>
-          </Alert>
-
-          <div className="bg-purple-50 p-4 rounded-lg mb-6 border border-purple-200">
-            <h3 className="text-sm font-bold text-purple-800 mb-1">
-              Why We Track This Information
-            </h3>
-            <p className="text-sm text-purple-700">
-              The EigenLayer ecosystem's security depends on both{' '}
-              <strong>how operators are permitted to join</strong>{' '}
-              (Permissioning) and{' '}
-              <strong>what penalties they face for misconduct</strong>{' '}
-              (Slashing). Permissioning models range from fully permissionless
-              (anyone can join) to strictly whitelisted (selected operators
-              only), directly affecting decentralization. Slashing conditions
-              define what behaviors result in penalties for operators, providing
-              protection against malicious or negligent actions.
-            </p>
+      <div className="bg-white p-6 rounded-lg mt-8 shadow-md">
+        <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center">
+          <div className="mr-3">
+            <StyledIcon
+              icon={<Layers className="h-4 w-4" />}
+              gradientColors={['#8b5cf6', '#d946ef']}
+              size="h-9 w-9"
+            />
           </div>
+          All AVSs by Category/Type
+        </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Displaying all Actively Validated Services in the ecosystem with
+          their operator permission models and slashing conditions
+        </p>
 
-          {renderFilterControls()}
+        <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
+          <p className="text-red-700 font-medium">
+            AVSs implement various slashing conditions that directly impact
+            the security of your staked ETH
+          </p>
+          <p className="text-sm text-red-600 mt-1">
+            The Permission Model indicates whether an AVS allows any operator to secure it (Permissionless) or
+            restricts operators through whitelisting (Whitelisted)
+          </p>
+          <p className="text-sm text-red-600 mt-1">
+            Different implementation statuses and slashing conditions affect overall risk profile.
+            Always research thoroughly before restaking to an AVS.
+          </p>
+        </div>
 
-          {isLoading ? (
-            <div className="space-y-4">
-              <Skeleton className="h-8 w-full" />
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-24 w-full" />
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto max-h-[70vh] border rounded-lg shadow-sm">
-                <Table>
-                  <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
-                    <TableRow className="border-b-2 border-purple-200">
-                      <TableHead className="w-[50px] text-center">
-                        <span className="text-purple-700">#</span>
-                      </TableHead>
-                      <TableHead className="w-[50px] text-center">
-                        <div className="flex justify-center">
-                          <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded-full">
-                            Details
-                          </span>
-                        </div>
-                      </TableHead>
-                      <TableHead>
-                        <button
-                          className="flex items-center font-bold"
-                          onClick={() => handleSort('avsName')}
-                        >
-                          AVS Name <SortIcon column="avsName" />
-                        </button>
-                      </TableHead>
-                      <TableHead>
-                        <button
-                          className="flex items-center font-bold"
-                          onClick={() => handleSort('category')}
-                        >
-                          Category/Type <SortIcon column="category" />
-                        </button>
-                      </TableHead>
-                      <TableHead>
-                        <button
-                          className="flex items-center font-bold"
-                          onClick={() => handleSort('permissionModel')}
-                        >
-                          Operator Permission Model{' '}
-                          <SortIcon column="permissionModel" />
-                        </button>
-                        <InfoTooltip content="Controls which operators can secure the AVS - Whitelisted means restricted access requiring approval, Permissionless means open to all operators meeting objective criteria, Hybrid combines both approaches" />
-                      </TableHead>
-                      <TableHead>
-                        <button
-                          className="flex items-center font-bold"
-                          onClick={() => handleSort('implementationStatus')}
-                        >
-                          Implementation Status{' '}
-                          <SortIcon column="implementationStatus" />
-                        </button>
-                        <InfoTooltip content="The current deployment stage of the AVS - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
-                      </TableHead>
-                      <TableHead>
-                        <button
-                          className="flex items-center font-bold"
-                          onClick={() => handleSort('amountManaged')}
-                        >
-                          Amount Managed <SortIcon column="amountManaged" />
-                        </button>
-                        <InfoTooltip content="Total value of ETH (or equivalent) managed by this AVS, indicating its economic security and adoption" />
-                      </TableHead>
-                      <TableHead>
-                        <span className="flex items-center font-bold">
-                          Slashing Conditions
-                          <InfoTooltip content="Conditions under which operator stakes can be penalized (slashed) for misconduct. Red dots indicate active slashing conditions." />
+        <div className="bg-purple-50 p-4 rounded-lg mb-6 border border-purple-200">
+          <p className="text-purple-700 font-medium">
+            The EigenLayer ecosystem's security depends on both how operators are permitted to join
+            (Permissioning) and what penalties they face for misconduct (Slashing)
+          </p>
+          <p className="text-sm text-purple-600 mt-1">
+            Permissioning models range from fully permissionless (anyone can join) to strictly whitelisted 
+            (selected operators only), directly affecting decentralization
+          </p>
+          <p className="text-sm text-purple-600 mt-1">
+            Slashing conditions define what behaviors result in penalties for operators, providing 
+            protection against malicious or negligent actions
+          </p>
+        </div>
+
+        {renderFilterControls()}
+
+        {isLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto max-h-[70vh] border rounded-lg shadow-sm">
+              <Table>
+                <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                  <TableRow className="border-b-2 border-purple-200">
+                    <TableHead className="w-[50px] text-center">
+                      <span className="text-purple-700">#</span>
+                    </TableHead>
+                    <TableHead className="w-[50px] text-center">
+                      <div className="flex justify-center">
+                        <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded-full">
+                          Details
                         </span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {paginatedData.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={8} className="text-center py-8">
-                          No AVS data found matching your filters
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      paginatedData.map((avs, index) => (
-                        <React.Fragment key={avs.avsName}>
-                          <TableRow
-                            className={`border-b ${
-                              avs.implementationStatus === 'Mainnet Active'
-                                ? 'bg-green-50'
-                                : avs.implementationStatus === 'Testnet Only'
-                                  ? 'bg-blue-50'
-                                  : ''
-                            } hover:bg-gray-50`}
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('avsName')}
+                        className="font-semibold"
+                      >
+                        AVS Name
+                        <SortIcon column="avsName" />
+                      </Button>
+                    </TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('category')}
+                        className="font-semibold"
+                      >
+                        Category/Type
+                        <SortIcon column="category" />
+                      </Button>
+                    </TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('permissionModel')}
+                        className="font-semibold"
+                      >
+                        Operator Permission Model
+                        <SortIcon column="permissionModel" />
+                      </Button>
+                      <InfoTooltip content="Controls which operators can secure the AVS - Whitelisted means restricted access requiring approval, Permissionless means open to all operators meeting objective criteria, Hybrid combines both approaches" />
+                    </TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('implementationStatus')}
+                        className="font-semibold"
+                      >
+                        Implementation Status
+                        <SortIcon column="implementationStatus" />
+                      </Button>
+                      <InfoTooltip content="The current deployment stage of the AVS - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
+                    </TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleSort('amountManaged')}
+                        className="font-semibold"
+                      >
+                        Amount Managed
+                        <SortIcon column="amountManaged" />
+                      </Button>
+                      <InfoTooltip content="Total value of ETH (or equivalent) managed by this AVS, indicating its economic security and adoption" />
+                    </TableHead>
+                    <TableHead>
+                      <span className="font-semibold">Slashing Conditions</span>
+                      <InfoTooltip content="Conditions under which operator stakes can be penalized (slashed) for misconduct. Red dots indicate active slashing conditions." />
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedData.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8">
+                        <div className="flex flex-col items-center">
+                          <p className="text-gray-500 mb-2">
+                            No AVS data found matching your filters
+                          </p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSearchTerm('');
+                              setPermissionFilter('all');
+                              setImplementationFilter('all');
+                            }}
                           >
-                            <TableCell className="text-center">
-                              {(currentPage - 1) * itemsPerPage + index + 1}
-                            </TableCell>
-                            <TableCell className="text-center p-0">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => toggleRowExpansion(avs.avsName)}
-                                className="rounded-full p-1 h-7 w-7"
-                                aria-label="Toggle details"
-                              >
-                                {expandedRows[avs.avsName] ? (
-                                  <ChevronUp className="h-4 w-4" />
-                                ) : (
-                                  <ChevronDown className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              {avs.avsName}
-                            </TableCell>
-                            <TableCell>{avs.category}</TableCell>
-                            <TableCell>
-                              <Badge
-                                color={getPermissionColor(avs.permissionModel)}
-                                text={avs.permissionModel}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                color={getStatusColor(avs.implementationStatus)}
-                                text={avs.implementationStatus}
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <span
-                                className={`font-medium ${
-                                  avs.amountManaged > 5000
-                                    ? 'text-green-600'
-                                    : avs.amountManaged > 1000
-                                      ? 'text-blue-600'
-                                      : 'text-gray-600'
-                                }`}
-                              >
-                                {formatETHValue(avs.amountManaged)}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex space-x-1">
-                                {renderSlashingIndicator(
-                                  avs.slashingConditions.incorrectSig,
-                                )}
-                                {renderSlashingIndicator(
-                                  avs.slashingConditions.doubleSigning,
-                                )}
-                                {renderSlashingIndicator(
-                                  avs.slashingConditions.commitmentBreach,
-                                )}
-                                {renderSlashingIndicator(
-                                  avs.slashingConditions.inactivity,
-                                )}
-                                {renderSlashingIndicator(
-                                  avs.slashingConditions.dkgMalice,
-                                )}
-                                {renderSlashingIndicator(
-                                  avs.slashingConditions.failureToSettle,
-                                )}
-                                {renderSlashingIndicator(
-                                  avs.slashingConditions.falseNegative,
-                                )}
-                              </div>
+                            Clear All Filters
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    paginatedData.map((avs, index) => (
+                      <React.Fragment key={avs.avsName}>
+                        <TableRow
+                          className={`hover:bg-gray-50 transition-colors
+                            ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                            ${expandedRows[avs.avsName] ? 'border-b-0' : ''}`}
+                        >
+                          <TableCell className="font-semibold text-center">
+                            {(currentPage - 1) * itemsPerPage + index + 1}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleRowExpansion(avs.avsName)}
+                              className="p-1 h-8 w-8 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 hover:text-purple-800 transition-colors border border-purple-200"
+                              title="Click for details"
+                            >
+                              {expandedRows[avs.avsName] ? (
+                                <ChevronUp className="h-4 w-4" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {avs.avsName}
+                          </TableCell>
+                          <TableCell>{avs.category}</TableCell>
+                          <TableCell>
+                            <Badge
+                              color={getPermissionColor(avs.permissionModel)}
+                              text={avs.permissionModel}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              color={getStatusColor(avs.implementationStatus)}
+                              text={avs.implementationStatus}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={`font-medium ${
+                                avs.amountManaged > 5000
+                                  ? 'text-green-600'
+                                  : avs.amountManaged > 1000
+                                    ? 'text-blue-600'
+                                    : 'text-gray-600'
+                              }`}
+                            >
+                              {formatETHValue(avs.amountManaged)}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex space-x-1">
+                              {renderSlashingIndicator(
+                                avs.slashingConditions.incorrectSig,
+                              )}
+                              {renderSlashingIndicator(
+                                avs.slashingConditions.doubleSigning,
+                              )}
+                              {renderSlashingIndicator(
+                                avs.slashingConditions.commitmentBreach,
+                              )}
+                              {renderSlashingIndicator(
+                                avs.slashingConditions.inactivity,
+                              )}
+                              {renderSlashingIndicator(
+                                avs.slashingConditions.dkgMalice,
+                              )}
+                              {renderSlashingIndicator(
+                                avs.slashingConditions.failureToSettle,
+                              )}
+                              {renderSlashingIndicator(
+                                avs.slashingConditions.falseNegative,
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        {expandedRows[avs.avsName] && (
+                          <TableRow className="bg-purple-50 border-t-0">
+                            <TableCell colSpan={8} className="p-0">
+                              {renderExpandedDetails(avs)}
                             </TableCell>
                           </TableRow>
-                          {expandedRows[avs.avsName] && (
-                            <TableRow className="bg-gray-50">
-                              <TableCell colSpan={8} className="p-0">
-                                {renderExpandedDetails(avs)}
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </React.Fragment>
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                        )}
+                      </React.Fragment>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
 
-              {totalPages > 1 && (
-                <div className="flex justify-between items-center mt-4">
-                  <div className="text-sm text-gray-500">
-                    Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                    {Math.min(
-                      currentPage * itemsPerPage,
-                      filteredAndSortedData.length,
-                    )}{' '}
-                    of {filteredAndSortedData.length} entries
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(prev - 1, 1))
-                      }
-                      disabled={currentPage === 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="flex items-center text-sm">
-                      Page {currentPage} of {totalPages}
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                      }
-                      disabled={currentPage === totalPages}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
+            <div className="mt-4 flex items-center justify-between">
+              <div>
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                {Math.min(
+                  currentPage * itemsPerPage,
+                  filteredAndSortedData.length,
+                )}{' '}
+                of {filteredAndSortedData.length} AVSs
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </Button>
+                <div className="text-sm px-3 py-1 bg-gray-100 rounded-md">
+                  Page {currentPage} of {totalPages}
                 </div>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-4 text-sm text-gray-600 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="font-medium mb-2">AVS risk assessment guide:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>
+                  <strong>Permissioning models:</strong> Whitelisted AVSs have centralized control over which
+                  operators can participate, while permissionless AVSs allow any
+                  operator meeting technical requirements.
+                </li>
+                <li>
+                  <strong>Implementation status:</strong> Indicates maturity level. Mainnet active services have undergone more testing but may have higher stakes at risk.
+                </li>
+                <li>
+                  <strong>Slashing conditions:</strong> Define what behaviors trigger penalties, impacting the AVS's security and reliability.
+                </li>
+                <li>
+                  <strong>Risk assessment:</strong> Consider all three factors when evaluating an AVS's overall risk profile and suitability for your restaking strategy.
+                </li>
+              </ul>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };
