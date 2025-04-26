@@ -315,7 +315,8 @@ const AVSOverview: React.FC = () => {
             dkgMalice: 'false',
             failureToSettle: 'false',
             falseNegative: 'false',
-            penaltyDetails: 'N/A',
+            penaltyDetails:
+              'No specific slashing information found. Penalties would likely use EigenLayer mechanism.',
             implementationStatus: 'Not Implemented',
             notes: 'No slashing information available',
           };
@@ -574,6 +575,47 @@ const AVSOverview: React.FC = () => {
     );
   };
 
+  // Check if all slashing conditions are null/undefined/empty or not found
+  const hasNoSlashingInfo = (avs: AVSData): boolean => {
+    // Check if penalty details mentions "No specific slashing information found"
+    if (
+      avs.slashingPenaltyDetails.includes(
+        'No specific slashing information found',
+      ) ||
+      avs.slashingPenaltyDetails === 'N/A'
+    ) {
+      return true;
+    }
+
+    // Check if there's empty data in the notes
+    if (
+      avs.slashingNotes.includes('No additional slashing notes available') ||
+      avs.slashingNotes.includes('No slashing information available')
+    ) {
+      // Only return true if all conditions are also false
+      const conditions = avs.slashingConditions;
+      return (
+        !conditions.incorrectSig &&
+        !conditions.doubleSigning &&
+        !conditions.commitmentBreach &&
+        !conditions.inactivity &&
+        !conditions.dkgMalice &&
+        !conditions.failureToSettle &&
+        !conditions.falseNegative
+      );
+    }
+
+    // If all values are empty strings or false in the CSV, then there's no slashing info
+    return (
+      Object.values(avs.slashingConditions).every((val) => val === false) &&
+      // Additional check to ensure we're not incorrectly flagging AVSs with real info
+      !avs.slashingPenaltyDetails.includes('Slashing') &&
+      !avs.slashingPenaltyDetails.includes('slashing') &&
+      !avs.slashingPenaltyDetails.includes('penalty') &&
+      !avs.slashingPenaltyDetails.includes('Penalty')
+    );
+  };
+
   // Render expanded detail row
   const renderExpandedDetails = (avs: AVSData): React.ReactNode => {
     return (
@@ -604,7 +646,18 @@ const AVSOverview: React.FC = () => {
               <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
                 Slashing Penalty Details
               </h5>
-              <p className="py-1">{avs.slashingPenaltyDetails}</p>
+              {avs.slashingPenaltyDetails.includes(
+                'No specific slashing information found',
+              ) ? (
+                <div className="py-2 text-center">
+                  <span className="text-xs italic text-amber-700 bg-amber-50 border border-amber-200 p-1.5 rounded flex items-center justify-center">
+                    <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
+                    No specific slashing information available for this AVS
+                  </span>
+                </div>
+              ) : (
+                <p className="py-1">{avs.slashingPenaltyDetails}</p>
+              )}
             </div>
 
             <div className="bg-white p-4 rounded-md border border-gray-200 shadow-sm">
@@ -619,47 +672,63 @@ const AVSOverview: React.FC = () => {
             <h5 className="font-medium text-gray-800 mb-2 border-b pb-2">
               All Slashing Conditions
             </h5>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
-              <div className="flex items-center">
-                {renderSlashingIndicator(avs.slashingConditions.incorrectSig)}
-                <span className="text-sm">Incorrect Signatures</span>
-                <InfoTooltip content="Penalty for signing incorrect or invalid data, proofs, attestations, or checkpoints" />
+            {hasNoSlashingInfo(avs) ? (
+              <div className="py-4 text-center">
+                <span className="text-sm italic text-gray-600 bg-gray-100 p-2 rounded">
+                  No specific slashing information available
+                </span>
+                <p className="mt-2 text-xs text-gray-500">
+                  This AVS either has no documented slashing conditions or we
+                  were unable to find information about them.
+                </p>
               </div>
-              <div className="flex items-center">
-                {renderSlashingIndicator(avs.slashingConditions.doubleSigning)}
-                <span className="text-sm">Double Signing</span>
-                <InfoTooltip content="Penalty for signing two different blocks or messages for the same slot or task" />
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                <div className="flex items-center">
+                  {renderSlashingIndicator(avs.slashingConditions.incorrectSig)}
+                  <span className="text-sm">Incorrect Signatures</span>
+                  <InfoTooltip content="Penalty for signing incorrect or invalid data, proofs, attestations, or checkpoints" />
+                </div>
+                <div className="flex items-center">
+                  {renderSlashingIndicator(
+                    avs.slashingConditions.doubleSigning,
+                  )}
+                  <span className="text-sm">Double Signing</span>
+                  <InfoTooltip content="Penalty for signing two different blocks or messages for the same slot or task" />
+                </div>
+                <div className="flex items-center">
+                  {renderSlashingIndicator(
+                    avs.slashingConditions.commitmentBreach,
+                  )}
+                  <span className="text-sm">Commitment Breach</span>
+                  <InfoTooltip content="Penalty for failing to fulfill a prior commitment (e.g., data availability, task execution, promised transactions)" />
+                </div>
+                <div className="flex items-center">
+                  {renderSlashingIndicator(avs.slashingConditions.inactivity)}
+                  <span className="text-sm">Inactivity</span>
+                  <InfoTooltip content="Penalty for liveness failures, such as failing to participate or respond within required timeframes" />
+                </div>
+                <div className="flex items-center">
+                  {renderSlashingIndicator(avs.slashingConditions.dkgMalice)}
+                  <span className="text-sm">DKG Malice</span>
+                  <InfoTooltip content="Penalty for malicious behavior during Distributed Key Generation processes, relevant for TSS/MPC-based AVSs" />
+                </div>
+                <div className="flex items-center">
+                  {renderSlashingIndicator(
+                    avs.slashingConditions.failureToSettle,
+                  )}
+                  <span className="text-sm">Failure to Settle</span>
+                  <InfoTooltip content="Penalty for failing to settle transaction batches or preconfirmations on Layer 1" />
+                </div>
+                <div className="flex items-center">
+                  {renderSlashingIndicator(
+                    avs.slashingConditions.falseNegative,
+                  )}
+                  <span className="text-sm">False Negative</span>
+                  <InfoTooltip content="Penalty for incorrectly approving or signing something that violates objective rules or policies" />
+                </div>
               </div>
-              <div className="flex items-center">
-                {renderSlashingIndicator(
-                  avs.slashingConditions.commitmentBreach,
-                )}
-                <span className="text-sm">Commitment Breach</span>
-                <InfoTooltip content="Penalty for failing to fulfill a prior commitment (e.g., data availability, task execution, promised transactions)" />
-              </div>
-              <div className="flex items-center">
-                {renderSlashingIndicator(avs.slashingConditions.inactivity)}
-                <span className="text-sm">Inactivity</span>
-                <InfoTooltip content="Penalty for liveness failures, such as failing to participate or respond within required timeframes" />
-              </div>
-              <div className="flex items-center">
-                {renderSlashingIndicator(avs.slashingConditions.dkgMalice)}
-                <span className="text-sm">DKG Malice</span>
-                <InfoTooltip content="Penalty for malicious behavior during Distributed Key Generation processes, relevant for TSS/MPC-based AVSs" />
-              </div>
-              <div className="flex items-center">
-                {renderSlashingIndicator(
-                  avs.slashingConditions.failureToSettle,
-                )}
-                <span className="text-sm">Failure to Settle</span>
-                <InfoTooltip content="Penalty for failing to settle transaction batches or preconfirmations on Layer 1" />
-              </div>
-              <div className="flex items-center">
-                {renderSlashingIndicator(avs.slashingConditions.falseNegative)}
-                <span className="text-sm">False Negative</span>
-                <InfoTooltip content="Penalty for incorrectly approving or signing something that violates objective rules or policies" />
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
@@ -1017,29 +1086,35 @@ const AVSOverview: React.FC = () => {
                             </span>
                           </TableCell>
                           <TableCell>
-                            <div className="flex space-x-1">
-                              {renderSlashingIndicator(
-                                avs.slashingConditions.incorrectSig,
-                              )}
-                              {renderSlashingIndicator(
-                                avs.slashingConditions.doubleSigning,
-                              )}
-                              {renderSlashingIndicator(
-                                avs.slashingConditions.commitmentBreach,
-                              )}
-                              {renderSlashingIndicator(
-                                avs.slashingConditions.inactivity,
-                              )}
-                              {renderSlashingIndicator(
-                                avs.slashingConditions.dkgMalice,
-                              )}
-                              {renderSlashingIndicator(
-                                avs.slashingConditions.failureToSettle,
-                              )}
-                              {renderSlashingIndicator(
-                                avs.slashingConditions.falseNegative,
-                              )}
-                            </div>
+                            {hasNoSlashingInfo(avs) ? (
+                              <span className="text-xs italic text-gray-600 bg-gray-100 p-1 rounded">
+                                No specific slashing information available
+                              </span>
+                            ) : (
+                              <div className="flex space-x-1">
+                                {renderSlashingIndicator(
+                                  avs.slashingConditions.incorrectSig,
+                                )}
+                                {renderSlashingIndicator(
+                                  avs.slashingConditions.doubleSigning,
+                                )}
+                                {renderSlashingIndicator(
+                                  avs.slashingConditions.commitmentBreach,
+                                )}
+                                {renderSlashingIndicator(
+                                  avs.slashingConditions.inactivity,
+                                )}
+                                {renderSlashingIndicator(
+                                  avs.slashingConditions.dkgMalice,
+                                )}
+                                {renderSlashingIndicator(
+                                  avs.slashingConditions.failureToSettle,
+                                )}
+                                {renderSlashingIndicator(
+                                  avs.slashingConditions.falseNegative,
+                                )}
+                              </div>
+                            )}
                           </TableCell>
                         </TableRow>
                         {expandedRows[avs.avsName] && (
