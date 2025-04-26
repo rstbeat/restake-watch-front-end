@@ -758,46 +758,68 @@ const AVSOverview: React.FC = () => {
               size="h-9 w-9"
             />
           </div>
-          All AVSs by Category/Type
+          All AVSs
         </h2>
         <p className="text-sm text-gray-600 mb-4">
           Displaying all Actively Validated Services in the ecosystem with their
           operator permission models and slashing conditions
         </p>
 
-        <div className="bg-red-50 p-4 rounded-lg mb-4 border border-red-200">
-          <p className="text-red-700 font-medium">
-            AVSs implement various slashing conditions that directly impact the
-            security of your staked ETH
-          </p>
-          <p className="text-sm text-red-600 mt-1">
-            The Permission Model indicates whether an AVS allows any operator to
-            secure it (Permissionless) or restricts operators through
-            whitelisting (Whitelisted)
-          </p>
-          <p className="text-sm text-red-600 mt-1">
-            Different implementation statuses and slashing conditions affect
-            overall risk profile. Always research thoroughly before restaking to
-            an AVS.
-          </p>
-        </div>
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+            <h3 className="text-red-700 font-medium flex items-center mb-2">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              Slashing Conditions
+            </h3>
+            <p className="text-red-700 mb-2">
+              AVSs implement various slashing conditions that directly impact the
+              security of your staked ETH
+            </p>
+            <p className="text-sm text-red-600">
+              Different slashing conditions affect the overall risk profile. Always research
+              thoroughly before restaking to an AVS.
+            </p>
+          </div>
+          
+          <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+            <h3 className="text-amber-700 font-medium flex items-center mb-2">
+              <Info className="h-4 w-4 mr-2" />
+              Permission Model
+            </h3>
+            <p className="text-amber-700 mb-2">
+              The Permission Model indicates whether an AVS allows any operator to
+              secure it (Permissionless) or restricts operators through
+              whitelisting (Whitelisted)
+            </p>
+            <p className="text-sm text-amber-600">
+              Different implementation statuses and permission models directly
+              affect an AVS's decentralization and accessibility.
+            </p>
+          </div>
 
-        <div className="bg-purple-50 p-4 rounded-lg mb-6 border border-purple-200">
-          <p className="text-purple-700 font-medium">
-            The EigenLayer ecosystem's security depends on both how operators
-            are permitted to join (Permissioning) and what penalties they face
-            for misconduct (Slashing)
-          </p>
-          <p className="text-sm text-purple-600 mt-1">
-            Permissioning models range from fully permissionless (anyone can
-            join) to strictly whitelisted (selected operators only), directly
-            affecting decentralization
-          </p>
-          <p className="text-sm text-purple-600 mt-1">
-            Slashing conditions define what behaviors result in penalties for
-            operators, providing protection against malicious or negligent
-            actions
-          </p>
+          <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+            <h3 className="text-purple-700 font-medium flex items-center mb-2">
+              <Layers className="h-4 w-4 mr-2" />
+              EigenLayer Ecosystem Security
+            </h3>
+            <p className="text-purple-700 mb-2">
+              The EigenLayer ecosystem's security depends on both how operators
+              are permitted to join (Permissioning) and what penalties they face
+              for misconduct (Slashing)
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+              <div className="text-sm text-purple-600 bg-purple-100 p-2 rounded">
+                <span className="font-medium">Permissioning models</span> range from fully permissionless (anyone can
+                join) to strictly whitelisted (selected operators only), directly
+                affecting decentralization
+              </div>
+              <div className="text-sm text-purple-600 bg-purple-100 p-2 rounded">
+                <span className="font-medium">Slashing conditions</span> define what behaviors result in penalties for
+                operators, providing protection against malicious or negligent
+                actions
+              </div>
+            </div>
+          </div>
         </div>
 
         {renderFilterControls()}
