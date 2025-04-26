@@ -3,33 +3,33 @@ EigenDA,Data Availability,Permissionless,"Stake Threshold (Dynamic), EigenLayer 
 AltLayer MACH,Fast Finality,Permissioned,"Explicit Whitelist (AltLayer Multisig, Google Form)","Whitelist (""training wheels"") remains active; No indication of opening. Mandatory v0.3.3 upgrade deployed.",10,1.20M 
 Cyber MACH,Fast Finality (for Cyber L2),Permissioned,AltLayer Managed Whitelist,Inherits AltLayer MACH permissioning; Whitelist active. Mandatory v0.3.3 upgrade deployed.,10,3.68M
 ARPA Network (Randcast),Randomness (BLS-TSS),Permissionless,Open Registration (Threshold BLS Network),"Confirmed permissionless based on official site, resolving prior ambiguity.",48,1.74M
-Automata (Multi-Prover),TEE Coprocessor,Permissioned,"TEE Attestation Required, Likely Curated Onboarding",Requires TEE hardware/attestation; Ether.fi guide suggests curated process. Not a simple open whitelist.,26,1.72M
+Automata,TEE Coprocessor,Permissioned,"TEE Attestation Required, Likely Curated Onboarding",Requires TEE hardware/attestation; Ether.fi guide suggests curated process. Not a simple open whitelist.,26,1.72M
 Ava Protocol,Event-Driven Automation,Permissionless,Open Registration,Consistently open model confirmed by docs/activity.,31,1.18M
 Brevis coChain,ZK Coprocessor,Permissioned,"Curated Set (Expanded from 29 to 71 ops), Likely Invite/Partner","Started closed, gradually added known operators. No confirmation of fully open access yet.",51,1.86M
 DODOchain MACH,Fast Finality (for DODO Chain),Permissioned,AltLayer Managed Whitelist,Inherits AltLayer MACH permissioning; Whitelist active. Mandatory v0.3.3 upgrade deployed.,12,116.18K
 GM Network MACH,Fast Finality (for GM Network),Permissioned,AltLayer Managed Whitelist,Inherits AltLayer MACH permissioning; Whitelist active.,[User Query],71.26K
-Hyperlane AVS,Interoperability,Permissionless,Open Registration (No minimums),Consistently permissionless; Requires running validator agent.,21,3.59M
+Hyperlane,Interoperability,Permissionless,Open Registration (No minimums),Consistently permissionless; Requires running validator agent.,21,3.59M
 Lagrange State Committees,ZK Light Client (State Proofs),Permissioned,"Explicit Whitelist (Lagrange Admin EOA, Launch Partners)",Mainnet remains permissioned despite open public testnet.,53,2.89M
 Lagrange ZK Prover,ZK Proving Network,Permissioned,Explicit Whitelist (Lagrange Admin EOA),Mainnet requires permission; Testnets inviting more operators. Worker setup required.,53,3.66M
 Omni Network,Interoperability,Implicit-TeamRun,Assumed Team/Selected Validators,"Roadmap mentioned operator network live Q4 2024, but public joining process still unclear. Assumed closed.",55,498.35K
 Opacity,(Unknown/Privacy?),Implicit-TeamRun,Assumed Team/Partner Run,No public info on operator access; Assumed closed.,[User Query],819.46K
-OpenLayer AVS,Modular Data Layer,Permissionless,Open Registration,Consistently open model confirmed.,56,3.62M
+OpenLayer,Modular Data Layer,Permissionless,Open Registration,Consistently open model confirmed.,56,3.62M
 Predicate (Aethos),Policy Engine,Permissionless,Open Registration (CLI),Consistently open model confirmed.,33,2.80M
-Witness Chain (InfinityWatch),DePIN Coordination,Permissioned,Explicit Whitelist (Team Approval via Discord),Whitelist remains active; Requires CLI registration after approval.,24,3.76M
+Witness Chain,DePIN Coordination,Permissioned,Explicit Whitelist (Team Approval via Discord),Whitelist remains active; Requires CLI registration after approval.,24,3.76M
 Xterio MACH,Fast Finality (for Xterio Chain),Permissioned,AltLayer Managed Whitelist,Inherits AltLayer MACH permissioning; Whitelist active. Mandatory v0.3.3 upgrade deployed.,12,1.14M
-eOracle (Lightnodes),Oracle,Permissionless,"Stake Threshold (32 ETH), EigenLayer Reg.",Consistently open model confirmed; Stake minimum applies.,25,3.77M
+eOracle,Oracle,Permissionless,"Stake Threshold (32 ETH), EigenLayer Reg.",Consistently open model confirmed; Stake minimum applies.,25,3.77M
 UniFi (Puffer),(Part of Puffer Ecosystem),Permissionless,Open Registration (On-chain registry),Consistently open model confirmed.,35,2.99M
 Ungate InfiniRoute,(Unknown/Routing?),Permissioned,"Invited Operators (e.g., Ankr)",Launched closed (Oct 2024); Assumed still curated.,[User Query],2.36M
-Aligned (ZK Verification),ZK Verification Layer,Permissioned,Likely Whitelist/Partner Onboarding (Mainnet),"Launched Mainnet Q1 2025; Despite open testnet & intent, mainnet access likely started permissioned. Needs verification.",58,2.75M
-GoPlus Security AVS,Security Compute Layer,Permissioned,AltLayer Managed Whitelist,Inherits AltLayer MACH permissioning; Whitelist active.,59,970.00K
-K3 Labs AVS,Workflow Automation,Permissioned,Invited Operators Only (Mainnet),Mainnet remains permissioned (invite-only) despite open testnets.,60,609.19K
-zScore AVS,(Unknown/Reputation?),Implicit-TeamRun,Assumed Team/Invited Run,No public info on operator access; Assumed closed.,62,931.04K
+Aligned Layer,ZK Verification Layer,Permissioned,Likely Whitelist/Partner Onboarding (Mainnet),"Launched Mainnet Q1 2025; Despite open testnet & intent, mainnet access likely started permissioned. Needs verification.",58,2.75M
+GoPlus Security,Security Compute Layer,Permissioned,AltLayer Managed Whitelist,Inherits AltLayer MACH permissioning; Whitelist active.,59,970.00K
+K3 Labs,Workflow Automation,Permissioned,Invited Operators Only (Mainnet),Mainnet remains permissioned (invite-only) despite open testnets.,60,609.19K
+zScore (Zeru),(Unknown/Reputation?),Implicit-TeamRun,Assumed Team/Invited Run,No public info on operator access; Assumed closed.,62,931.04K
 Vision (ETHGas),Gas Price Oracle/Prediction?,Permissionless,Open Registration,Launched open (Nov 2024); Increased stake caps but remains open access.,[User Query],2.79M
-RedStone Oracle AVS,Oracle,Permissioned,Explicit Whitelist (Phase 1),"Currently in Phase 1 requiring whitelist, contradicting earlier user query data. Plans for Phase 2 opening.",37,31.02K
-mev-commit (Primev),MEV/Preconfirmation Network,Permissionless,Open Registration (CLI),Consistently open model confirmed.,36,1.14M
-Chainbase Network AVS,Omnichain Data Network,Permissioned,Invited Operators Only (Mainnet),Mainnet remains permissioned (invite-only) despite open testnets.,64,590.92K
-Bolt AVS,(Unknown),Implicit-TeamRun,Assumed Team Run,No public info on operator access; Assumed closed.,[User Query],1.22K
-Skate AVS,State Channel Network?,Permissionless,Open Registration (Utilizes Othentic Stack),Launched open; Requires running specific operator roles/software.,65,1.10M
+RedStone Oracle,Oracle,Permissioned,Explicit Whitelist (Phase 1),"Currently in Phase 1 requiring whitelist, contradicting earlier user query data. Plans for Phase 2 opening.",37,31.02K
+MEV-commit (Primev),MEV/Preconfirmation Network,Permissionless,Open Registration (CLI),Consistently open model confirmed.,36,1.14M
+Chainbase Network,Omnichain Data Network,Permissioned,Invited Operators Only (Mainnet),Mainnet remains permissioned (invite-only) despite open testnets.,64,590.92K
+Bolt,(Unknown),Implicit-TeamRun,Assumed Team Run,No public info on operator access; Assumed closed.,[User Query],1.22K
+Skate,State Channel Network?,Permissionless,Open Registration (Utilizes Othentic Stack),Launched open; Requires running specific operator roles/software.,65,1.10M
 Blockless,Verifiable Computing Engine,Permissionless,Open Registration (Docker/CLI setup),Operator guide suggests open registration; No mention of whitelist/stake threshold.,29,
 Drosera Network,Security Automation/Responder,Permissionless (w/ Opt-in),"Open Registration, Requires Opt-in per ""Trap""","Network access seems open, but participation requires opting into specific monitoring tasks (Traps).",67,
 Espresso Sequencer,Decentralized Sequencer,Implicit-TeamRun,Assumed Team/Partner Run,Complex system; No public operator joining process found. Assumed closed currently.,67,

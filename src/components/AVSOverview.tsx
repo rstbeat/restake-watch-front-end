@@ -94,34 +94,66 @@ interface SlashingInfo {
 
 // Helper function to parse CSV
 const parseCSV = (csvText: string): string[][] => {
-  const rows = csvText.split('\n');
-  return rows.map((row) => {
-    // Handle commas within quotes properly
-    const result = [];
-    let inQuotes = false;
-    let currentEntry = '';
+  // First, normalize line endings
+  const normalizedText = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
-    for (let i = 0; i < row.length; i++) {
-      const char = row[i];
+  const result: string[][] = [];
+  let row: string[] = [];
+  let currentField = '';
+  let inQuotes = false;
 
-      if (char === '"' && (i === 0 || row[i - 1] !== '\\')) {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        result.push(currentEntry);
-        currentEntry = '';
+  // Process one character at a time
+  for (let i = 0; i < normalizedText.length; i++) {
+    const char = normalizedText[i];
+    const nextChar = i < normalizedText.length - 1 ? normalizedText[i + 1] : '';
+
+    // Handle quotes
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        // Double quotes inside quotes are escaped quotes
+        currentField += '"';
+        i++; // Skip the next quote
       } else {
-        currentEntry += char;
+        // Toggle quote state
+        inQuotes = !inQuotes;
       }
     }
+    // Handle commas
+    else if (char === ',' && !inQuotes) {
+      row.push(currentField.trim());
+      currentField = '';
+    }
+    // Handle line breaks
+    else if (char === '\n' && !inQuotes) {
+      row.push(currentField.trim());
+      if (row.length > 0) {
+        result.push(row);
+      }
+      row = [];
+      currentField = '';
+    }
+    // Regular character
+    else {
+      currentField += char;
+    }
+  }
 
-    result.push(currentEntry);
-    return result;
-  });
+  // Handle the last field and row
+  if (currentField || row.length > 0) {
+    if (currentField) {
+      row.push(currentField.trim());
+    }
+    if (row.length > 0) {
+      result.push(row);
+    }
+  }
+
+  return result;
 };
 
 // Helper function to convert string to boolean
 const stringToBoolean = (value: string): boolean => {
-  return value.toLowerCase() === 'true';
+  return value?.toLowerCase()?.trim() === 'true';
 };
 
 // StyledIcon component used across overview components
