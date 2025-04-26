@@ -801,7 +801,9 @@ const AVSOverview: React.FC = () => {
       </div>
 
       <div className="flex items-center">
-        <h4 className="text-sm font-semibold mr-2">Implementation Status:</h4>
+        <h4 className="text-sm font-semibold mr-2">
+          Slashing Implementation Status:
+        </h4>
         <Button
           variant={implementationFilter === 'all' ? 'default' : 'outline'}
           size="sm"
@@ -842,7 +844,7 @@ const AVSOverview: React.FC = () => {
         >
           Not Implemented
         </Button>
-        <InfoTooltip content="The current deployment stage of the AVS - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
+        <InfoTooltip content="The current deployment stage of the slashing mechanism - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
       </div>
     </div>
   );
@@ -877,8 +879,9 @@ const AVSOverview: React.FC = () => {
               the security of your staked ETH
             </p>
             <p className="text-sm text-red-600">
-              Different slashing conditions affect the overall risk profile.
-              Always research thoroughly before restaking to an AVS.
+              Different slashing conditions and implementation statuses affect
+              the overall risk profile. Always research thoroughly before
+              restaking to an AVS.
             </p>
           </div>
 
@@ -893,8 +896,8 @@ const AVSOverview: React.FC = () => {
               whitelisting (Whitelisted)
             </p>
             <p className="text-sm text-amber-600">
-              Different implementation statuses and permission models directly
-              affect an AVS's decentralization and accessibility.
+              Different slashing implementation statuses and permission models
+              directly affect an AVS's decentralization and accessibility.
             </p>
           </div>
 
@@ -916,9 +919,9 @@ const AVSOverview: React.FC = () => {
                 decentralization
               </div>
               <div className="text-sm text-purple-600 bg-purple-100 p-2 rounded">
-                <span className="font-medium">Slashing conditions</span> define
-                what behaviors result in penalties for operators, providing
-                protection against malicious or negligent actions
+                <span className="font-medium">Slashing mechanisms</span> define
+                what behaviors result in penalties for operators, with varying
+                implementation status from active to planned deployment
               </div>
             </div>
           </div>
@@ -986,10 +989,10 @@ const AVSOverview: React.FC = () => {
                         onClick={() => handleSort('implementationStatus')}
                         className="font-semibold"
                       >
-                        Implementation Status
+                        Slashing Implementation Status
                         <SortIcon column="implementationStatus" />
                       </Button>
-                      <InfoTooltip content="The current deployment stage of the AVS - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
+                      <InfoTooltip content="The current deployment stage of the slashing mechanism - Mainnet Active (live on Ethereum mainnet), Testnet Only (testing phase), Planned (in development), Not Implemented (early concept), or Inherited (using Ethereum's native mechanisms)" />
                     </TableHead>
                     <TableHead>
                       <Button
@@ -1179,9 +1182,9 @@ const AVSOverview: React.FC = () => {
                   requirements.
                 </li>
                 <li>
-                  <strong>Implementation status:</strong> Indicates maturity
-                  level. Mainnet active services have undergone more testing but
-                  may have higher stakes at risk.
+                  <strong>Slashing implementation status:</strong> Indicates
+                  maturity level of slashing mechanisms. Mainnet active slashing
+                  has undergone more testing but may have higher stakes at risk.
                 </li>
                 <li>
                   <strong>Slashing conditions:</strong> Define what behaviors
