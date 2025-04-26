@@ -41,6 +41,7 @@ import {
   Copy,
   Check,
   LucideIcon,
+  Layers,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '../components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
@@ -1363,6 +1364,23 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     compromise.
                   </p>
                 </div>
+
+                {/* New AVS Centralization Risk Point */}
+                <div className="flex items-start">
+                  <div className="shrink-0 mr-2">
+                    <SmallStyledIcon
+                      icon={<AlertCircle className="h-3 w-3" />}
+                      gradientColors={['#ef4444', '#f97316']}
+                    />
+                  </div>
+                  <p className="text-sm text-red-800">
+                    <span className="font-bold">Centralized Gatekeeping:</span>{' '}
+                    <strong>89%</strong> of AVSs use whitelisted permissioning,
+                    allowing AVS teams to decide which operators can secure
+                    their protocols, creating significant centralization at the
+                    ecosystem level.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -2099,6 +2117,85 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 />
               </ExpandableSection>
             )}
+
+            {/* AVS Risk - New section based on AVSOverview.tsx */}
+            <ExpandableSection
+              title="AVS Permissioning & Slashing Risk"
+              severity="critical"
+              defaultOpen={false}
+            >
+              <RiskIndicator
+                level="critical"
+                title="Centralized AVS Permissioning"
+                description={
+                  <p>
+                    <strong>17 out of 19</strong> Actively Validated Services
+                    (AVSs) use whitelisted permissioning models, limiting which
+                    operators can secure them. This high degree of centralized
+                    gatekeeping creates significant systemic risks and limits
+                    decentralization in the operator market.
+                  </p>
+                }
+              />
+
+              <RiskIndicator
+                level="critical"
+                title="Incomplete Slashing Implementation"
+                description={
+                  <p>
+                    Many AVSs have not fully implemented their documented
+                    slashing conditions, potentially creating a false sense of
+                    security. This gap between documentation and implementation
+                    means economic security guarantees may not be properly
+                    enforced.
+                  </p>
+                }
+              />
+
+              <RiskIndicator
+                level="warning"
+                title="Major AVSs with Concentrated Control"
+                description={
+                  <p>
+                    Even in permissionless AVSs, just{' '}
+                    <strong>5 operators</strong> typically control over 75% of
+                    restaked assets. This concentration is particularly
+                    concerning for slashing conditions like double signing,
+                    where a small group of colluding operators could potentially
+                    compromise AVS integrity.
+                  </p>
+                }
+              />
+
+              <RiskIndicator
+                level="warning"
+                title="Inconsistent Slashing Penalties"
+                description={
+                  <p>
+                    The penalty mechanisms vary widely across AVSs, from minimal
+                    penalties to complete slashing of staked ETH. This
+                    inconsistency creates unclear risk profiles for operators
+                    participating in multiple AVSs and restakers supporting
+                    these operators.
+                  </p>
+                }
+              />
+
+              <RiskIndicator
+                level="positive"
+                title="Growing Ecosystem Diversification"
+                description={
+                  <p>
+                    Despite current centralization concerns, the AVS ecosystem
+                    is growing with
+                    <strong> 10+ AVSs</strong> in active development or testnet
+                    phases. This growth increases the diversity of services and
+                    may eventually lead to more permissionless options and
+                    better-implemented slashing conditions.
+                  </p>
+                }
+              />
+            </ExpandableSection>
           </div>
         </CardContent>
       </Card>
