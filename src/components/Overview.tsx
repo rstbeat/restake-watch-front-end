@@ -1205,14 +1205,8 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 total stETH in circulation`}
             />
             <MetricSummaryCard
-              title="Combined Ecosystem Impact"
-              value={
-                restakePercents ? (
-                  `${restakePercents.combinedPercent}%`
-                ) : (
-                  <Skeleton className="h-7 w-20 rounded inline-block" />
-                )
-              }
+              title="Whitelisting Centralization Index (WCI)"
+              value={<Skeleton className="h-7 w-20 rounded inline-block" />}
               icon={
                 <StyledIcon
                   icon={<ServerCog className="h-4 w-4" />}
@@ -1220,16 +1214,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   size="h-9 w-9"
                 />
               }
-              description={`Percentage of combined ETH and stETH in circulation restaked in EigenLayer (${operatorData?.totalETHRestaked ? formattedETH : '?'} out of ${
-                ethereumStats
-                  ? new Intl.NumberFormat('en-US').format(
-                      Math.round(
-                        ethereumStats.totalEthSupply +
-                          ethereumStats.totalStEthSupply,
-                      ),
-                    )
-                  : '?'
-              } total)`}
+              description={`Proportion of stake in whitelisted AVSs vs all AVSs. Higher values indicate more centralization from permissioned protocols. A high WCI (>75%) suggests heavy reliance on closed systems with gatekeepers controlling operator access.`}
             />
           </div>
 
