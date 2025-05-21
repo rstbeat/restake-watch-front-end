@@ -752,6 +752,16 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
     totalEthSupply: number;
     totalStEthSupply: number;
   } | null>(null);
+  const [wciMetric, setWciMetric] = useState<{
+    wci: number;
+    whitelistedStake: number;
+    totalStake: number;
+  } | null>(null);
+  const [avsPermissionStats, setAvsPermissionStats] = useState<{
+    permissionedPercentage: number;
+    permissionedCount: number;
+    totalCount: number;
+  } | null>(null);
 
   // Format values for display
   const totalETHValue = operatorData?.totalETHRestaked || 0;
@@ -800,6 +810,80 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
     };
 
     getEthereumStats();
+  }, []);
+
+  // Calculate the WCI (Whitelisting Centralization Index)
+  useEffect(() => {
+    const calculateWCI = async () => {
+      try {
+        // Fetch the AVS whitelisting data CSV
+        const response = await fetch('/data/AVS - whitelisting info.csv');
+        const csvText = await response.text();
+
+        // Parse CSV (simple parsing, skipping the header)
+        const rows = csvText
+          .split('\n')
+          .slice(1)
+          .filter((row) => row.trim() !== '');
+
+        let totalWhitelistedStake = 0;
+        let totalStake = 0;
+
+        rows.forEach((row) => {
+          const columns = row.split(',');
+          if (columns.length >= 7) {
+            const permissionModel = columns[2].trim();
+            const amountStr = columns[6].trim();
+
+            // Skip rows with empty amount
+            if (!amountStr) return;
+
+            // Parse the amount (handle K and M suffixes)
+            let amount = 0;
+            if (amountStr.endsWith('K')) {
+              amount = parseFloat(amountStr.replace('K', '')) * 1000;
+            } else if (amountStr.endsWith('M')) {
+              amount = parseFloat(amountStr.replace('M', '')) * 1000000;
+            } else {
+              amount = parseFloat(amountStr);
+            }
+
+            // Add to the total stake
+            if (!isNaN(amount)) {
+              totalStake += amount;
+
+              // Check if this AVS is whitelisted/permissioned
+              if (
+                permissionModel === 'Permissioned' ||
+                permissionModel === 'Implicit-TeamRun'
+              ) {
+                totalWhitelistedStake += amount;
+              }
+            }
+          }
+        });
+
+        // Calculate the WCI ratio
+        const wci = totalWhitelistedStake / totalStake;
+
+        setWciMetric({
+          wci,
+          whitelistedStake: totalWhitelistedStake,
+          totalStake,
+        });
+
+        console.log('WCI calculated:', {
+          wci: wci * 100,
+          whitelistedStake: totalWhitelistedStake,
+          totalStake,
+          permissionedPercentage: (wci * 100).toFixed(1) + '%',
+        });
+      } catch (error) {
+        console.error('Error calculating WCI:', error);
+      }
+    };
+
+    calculateWCI();
   }, []);
 
   // Calculate restaked percentages if stats are available
@@ -874,6 +958,61 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
   const combinedShare = p2pShare + nodeMonsterShare;
   const formattedCombinedShare = combinedShare.toFixed(1);
 
+  // Calculate AVS permission statistics
+  useEffect(() => {
+    const calculateAvsPermissionStats = async () => {
+      try {
+        // Fetch the AVS whitelisting data CSV
+        const response = await fetch('/data/AVS - whitelisting info.csv');
+        const csvText = await response.text();
+
+        // Parse CSV (simple parsing, skipping the header)
+        const rows = csvText
+          .split('\n')
+          .slice(1)
+          .filter((row) => row.trim() !== '');
+
+        let permissionedCount = 0;
+        const totalCount = rows.length;
+
+        rows.forEach((row) => {
+          const columns = row.split(',');
+          if (columns.length >= 3) {
+            const permissionModel = columns[2].trim();
+
+            // Check if this AVS is whitelisted/permissioned
+            if (
+              permissionModel === 'Permissioned' ||
+              permissionModel === 'Implicit-TeamRun'
+            ) {
+              permissionedCount++;
+            }
+          }
+        });
+
+        // Calculate the percentage
+        const permissionedPercentage = (permissionedCount / totalCount) * 100;
+
+        setAvsPermissionStats({
+          permissionedPercentage,
+          permissionedCount,
+          totalCount,
+        });
+
+        console.log('AVS Permission Stats calculated:', {
+          permissionedPercentage: permissionedPercentage.toFixed(1) + '%',
+          permissionedCount,
+          totalCount,
+          permissionlessCount: totalCount - permissionedCount,
+        });
+      } catch (error) {
+        console.error('Error calculating AVS permission stats:', error);
+      }
+    };
+
+    calculateAvsPermissionStats();
+  }, []);
+
   return (
     <>
       {/* Risk Overview Card */}
@@ -917,7 +1056,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   size="h-9 w-9"
                 />
               }
-              description="ETH value of all restaked assets (includes Beacon Chain ETH, stETH, EIGEN, etc.)"
+              description="ETH value of all restaked assets (includes Beacon Chain ETH, stETH, EIGEN, etc.). Total value at risk if EigenLayer experiences critical governance, economic, or technical failures."
             />
             <MetricSummaryCard
               title="Active Operators"
@@ -935,7 +1074,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   size="h-9 w-9"
                 />
               }
-              description="Number of active operators securing the network (with more than 0 restaked assets)"
+              description="Number of active operators securing the network (with more than 0 restaked assets). More operators typically improves security through decentralization, reducing coordination risks."
             />
             <MetricSummaryCard
               title="Active Restakers"
@@ -953,7 +1092,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   size="h-9 w-9"
                 />
               }
-              description="Number of unique addresses restaking ETH (with more than 0 restaked assets)"
+              description="Number of unique addresses restaking ETH (with more than 0 restaked assets). A larger, more diverse restaker base distributes risk and reduces the influence of individual whales on the network."
             />
           </div>
 
@@ -1002,7 +1141,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               }
               description={(() => {
                 if (!operatorData?.totalETHRestaked)
-                  return 'Percentage of all restaked ETH controlled by the top 5 operators';
+                  return 'Percentage of all restaked ETH controlled by the top 5 operators. High concentration creates a critical risk of collusion, capture, or cascading failures.';
 
                 // Calculate percentage using the appropriate method
                 let percentage = 0;
@@ -1046,7 +1185,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                       )
                     : '';
 
-                return `${formattedETH} ETH${formattedUSD ? ` ($${formattedUSD})` : ''} controlled by the top 5 operators`;
+                return `${formattedETH} ETH${formattedUSD ? ` ($${formattedUSD})` : ''} controlled by the top 5 operators. High concentration creates a critical risk of collusion, capture, or coordinated failures.`;
               })()}
             />
             <MetricSummaryCard
@@ -1074,7 +1213,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               }
               description={(() => {
                 if (!restakeData?.stakerData || !operatorData?.totalETHRestaked)
-                  return 'Percentage of all restaked ETH controlled by the top 20 restaker wallets';
+                  return 'Percentage of all restaked ETH controlled by the top 20 restaker wallets. Whale dominance creates market volatility risks and potential governance capture.';
 
                 const percentage =
                   restakeData.stakerData
@@ -1100,7 +1239,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                       )
                     : '';
 
-                return `${formattedETH} ETH${formattedUSD ? ` ($${formattedUSD})` : ''} controlled by the top 20 wallets`;
+                return `${formattedETH} ETH${formattedUSD ? ` ($${formattedUSD})` : ''} controlled by the top 20 wallets. This whale dominance creates liquidity risks and potential governance capture through economic influence.`;
               })()}
             />
             <MetricSummaryCard
@@ -1126,7 +1265,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   size="h-9 w-9"
                 />
               }
-              description="Number of active strategies in the EigenLayer ecosystem"
+              description="Number of active strategies in the EigenLayer ecosystem. More diverse strategies can improve system resilience, but each adds unique risks and complexity to the ecosystem."
             />
           </div>
 
@@ -1168,7 +1307,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                       )
                     : '?'
                 } 
-                total ETH in circulation`}
+                total ETH in circulation. Higher percentages mean more of Ethereum's security is dependent on EigenLayer, creating systemic risk if vulnerabilities emerge.`}
             />
             <MetricSummaryCard
               title="stETH Restaked vs. Total Supply"
@@ -1202,11 +1341,17 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                       )
                     : '?'
                 } 
-                total stETH in circulation`}
+                total stETH in circulation. Creates a dependency chain where EigenLayer risks are compounded with Lido risks, amplifying potential cascading failures in the ecosystem.`}
             />
             <MetricSummaryCard
               title="Whitelisting Centralization Index (WCI)"
-              value={<Skeleton className="h-7 w-20 rounded inline-block" />}
+              value={
+                wciMetric ? (
+                  `${(wciMetric.wci * 100).toFixed(1)}%`
+                ) : (
+                  <Skeleton className="h-7 w-20 rounded inline-block" />
+                )
+              }
               icon={
                 <StyledIcon
                   icon={<ServerCog className="h-4 w-4" />}
@@ -1214,7 +1359,17 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   size="h-9 w-9"
                 />
               }
-              description={`Proportion of stake in whitelisted AVSs vs all AVSs. Higher values indicate more centralization from permissioned protocols. A high WCI (>75%) suggests heavy reliance on closed systems with gatekeepers controlling operator access.`}
+              description={
+                wciMetric
+                  ? `${new Intl.NumberFormat('en-US').format(
+                      Math.round(wciMetric.whitelistedStake),
+                    )} ETH is in permissioned AVSs out of ${new Intl.NumberFormat(
+                      'en-US',
+                    ).format(
+                      Math.round(wciMetric.totalStake),
+                    )} total ETH. Permissioned AVSs only allow pre-approved operators, creating gatekeeping that limits competition and concentrates security power among a small elite operator set.`
+                  : `Proportion of stake in whitelisted AVSs vs all AVSs. Permissioned AVSs only allow pre-approved operators, creating centralization by restricting which validators can secure protocols.`
+              }
             />
           </div>
 
@@ -1360,10 +1515,18 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </div>
                   <p className="text-sm text-red-800">
                     <span className="font-bold">Centralized Gatekeeping:</span>{' '}
-                    <strong>89%</strong> of AVSs use whitelisted permissioning,
-                    allowing AVS teams to decide which operators can secure
-                    their protocols, creating significant centralization at the
-                    ecosystem level.
+                    <strong>
+                      {avsPermissionStats
+                        ? `${Math.round(avsPermissionStats.permissionedPercentage)}%`
+                        : '89%'}
+                    </strong>{' '}
+                    of AVSs (
+                    {avsPermissionStats
+                      ? `${avsPermissionStats.permissionedCount} out of ${avsPermissionStats.totalCount}`
+                      : 'many'}
+                    ) use whitelisted permissioning, allowing AVS teams to
+                    decide which operators can secure their protocols, creating
+                    significant centralization at the ecosystem level.
                   </p>
                 </div>
               </div>
@@ -1476,11 +1639,22 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
                     className="bg-red-500 h-2.5 rounded-full"
-                    style={{ width: '10%' }}
+                    style={{
+                      width: avsPermissionStats
+                        ? `${100 - avsPermissionStats.permissionedPercentage}%`
+                        : '10%',
+                    }}
                   ></div>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Only 2 out of 19 AVSs allow operators without whitelisting
+                  Only{' '}
+                  {avsPermissionStats
+                    ? avsPermissionStats.totalCount -
+                      avsPermissionStats.permissionedCount
+                    : 2}{' '}
+                  out of{' '}
+                  {avsPermissionStats ? avsPermissionStats.totalCount : 19} AVSs
+                  allow operators without whitelisting
                 </p>
               </div>
             </div>

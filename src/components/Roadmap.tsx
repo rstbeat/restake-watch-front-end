@@ -135,6 +135,7 @@ const Roadmap: React.FC = () => {
       title: 'WCI Implementation',
       description:
         'Launch of Whitelisting Concentration Index (WCI) metric for EigenLayer',
+      completed: true,
     },
     {
       date: 'April 2025',
