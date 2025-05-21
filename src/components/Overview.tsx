@@ -21,7 +21,6 @@ import {
 } from 'recharts';
 
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { InfoCircledIcon } from '@radix-ui/react-icons';
 import {
   AlertTriangle,
   ChevronDown,
@@ -42,6 +41,7 @@ import {
   Check,
   LucideIcon,
   Layers,
+  HelpCircle,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '../components/ui/card';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
@@ -77,7 +77,7 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => (
   <Tooltip.Provider>
     <Tooltip.Root>
       <Tooltip.Trigger asChild>
-        <InfoCircledIcon className="inline-block ml-2 cursor-help" />
+        <HelpCircle className="inline-block ml-2 cursor-help h-4 w-4 text-gray-500" />
       </Tooltip.Trigger>
       <Tooltip.Portal>
         <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs">
@@ -150,7 +150,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
           <Tooltip.Provider>
             <Tooltip.Root>
               <Tooltip.Trigger asChild>
-                <InfoCircledIcon className="h-4 w-4 text-gray-400 cursor-help" />
+                <HelpCircle className="h-4 w-4 text-gray-400 cursor-help" />
               </Tooltip.Trigger>
               <Tooltip.Portal>
                 <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-sm">
@@ -1602,7 +1602,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     <Tooltip.Provider>
                       <Tooltip.Root>
                         <Tooltip.Trigger asChild>
-                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                          <HelpCircle className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
                         </Tooltip.Trigger>
                         <Tooltip.Portal>
                           <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
@@ -1635,7 +1635,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     <Tooltip.Provider>
                       <Tooltip.Root>
                         <Tooltip.Trigger asChild>
-                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                          <HelpCircle className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
                         </Tooltip.Trigger>
                         <Tooltip.Portal>
                           <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
@@ -1672,7 +1672,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     <Tooltip.Provider>
                       <Tooltip.Root>
                         <Tooltip.Trigger asChild>
-                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                          <HelpCircle className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
                         </Tooltip.Trigger>
                         <Tooltip.Portal>
                           <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
@@ -1719,7 +1719,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     <Tooltip.Provider>
                       <Tooltip.Root>
                         <Tooltip.Trigger asChild>
-                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                          <HelpCircle className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
                         </Tooltip.Trigger>
                         <Tooltip.Portal>
                           <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
@@ -1755,7 +1755,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     <Tooltip.Provider>
                       <Tooltip.Root>
                         <Tooltip.Trigger asChild>
-                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                          <HelpCircle className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
                         </Tooltip.Trigger>
                         <Tooltip.Portal>
                           <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
@@ -1768,7 +1768,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                             {avsPermissionStats
                               ? avsPermissionStats.totalCount
                               : 19}{' '}
-                            AVSs allow permissionless operator participation
+                            AVSs allow operators without whitelisting
                             <Tooltip.Arrow className="fill-gray-800" />
                           </Tooltip.Content>
                         </Tooltip.Portal>
@@ -3491,8 +3491,6 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
     null,
   );
-
-  // Add state for strategies data
   const [strategiesData, setStrategiesData] = useState<StrategiesData | null>(
     null,
   );
@@ -3624,6 +3622,29 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     return null;
   };
 
+  // Calculate metrics for dashboard
+  const totalETHValue = operatorData?.totalETHRestaked || 0;
+  const formattedETH = new Intl.NumberFormat('en-US').format(totalETHValue);
+  const usdValue = totalETHValue * ethPrice;
+  const formattedUSD =
+    usdValue > 0
+      ? new Intl.NumberFormat('en-US').format(Math.round(usdValue))
+      : '0';
+
+  // Get operator concentration metrics
+  const operatorTopCount =
+    operatorData?.concentrationMetrics?.top33PercentCount || 0;
+  const restakerTopCount =
+    restakeData?.concentrationMetrics?.top33PercentCount || 0;
+
+  // Format metrics values
+  const formattedOperators = new Intl.NumberFormat('en-US').format(
+    operatorData?.activeEntities || 0,
+  );
+  const formattedRestakers = new Intl.NumberFormat('en-US').format(
+    restakeData?.activeRestakers || 0,
+  );
+
   // Get operator data
   const p2pData = findOperatorData('p2p');
   const nodeMonsterData = findOperatorData('node monster');
@@ -3685,9 +3706,93 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
 
   return (
     <div className="space-y-6">
-      {/* <RiskAssessment /> */}
+      {/* Add dashboard-style metrics section at the top */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {/* Metric 1: Total Value Locked */}
+        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-100 shadow-md p-5 transition-all duration-300 hover:shadow-lg">
+          <div className="flex items-center mb-3">
+            <div className="p-2 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg shadow-md">
+              <DollarSign className="h-6 w-6 text-white" />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-500 ml-3">
+              Total Value Locked
+            </h3>
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-gray-900">
+              {formattedETH} <span className="text-sm font-normal">ETH</span>
+            </p>
+            <p className="text-lg font-semibold text-gray-600">
+              ${formattedUSD}
+            </p>
+          </div>
+        </div>
+
+        {/* Metric 2: Active Operators */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 shadow-md p-5 transition-all duration-300 hover:shadow-lg">
+          <div className="flex items-center mb-3">
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-md">
+              <ServerCog className="h-6 w-6 text-white" />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-500 ml-3">
+              Active Operators
+            </h3>
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-gray-900">
+              {formattedOperators}
+            </p>
+            <p className="text-lg font-normal text-gray-600">
+              Securing the network
+            </p>
+          </div>
+        </div>
+
+        {/* Metric 3: Active Restakers */}
+        <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl border border-green-100 shadow-md p-5 transition-all duration-300 hover:shadow-lg">
+          <div className="flex items-center mb-3">
+            <div className="p-2 bg-gradient-to-br from-green-500 to-teal-600 rounded-lg shadow-md">
+              <Users className="h-6 w-6 text-white" />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-500 ml-3">
+              Active Restakers
+            </h3>
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-gray-900">
+              {formattedRestakers}
+            </p>
+            <p className="text-lg font-normal text-gray-600">
+              Unique addresses
+            </p>
+          </div>
+        </div>
+
+        {/* Metric 4: Concentration Risk */}
+        <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border border-red-100 shadow-md p-5 transition-all duration-300 hover:shadow-lg">
+          <div className="flex items-center mb-3">
+            <div className="p-2 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg shadow-md">
+              <AlertTriangle className="h-6 w-6 text-white" />
+            </div>
+            <h3 className="text-sm font-semibold text-gray-500 ml-3">
+              Concentration Risk
+            </h3>
+          </div>
+          <div>
+            <p className="text-3xl font-bold text-gray-900">
+              {operatorTopCount || '?'}{' '}
+              <span className="text-lg font-normal">operators</span>
+            </p>
+            <p className="text-lg font-semibold text-red-500">
+              Control 33% of ETH
+            </p>
+          </div>
+        </div>
+      </div>
+
       <EnhancedMetrics restakeData={restakeData} operatorData={operatorData} />
 
+      {/* Rest of the existing code... */}
       {/* Add Strategies Overview component with ethPrice */}
       {strategiesData && (
         <StrategiesOverview
