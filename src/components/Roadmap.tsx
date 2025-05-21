@@ -142,20 +142,35 @@ const Roadmap: React.FC = () => {
       title: 'GBP Implementation',
       description:
         'Launch of Governance Bribery Potential (GBP) metric for EigenLayer',
+      completed: true,
     },
     {
-      date: 'April 2025',
+      date: 'May 2025',
+      title: 'AVS Slashing Parameters',
+      description:
+        'Creation of slashing parameters for AVS metrics to monitor validator performance and security',
+      completed: true,
+    },
+    {
+      date: 'May 2025',
+      title: 'Slashing Tracker X Bot',
+      description:
+        'Development of a Twitter bot to track and report slashing events in real-time',
+      completed: true,
+    },
+    {
+      date: 'June 2025',
       title: 'CAPVAR Implementation',
       description:
         'Launch of Cross-Asset Price & Volatile Asset Risk (CAPVAR) metric for EigenLayer',
     },
     {
-      date: 'April 2025',
+      date: 'June 2025',
       title: 'CF Implementation',
       description: 'Launch of Contagion Factor (CF) metric for EigenLayer',
     },
     {
-      date: 'May 2025',
+      date: 'June 2025',
       title: 'Symbiotic Data',
       description:
         'Integration of symbiotic operator, restakers, and network concentration data - a particularly interesting expansion',
