@@ -1301,44 +1301,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   : `Proportion of stake in whitelisted AVSs vs all AVSs. Permissioned AVSs only allow pre-approved operators, creating centralization by restricting which validators can secure protocols.`
               }
             />
-            <MetricSummaryCard
-              title="ETH Restaked vs. Total Supply"
-              value={
-                restakePercents ? (
-                  `${restakePercents.ethPercent}%`
-                ) : (
-                  <Skeleton className="h-7 w-20 rounded inline-block" />
-                )
-              }
-              icon={
-                <StyledIcon
-                  icon={<Network className="h-4 w-4" />}
-                  gradientColors={['#10b981', '#3b82f6']}
-                  size="h-9 w-9"
-                />
-              }
-              description={`${
-                operatorData?.totalRestakedAssetsPerStrategy?.[
-                  'BeaconChain_ETH'
-                ]
-                  ? new Intl.NumberFormat('en-US').format(
-                      Math.round(
-                        operatorData.totalRestakedAssetsPerStrategy[
-                          'BeaconChain_ETH'
-                        ],
-                      ),
-                    )
-                  : '?'
-              } 
-                ETH restaked out of ${
-                  ethereumStats?.totalEthSupply
-                    ? new Intl.NumberFormat('en-US').format(
-                        Math.round(ethereumStats.totalEthSupply),
-                      )
-                    : '?'
-                } 
-                total ETH in circulation. Higher percentages mean more of Ethereum's security is dependent on EigenLayer, creating systemic risk if vulnerabilities emerge.`}
-            />
+
             <MetricSummaryCard
               title="stETH Restaked vs. Total Supply"
               value={
@@ -1372,68 +1335,6 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     : '?'
                 } 
                 total stETH in circulation. Creates a dependency chain where EigenLayer risks are compounded with Lido risks, amplifying potential cascading failures in the ecosystem.`}
-            />
-          </div>
-
-          {/* Third row of metrics - Network size metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <MetricSummaryCard
-              title="Total Restaked Value (ETH)"
-              value={
-                operatorData?.totalETHRestaked ? (
-                  formattedETH
-                ) : (
-                  <Skeleton className="h-7 w-28 rounded" />
-                )
-              }
-              usdValue={
-                formattedUSD ||
-                (ethPrice > 0 ? <Skeleton className="h-5 w-20 rounded" /> : '')
-              }
-              icon={
-                <StyledIcon
-                  icon={<Wallet className="h-4 w-4" />}
-                  gradientColors={['#3b82f6', '#06b6d4']}
-                  size="h-9 w-9"
-                />
-              }
-              description="ETH value of all restaked assets (includes Beacon Chain ETH, stETH, EIGEN, etc.). Total value at risk if EigenLayer experiences critical governance, economic, or technical failures."
-            />
-            <MetricSummaryCard
-              title="Active Operators"
-              value={
-                operatorData?.activeEntities ? (
-                  formattedOperators
-                ) : (
-                  <Skeleton className="h-7 w-16 rounded" />
-                )
-              }
-              icon={
-                <StyledIcon
-                  icon={<Users className="h-4 w-4" />}
-                  gradientColors={['#8b5cf6', '#d946ef']}
-                  size="h-9 w-9"
-                />
-              }
-              description="Number of active operators securing the network (with more than 0 restaked assets). More operators typically improves security through decentralization, reducing coordination risks."
-            />
-            <MetricSummaryCard
-              title="Active Restakers"
-              value={
-                restakeData?.activeRestakers ? (
-                  formattedRestakers
-                ) : (
-                  <Skeleton className="h-7 w-16 rounded" />
-                )
-              }
-              icon={
-                <StyledIcon
-                  icon={<Network className="h-4 w-4" />}
-                  gradientColors={['#10b981', '#06b6d4']}
-                  size="h-9 w-9"
-                />
-              }
-              description="Number of unique addresses restaking ETH (with more than 0 restaked assets). A larger, more diverse restaker base distributes risk and reduces the influence of individual whales on the network."
             />
           </div>
 
@@ -3495,6 +3396,10 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     null,
   );
   const [ethPrice, setEthPrice] = useState<number>(0);
+  const [ethereumStats, setEthereumStats] = useState<{
+    totalEthSupply: number;
+    totalStEthSupply: number;
+  } | null>(null);
 
   // Format USD value with appropriate suffix (B for billions, M for millions)
   const formatUSDValue = (value: number): string => {
@@ -3597,6 +3502,20 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     });
   }, [strategiesData]);
 
+  // Add useEffect to fetch Ethereum stats
+  useEffect(() => {
+    const getEthStats = async () => {
+      try {
+        const stats = await fetchEthereumStats();
+        setEthereumStats(stats);
+      } catch (error) {
+        console.error('Error fetching Ethereum stats:', error);
+      }
+    };
+
+    getEthStats();
+  }, []);
+
   // Find operator data helper function
   const findOperatorData = (operatorName: string) => {
     if (!operatorData?.majorOperatorGroupMetrics) return null;
@@ -3664,6 +3583,31 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     ethPrice > 0 ? topOperatorsETHValue * ethPrice : 0;
   const formattedTopOperatorsUSD = formatUSDValue(topOperatorsUSDValue);
 
+  // Calculate restaked percentages
+  const restakePercents = useMemo(() => {
+    if (!ethereumStats || !operatorData) return null;
+
+    // Get BeaconChain ETH and Lido from strategies
+    const beaconChainETH =
+      operatorData.totalRestakedAssetsPerStrategy?.['BeaconChain_ETH'] || 0;
+    const lidoETH = operatorData.totalRestakedAssetsPerStrategy?.['Lido'] || 0;
+
+    return {
+      ethPercent: (
+        (beaconChainETH / ethereumStats.totalEthSupply) *
+        100
+      ).toFixed(2),
+      stethPercent: ((lidoETH / ethereumStats.totalStEthSupply) * 100).toFixed(
+        2,
+      ),
+      combinedPercent: (
+        ((beaconChainETH + lidoETH) /
+          (ethereumStats.totalEthSupply + ethereumStats.totalStEthSupply)) *
+        100
+      ).toFixed(2),
+    };
+  }, [ethereumStats, operatorData]);
+
   // Color array for different sections
   const purpleColors = [
     '#9C27B0', // Base purple
@@ -3707,84 +3651,93 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   return (
     <div className="space-y-6">
       {/* Add dashboard-style metrics section at the top */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
         {/* Metric 1: Total Value Locked */}
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-100 shadow-md p-5 transition-all duration-300 hover:shadow-lg">
-          <div className="flex items-center mb-3">
-            <div className="p-2 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg shadow-md">
-              <DollarSign className="h-6 w-6 text-white" />
+        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border border-purple-100 shadow-sm p-3 transition-all duration-300 hover:shadow-md">
+          <div className="flex items-center mb-1.5">
+            <div className="p-1.5 bg-gradient-to-br from-purple-500 to-blue-600 rounded-md shadow-sm">
+              <DollarSign className="h-4 w-4 text-white" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-500 ml-3">
+            <h3 className="text-xs font-medium text-gray-500 ml-2">
               Total Value Locked
             </h3>
           </div>
           <div>
-            <p className="text-3xl font-bold text-gray-900">
-              {formattedETH} <span className="text-sm font-normal">ETH</span>
+            <p className="text-xl font-bold text-gray-900">
+              {formattedETH} <span className="text-xs font-normal">ETH</span>
             </p>
-            <p className="text-lg font-semibold text-gray-600">
-              ${formattedUSD}
+            <p className="text-sm font-medium text-gray-600">
+              ${formattedUSD}{' '}
+              <span className="text-xs text-gray-500">(USD)</span>
             </p>
           </div>
         </div>
 
         {/* Metric 2: Active Operators */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100 shadow-md p-5 transition-all duration-300 hover:shadow-lg">
-          <div className="flex items-center mb-3">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-md">
-              <ServerCog className="h-6 w-6 text-white" />
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100 shadow-sm p-3 transition-all duration-300 hover:shadow-md">
+          <div className="flex items-center mb-1.5">
+            <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md shadow-sm">
+              <ServerCog className="h-4 w-4 text-white" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-500 ml-3">
+            <h3 className="text-xs font-medium text-gray-500 ml-2">
               Active Operators
             </h3>
           </div>
           <div>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-xl font-bold text-gray-900">
               {formattedOperators}
             </p>
-            <p className="text-lg font-normal text-gray-600">
-              Securing the network
+            <p className="text-sm font-normal text-gray-600">
+              Securing the network{' '}
+              <span className="block text-xs text-gray-500">
+                (Entities with {'>'}0 restaked ETH)
+              </span>
             </p>
           </div>
         </div>
 
         {/* Metric 3: Active Restakers */}
-        <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl border border-green-100 shadow-md p-5 transition-all duration-300 hover:shadow-lg">
-          <div className="flex items-center mb-3">
-            <div className="p-2 bg-gradient-to-br from-green-500 to-teal-600 rounded-lg shadow-md">
-              <Users className="h-6 w-6 text-white" />
+        <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg border border-green-100 shadow-sm p-3 transition-all duration-300 hover:shadow-md">
+          <div className="flex items-center mb-1.5">
+            <div className="p-1.5 bg-gradient-to-br from-green-500 to-teal-600 rounded-md shadow-sm">
+              <Users className="h-4 w-4 text-white" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-500 ml-3">
+            <h3 className="text-xs font-medium text-gray-500 ml-2">
               Active Restakers
             </h3>
           </div>
           <div>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-xl font-bold text-gray-900">
               {formattedRestakers}
             </p>
-            <p className="text-lg font-normal text-gray-600">
-              Unique addresses
+            <p className="text-sm font-normal text-gray-600">
+              Unique addresses{' '}
+              <span className="block text-xs text-gray-500">
+                (Wallets with {'>'}0 restaked assets)
+              </span>
             </p>
           </div>
         </div>
 
-        {/* Metric 4: Concentration Risk */}
-        <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl border border-red-100 shadow-md p-5 transition-all duration-300 hover:shadow-lg">
-          <div className="flex items-center mb-3">
-            <div className="p-2 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg shadow-md">
-              <AlertTriangle className="h-6 w-6 text-white" />
+        {/* Metric 4: ETH Restaked vs. Total Supply */}
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg border border-blue-100 shadow-sm p-3 transition-all duration-300 hover:shadow-md">
+          <div className="flex items-center mb-1.5">
+            <div className="p-1.5 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-md shadow-sm">
+              <Network className="h-4 w-4 text-white" />
             </div>
-            <h3 className="text-sm font-semibold text-gray-500 ml-3">
-              Concentration Risk
+            <h3 className="text-xs font-medium text-gray-500 ml-2">
+              Restaked ETH vs. Supply
             </h3>
           </div>
           <div>
-            <p className="text-3xl font-bold text-gray-900">
-              {operatorTopCount || '?'}{' '}
-              <span className="text-lg font-normal">operators</span>
+            <p className="text-xl font-bold text-gray-900">
+              {restakePercents ? restakePercents.ethPercent : '?'}%
             </p>
-            <p className="text-lg font-semibold text-red-500">
-              Control 33% of ETH
+            <p className="text-sm font-normal text-gray-600">
+              Of total ETH supply{' '}
+              <span className="block text-xs text-gray-500">
+                (EigenLayer restaked ETH as % of circulating supply)
+              </span>
             </p>
           </div>
         </div>
