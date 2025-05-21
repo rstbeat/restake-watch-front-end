@@ -92,7 +92,7 @@ const RestakeWatch: React.FC = () => {
       name: 'Obol Collective',
       logo: '/obol-logo.png',
       description:
-        'Building trust-minimized staking technology for Ethereum through distributed validator technology.',
+        'Providing Distributed Validator Technology that enhances security and decentralization by enabling multiple operators to collaboratively run validators.',
     },
     // Add more backers here as needed
   ];
