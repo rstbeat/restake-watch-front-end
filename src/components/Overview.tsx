@@ -1034,70 +1034,97 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           </p>
         </CardHeader>
         <CardContent>
+          {/* TLDR Risk Summary */}
+          <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+              <h3 className="font-bold text-gray-800">
+                TLDR: EigenLayer Risk Summary
+              </h3>
+            </div>
+            <div className="p-4 bg-white space-y-2">
+              <div className="flex items-start space-x-2 p-2 bg-red-50 border-l-4 border-red-500 rounded">
+                <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-red-800">
+                    Critical Risk: Governance
+                  </p>
+                  <p className="text-sm text-red-700">
+                    A 9-of-13 multisig controls EigenLayer with no timelock,
+                    creating an immediate $1.2B+ security risk through potential
+                    collusion.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2 p-2 bg-red-50 border-l-4 border-red-500 rounded">
+                <AlertCircle className="h-5 w-5 text-red-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-red-800">
+                    Critical Risk: Centralization
+                  </p>
+                  <p className="text-sm text-red-700">
+                    Just 5 operators control over 1/3 of restaked ETH, with P2P
+                    alone controlling over {p2pShare ? formattedP2PShare : '15'}
+                    % of all assets.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2 p-2 bg-yellow-50 border-l-4 border-yellow-500 rounded">
+                <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-yellow-800">
+                    Medium Risk: AVS Permissioning
+                  </p>
+                  <p className="text-sm text-yellow-700">
+                    89% of AVSs use whitelisted permissioning, creating
+                    centralized gatekeeping that limits operator competition.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start space-x-2 p-2 bg-green-50 border-l-4 border-green-500 rounded">
+                <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-green-800">
+                    Positive: Growing Adoption
+                  </p>
+                  <p className="text-sm text-green-700">
+                    {formattedOperators ? formattedOperators : '500+'} active
+                    operators and{' '}
+                    {formattedRestakers ? formattedRestakers : '10,000+'}{' '}
+                    restakers creating a broad ecosystem foundation.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Key Metrics Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <MetricSummaryCard
-              title="Total Restaked Value (ETH)"
+              title="EigenLayer's $1.2 Billion Temptation"
               value={
-                operatorData?.totalETHRestaked ? (
-                  formattedETH
+                operatorData?.totalETHRestaked && ethPrice ? (
+                  ((value) => {
+                    if (value >= 1_000_000_000) {
+                      return `$${(value / 1_000_000_000).toFixed(2)}B`;
+                    } else if (value >= 1_000_000) {
+                      return `$${(value / 1_000_000).toFixed(2)}M`;
+                    } else {
+                      return `$${Math.round(value).toLocaleString()}`;
+                    }
+                  })((operatorData.totalETHRestaked * ethPrice) / 9)
                 ) : (
-                  <Skeleton className="h-7 w-28 rounded" />
-                )
-              }
-              usdValue={
-                formattedUSD ||
-                (ethPrice > 0 ? <Skeleton className="h-5 w-20 rounded" /> : '')
-              }
-              icon={
-                <StyledIcon
-                  icon={<Wallet className="h-4 w-4" />}
-                  gradientColors={['#3b82f6', '#06b6d4']}
-                  size="h-9 w-9"
-                />
-              }
-              description="ETH value of all restaked assets (includes Beacon Chain ETH, stETH, EIGEN, etc.). Total value at risk if EigenLayer experiences critical governance, economic, or technical failures."
-            />
-            <MetricSummaryCard
-              title="Active Operators"
-              value={
-                operatorData?.activeEntities ? (
-                  formattedOperators
-                ) : (
-                  <Skeleton className="h-7 w-16 rounded" />
+                  <Skeleton className="h-7 w-12 rounded" />
                 )
               }
               icon={
                 <StyledIcon
-                  icon={<Users className="h-4 w-4" />}
-                  gradientColors={['#8b5cf6', '#d946ef']}
+                  icon={<Layers className="h-4 w-4" />}
+                  gradientColors={['#ef4444', '#f97316']} // Red gradient emphasizes the risk
                   size="h-9 w-9"
                 />
               }
-              description="Number of active operators securing the network (with more than 0 restaked assets). More operators typically improves security through decentralization, reducing coordination risks."
+              description="The potential payout for EACH of 9 colluding multisig signers if they divided all restaked ETH amongst themselves. With no timelock, this immense temptation could be realized immediately through governance capture."
             />
-            <MetricSummaryCard
-              title="Active Restakers"
-              value={
-                restakeData?.activeRestakers ? (
-                  formattedRestakers
-                ) : (
-                  <Skeleton className="h-7 w-16 rounded" />
-                )
-              }
-              icon={
-                <StyledIcon
-                  icon={<Network className="h-4 w-4" />}
-                  gradientColors={['#10b981', '#06b6d4']}
-                  size="h-9 w-9"
-                />
-              }
-              description="Number of unique addresses restaking ETH (with more than 0 restaked assets). A larger, more diverse restaker base distributes risk and reduces the influence of individual whales on the network."
-            />
-          </div>
-
-          {/* Second row of metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <MetricSummaryCard
               title="Top 5 Operators Control"
               value={(() => {
@@ -1242,35 +1269,38 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 return `${formattedETH} ETH${formattedUSD ? ` ($${formattedUSD})` : ''} controlled by the top 20 wallets. This whale dominance creates liquidity risks and potential governance capture through economic influence.`;
               })()}
             />
+          </div>
+
+          {/* Second row of metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <MetricSummaryCard
-              title="Strategy Count"
+              title="Whitelisting Centralization Index (WCI)"
               value={
-                operatorData?.totalRestakedAssetsPerStrategy ? (
-                  Object.keys(
-                    operatorData.totalRestakedAssetsPerStrategy,
-                  ).filter(
-                    (key) =>
-                      operatorData?.totalRestakedAssetsPerStrategy?.[key] !==
-                        undefined &&
-                      operatorData?.totalRestakedAssetsPerStrategy?.[key] > 0,
-                  ).length
+                wciMetric ? (
+                  `${(wciMetric.wci * 100).toFixed(1)}%`
                 ) : (
-                  <Skeleton className="h-7 w-12 rounded" />
+                  <Skeleton className="h-7 w-20 rounded inline-block" />
                 )
               }
               icon={
                 <StyledIcon
-                  icon={<DollarSign className="h-4 w-4" />}
-                  gradientColors={['#8b5cf6', '#d946ef']}
+                  icon={<ServerCog className="h-4 w-4" />}
+                  gradientColors={['#8b5cf6', '#3b82f6']}
                   size="h-9 w-9"
                 />
               }
-              description="Number of active strategies in the EigenLayer ecosystem. More diverse strategies can improve system resilience, but each adds unique risks and complexity to the ecosystem."
+              description={
+                wciMetric
+                  ? `${new Intl.NumberFormat('en-US').format(
+                      Math.round(wciMetric.whitelistedStake),
+                    )} ETH is in permissioned AVSs out of ${new Intl.NumberFormat(
+                      'en-US',
+                    ).format(
+                      Math.round(wciMetric.totalStake),
+                    )} total ETH. Permissioned AVSs only allow pre-approved operators, creating gatekeeping that limits competition and concentrates security power among a small elite operator set.`
+                  : `Proportion of stake in whitelisted AVSs vs all AVSs. Permissioned AVSs only allow pre-approved operators, creating centralization by restricting which validators can secure protocols.`
+              }
             />
-          </div>
-
-          {/* Third row of metrics - Ethereum ecosystem stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <MetricSummaryCard
               title="ETH Restaked vs. Total Supply"
               value={
@@ -1343,33 +1373,67 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 } 
                 total stETH in circulation. Creates a dependency chain where EigenLayer risks are compounded with Lido risks, amplifying potential cascading failures in the ecosystem.`}
             />
+          </div>
+
+          {/* Third row of metrics - Network size metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <MetricSummaryCard
-              title="Whitelisting Centralization Index (WCI)"
+              title="Total Restaked Value (ETH)"
               value={
-                wciMetric ? (
-                  `${(wciMetric.wci * 100).toFixed(1)}%`
+                operatorData?.totalETHRestaked ? (
+                  formattedETH
                 ) : (
-                  <Skeleton className="h-7 w-20 rounded inline-block" />
+                  <Skeleton className="h-7 w-28 rounded" />
+                )
+              }
+              usdValue={
+                formattedUSD ||
+                (ethPrice > 0 ? <Skeleton className="h-5 w-20 rounded" /> : '')
+              }
+              icon={
+                <StyledIcon
+                  icon={<Wallet className="h-4 w-4" />}
+                  gradientColors={['#3b82f6', '#06b6d4']}
+                  size="h-9 w-9"
+                />
+              }
+              description="ETH value of all restaked assets (includes Beacon Chain ETH, stETH, EIGEN, etc.). Total value at risk if EigenLayer experiences critical governance, economic, or technical failures."
+            />
+            <MetricSummaryCard
+              title="Active Operators"
+              value={
+                operatorData?.activeEntities ? (
+                  formattedOperators
+                ) : (
+                  <Skeleton className="h-7 w-16 rounded" />
                 )
               }
               icon={
                 <StyledIcon
-                  icon={<ServerCog className="h-4 w-4" />}
-                  gradientColors={['#8b5cf6', '#3b82f6']}
+                  icon={<Users className="h-4 w-4" />}
+                  gradientColors={['#8b5cf6', '#d946ef']}
                   size="h-9 w-9"
                 />
               }
-              description={
-                wciMetric
-                  ? `${new Intl.NumberFormat('en-US').format(
-                      Math.round(wciMetric.whitelistedStake),
-                    )} ETH is in permissioned AVSs out of ${new Intl.NumberFormat(
-                      'en-US',
-                    ).format(
-                      Math.round(wciMetric.totalStake),
-                    )} total ETH. Permissioned AVSs only allow pre-approved operators, creating gatekeeping that limits competition and concentrates security power among a small elite operator set.`
-                  : `Proportion of stake in whitelisted AVSs vs all AVSs. Permissioned AVSs only allow pre-approved operators, creating centralization by restricting which validators can secure protocols.`
+              description="Number of active operators securing the network (with more than 0 restaked assets). More operators typically improves security through decentralization, reducing coordination risks."
+            />
+            <MetricSummaryCard
+              title="Active Restakers"
+              value={
+                restakeData?.activeRestakers ? (
+                  formattedRestakers
+                ) : (
+                  <Skeleton className="h-7 w-16 rounded" />
+                )
               }
+              icon={
+                <StyledIcon
+                  icon={<Network className="h-4 w-4" />}
+                  gradientColors={['#10b981', '#06b6d4']}
+                  size="h-9 w-9"
+                />
+              }
+              description="Number of unique addresses restaking ETH (with more than 0 restaked assets). A larger, more diverse restaker base distributes risk and reduces the influence of individual whales on the network."
             />
           </div>
 
@@ -1382,7 +1446,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   icon={<AlertCircle className="h-3 w-3" />}
                   gradientColors={['#ef4444', '#f97316']}
                 />
-                <span className="ml-2">Critical Risk Metrics</span>
+                <span className="ml-2">Top Security Concerns</span>
               </h3>
               <div className="space-y-3">
                 <div className="flex items-start">
@@ -1393,9 +1457,10 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     />
                   </div>
                   <p className="text-sm text-red-800">
-                    <span className="font-bold">Governance Risk:</span>{' '}
-                    EigenLayer relies on a 9-of-13 community multisig that can
-                    execute IMMEDIATE upgrades without a timelock.
+                    <span className="font-bold">Governance Vulnerability:</span>{' '}
+                    9-of-13 multisig with no timelock can instantly upgrade a
+                    $1.2B+ protocol, creating enormous collusion incentives
+                    (~$130M per signer).
                   </p>
                 </div>
                 <div className="flex items-start">
@@ -1406,27 +1471,10 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     />
                   </div>
                   <p className="text-sm text-red-800">
-                    <span className="font-bold">Operator Concentration:</span>{' '}
-                    Just{' '}
-                    {operatorTopCount !== '?' ? (
-                      operatorTopCount
-                    ) : (
-                      <Skeleton className="h-4 w-6 rounded-sm inline-block bg-red-200" />
-                    )}{' '}
-                    operators control 33% of restaked ETH. Their compromise or
-                    collusion could trigger a cascading effect.
-                  </p>
-                </div>
-                <div className="flex items-start">
-                  <div className="shrink-0 mr-2">
-                    <SmallStyledIcon
-                      icon={<AlertCircle className="h-3 w-3" />}
-                      gradientColors={['#ef4444', '#f97316']}
-                    />
-                  </div>
-                  <p className="text-sm text-red-800">
-                    <span className="font-bold">Major Operator Risk:</span>{' '}
-                    Between P2P (
+                    <span className="font-bold">
+                      Professional Operator Dominance:
+                    </span>{' '}
+                    P2P (
                     {p2pShare ? (
                       formattedP2PShare
                     ) : (
@@ -1438,7 +1486,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     ) : (
                       <Skeleton className="h-4 w-8 rounded-sm inline-block bg-red-200" />
                     )}
-                    %), these two professional operators control{' '}
+                    %) together control{' '}
                     <span className="font-bold">
                       {combinedShare ? (
                         formattedCombinedShare
@@ -1447,7 +1495,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                       )}
                       %
                     </span>{' '}
-                    of total restaked assets.
+                    of all restaked ETH.
                   </p>
                 </div>
                 <div className="flex items-start">
@@ -1458,14 +1506,23 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     />
                   </div>
                   <p className="text-sm text-red-800">
-                    <span className="font-bold">Restaker Concentration:</span>{' '}
-                    The top{' '}
+                    <span className="font-bold">
+                      33% Threshold Vulnerability:
+                    </span>{' '}
+                    Just{' '}
+                    {operatorTopCount !== '?' ? (
+                      operatorTopCount
+                    ) : (
+                      <Skeleton className="h-4 w-6 rounded-sm inline-block bg-red-200" />
+                    )}{' '}
+                    operators control 33% of restaked ETH, a critical blockchain
+                    security threshold. Similarly, the top{' '}
                     {restakerTopCount !== '?' ? (
                       restakerTopCount
                     ) : (
                       <Skeleton className="h-4 w-6 rounded-sm inline-block bg-red-200" />
                     )}{' '}
-                    individual restakers control 33% of all restaked assets.
+                    individual restakers control 33% of all assets.
                   </p>
                 </div>
                 <div className="flex items-start">
@@ -1476,10 +1533,11 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     />
                   </div>
                   <p className="text-sm text-red-800">
-                    <span className="font-bold">Strategy Risk:</span> Multiple
-                    strategies have critical concentration where a small number
-                    of operators control a significant percentage of assets.
-                    This puts{' '}
+                    <span className="font-bold">
+                      Concentrated Strategy Risk:
+                    </span>{' '}
+                    Multiple strategies have a critical setup where just 5
+                    operators control 75%+ of assets. This puts{' '}
                     {ethPrice > 0 &&
                     operatorData?.totalRestakedAssetsPerStrategy ? (
                       ((value) => {
@@ -1500,12 +1558,10 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     ) : (
                       <Skeleton className="h-4 w-16 rounded-sm inline-block bg-red-200" />
                     )}{' '}
-                    worth of assets at risk from operator collusion or
-                    compromise.
+                    at risk from coordinated actions.
                   </p>
                 </div>
 
-                {/* New AVS Centralization Risk Point */}
                 <div className="flex items-start">
                   <div className="shrink-0 mr-2">
                     <SmallStyledIcon
@@ -1520,13 +1576,9 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                         ? `${Math.round(avsPermissionStats.permissionedPercentage)}%`
                         : '89%'}
                     </strong>{' '}
-                    of AVSs (
-                    {avsPermissionStats
-                      ? `${avsPermissionStats.permissionedCount} out of ${avsPermissionStats.totalCount}`
-                      : 'many'}
-                    ) use whitelisted permissioning, allowing AVS teams to
-                    decide which operators can secure their protocols, creating
-                    significant centralization at the ecosystem level.
+                    of AVSs use whitelisting, allowing protocol teams to
+                    handpick operators and creating systemic centralization at
+                    the ecosystem level.
                   </p>
                 </div>
               </div>
@@ -1539,14 +1591,29 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   icon={<Info className="h-3 w-3" />}
                   gradientColors={['#3b82f6', '#06b6d4']}
                 />
-                <span className="ml-2">Risk Dashboard</span>
+                <span className="ml-2">Risk Assessment Dashboard</span>
               </h3>
 
               {/* Governance Risk */}
               <div className="mb-3">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 flex items-center">
                     Governance Risk
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
+                            9-of-13 multisig with immediate upgrade capabilities
+                            and no timelock creates significant security
+                            concerns
+                            <Tooltip.Arrow className="fill-gray-800" />
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
                   </span>
                   <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-red-100 text-red-800">
                     Critical
@@ -1563,8 +1630,23 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               {/* Operator Concentration */}
               <div className="mb-3">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 flex items-center">
                     Operator Concentration
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
+                            P2P and Node Monster control{' '}
+                            {formattedCombinedShare || '20+'}% of all restaked
+                            ETH
+                            <Tooltip.Arrow className="fill-gray-800" />
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
                   </span>
                   <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-orange-100 text-orange-800">
                     High
@@ -1585,8 +1667,33 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               {/* Restaker Concentration */}
               <div className="mb-3">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 flex items-center">
                     Restaker Concentration
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
+                            Top 20 whale wallets control{' '}
+                            {restakeData?.stakerData
+                              ? (
+                                  restakeData.stakerData
+                                    .slice(0, 20)
+                                    .reduce(
+                                      (sum, staker) =>
+                                        sum + (staker['Market Share'] || 0),
+                                      0,
+                                    ) * 100
+                                ).toFixed(1) + '%'
+                              : 'a significant portion'}{' '}
+                            of restaked assets
+                            <Tooltip.Arrow className="fill-gray-800" />
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
                   </span>
                   <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-yellow-100 text-yellow-800">
                     Moderate
@@ -1607,8 +1714,22 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               {/* Strategy Concentration */}
               <div className="mb-3">
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 flex items-center">
                     Strategy Concentration
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
+                            Some strategies have top 5 operators controlling
+                            over 75% of assets
+                            <Tooltip.Arrow className="fill-gray-800" />
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
                   </span>
                   <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-red-100 text-red-800">
                     Critical
@@ -1629,8 +1750,30 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
               {/* Permissionless Participation */}
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-gray-700">
-                    Permissionless Participation
+                  <span className="text-sm font-medium text-gray-700 flex items-center">
+                    Permissionless Access
+                    <Tooltip.Provider>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <InfoCircledIcon className="h-3.5 w-3.5 text-gray-400 ml-1 cursor-help" />
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content className="bg-gray-800 text-white p-2 rounded shadow-lg max-w-xs text-xs">
+                            Only{' '}
+                            {avsPermissionStats
+                              ? avsPermissionStats.totalCount -
+                                avsPermissionStats.permissionedCount
+                              : 2}{' '}
+                            out of{' '}
+                            {avsPermissionStats
+                              ? avsPermissionStats.totalCount
+                              : 19}{' '}
+                            AVSs allow permissionless operator participation
+                            <Tooltip.Arrow className="fill-gray-800" />
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </Tooltip.Provider>
                   </span>
                   <span className="text-xs font-semibold py-0.5 px-2 rounded-full bg-red-100 text-red-800">
                     Limited
@@ -1652,32 +1795,32 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                     ? avsPermissionStats.totalCount -
                       avsPermissionStats.permissionedCount
                     : 2}{' '}
-                  out of{' '}
-                  {avsPermissionStats ? avsPermissionStats.totalCount : 19} AVSs
-                  allow operators without whitelisting
+                  of {avsPermissionStats ? avsPermissionStats.totalCount : 19}{' '}
+                  AVSs allow operators without whitelisting
                 </p>
               </div>
             </div>
           </div>
 
           {/* Bottom section - Strategy breakdown */}
-          <div className="bg-gray-50 border border-gray-200 rounded-md p-4">
+          <div className="bg-gray-50 border-l-4 border-l-red-500 border border-gray-200 rounded-md p-4">
             <h3 className="text-base font-bold text-gray-800 mb-3 flex items-center">
               <SmallStyledIcon
                 icon={<DollarSign className="h-3 w-3" />}
-                gradientColors={['#8b5cf6', '#d946ef']}
+                gradientColors={['#ef4444', '#f97316']}
               />
-              <span className="ml-2">Strategy Risk Summary</span>
+              <span className="ml-2">Strategy Risk Distribution</span>
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Critical Concentration Strategies */}
-              <div className="bg-red-50 border border-red-200 rounded-md p-3">
+              <div className="bg-red-50 border-l-4 border-l-red-500 border border-red-200 rounded-md p-3 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-red-800">
-                    Critical Concentration
+                  <h4 className="text-sm font-semibold text-red-800 flex items-center">
+                    <AlertCircle className="h-4 w-4 inline mr-1 text-red-600" />
+                    Critical Risk
                   </h4>
-                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-red-100 text-red-800">
+                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-red-100 text-red-800 border border-red-300">
                     {operatorData?.strategyConcentrationMetrics
                       ? Object.entries(
                           operatorData.strategyConcentrationMetrics,
@@ -1690,9 +1833,10 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-red-700 mb-2">
-                  Top 5 operators control 75%+ of assets in these strategies
+                  Top 5 operators control 75%+ of assets, creating extreme
+                  centralization and single points of failure
                 </p>
-                <div className="text-sm font-bold text-red-800">
+                <div className="text-sm font-bold text-red-800 flex items-center">
                   {ethPrice > 0 &&
                   operatorData?.totalRestakedAssetsPerStrategy &&
                   operatorData?.strategyConcentrationMetrics
@@ -1722,17 +1866,18 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                           ) * ethPrice,
                       )
                     : 'N/A'}{' '}
-                  at risk
+                  of value at high risk
                 </div>
               </div>
 
               {/* Moderate Concentration Strategies */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+              <div className="bg-yellow-50 border-l-4 border-l-yellow-500 border border-yellow-200 rounded-md p-3 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-yellow-800">
-                    Moderate Concentration
+                  <h4 className="text-sm font-semibold text-yellow-800 flex items-center">
+                    <AlertTriangle className="h-4 w-4 inline mr-1 text-yellow-600" />
+                    Moderate Risk
                   </h4>
-                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-yellow-100 text-yellow-800">
+                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-yellow-100 text-yellow-800 border border-yellow-300">
                     {operatorData?.strategyConcentrationMetrics
                       ? Object.entries(
                           operatorData.strategyConcentrationMetrics,
@@ -1746,9 +1891,10 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-yellow-700 mb-2">
-                  Top 5 operators control 50-75% of assets in these strategies
+                  Top 5 operators control 50-75% of assets, creating concerning
+                  levels of centralization
                 </p>
-                <div className="text-sm font-bold text-yellow-800">
+                <div className="text-sm font-bold text-yellow-800 flex items-center">
                   {ethPrice > 0 &&
                   operatorData?.totalRestakedAssetsPerStrategy &&
                   operatorData?.strategyConcentrationMetrics
@@ -1779,17 +1925,18 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                           ) * ethPrice,
                       )
                     : 'N/A'}{' '}
-                  managed
+                  of value at moderate risk
                 </div>
               </div>
 
               {/* Healthy Distribution Strategies */}
-              <div className="bg-green-50 border border-green-200 rounded-md p-3">
+              <div className="bg-green-50 border-l-4 border-l-green-500 border border-green-200 rounded-md p-3 shadow-sm">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-green-800">
-                    Healthy Distribution
+                  <h4 className="text-sm font-semibold text-green-800 flex items-center">
+                    <CheckCircle className="h-4 w-4 inline mr-1 text-green-600" />
+                    Low Risk
                   </h4>
-                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-green-100 text-green-800">
+                  <span className="text-xs font-bold py-0.5 px-2 rounded-full bg-green-100 text-green-800 border border-green-300">
                     {operatorData?.strategyConcentrationMetrics
                       ? Object.entries(
                           operatorData.strategyConcentrationMetrics,
@@ -1802,10 +1949,10 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-green-700 mb-2">
-                  Top 5 operators control less than 50% of assets in these
-                  strategies
+                  Top 5 operators control less than 50% of assets, representing
+                  better decentralization
                 </p>
-                <div className="text-sm font-bold text-green-800">
+                <div className="text-sm font-bold text-green-800 flex items-center">
                   {ethPrice > 0 &&
                   operatorData?.totalRestakedAssetsPerStrategy &&
                   operatorData?.strategyConcentrationMetrics
@@ -1835,31 +1982,51 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                           ) * ethPrice,
                       )
                     : 'N/A'}{' '}
-                  secured
+                  of value properly secured
                 </div>
               </div>
             </div>
           </div>
 
           {/* Call to action */}
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-md p-4 flex items-center justify-between">
+          <div className="mt-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-md p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
-              <h3 className="text-sm font-bold text-blue-800 mb-1">
-                Want to help improve EigenLayer's risk profile?
+              <h3 className="text-sm font-bold text-blue-800 mb-1 flex items-center">
+                <Shield className="h-4 w-4 text-blue-700 mr-1" />
+                Help Strengthen EigenLayer's Security
               </h3>
-              <p className="text-xs text-blue-600">
-                Stake with smaller operators or become an operator yourself to
-                increase network decentralization.
-              </p>
+              <div className="flex flex-col gap-1">
+                <p className="text-xs text-blue-700">
+                  • Stake with smaller operators to increase network
+                  decentralization
+                </p>
+                <p className="text-xs text-blue-700">
+                  • Run your own operator node to diversify the validator set
+                </p>
+                <p className="text-xs text-blue-700">
+                  • Monitor governance activity and advocate for improved
+                  security measures
+                </p>
+              </div>
             </div>
-            <a
-              href="https://docs.eigenlayer.xyz/overview/readme"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center"
-            >
-              Learn More <ExternalLink className="ml-1 h-3 w-3" />
-            </a>
+            <div className="flex flex-col sm:flex-row gap-2 md:items-center">
+              <a
+                href="https://docs.eigenlayer.xyz/operator/operator-overview"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors flex items-center whitespace-nowrap"
+              >
+                Become an Operator <ExternalLink className="ml-1 h-3 w-3" />
+              </a>
+              <a
+                href="https://docs.eigenlayer.xyz/overview/readme"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition-colors flex items-center whitespace-nowrap"
+              >
+                Learn More <ExternalLink className="ml-1 h-3 w-3" />
+              </a>
+            </div>
           </div>
         </CardContent>
       </Card>
