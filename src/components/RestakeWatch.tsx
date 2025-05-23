@@ -85,14 +85,14 @@ const RestakeWatch: React.FC = () => {
       name: 'Ethereum Foundation (ESP)',
       logo: '/ethereum-logo.png',
       description:
-        'Supporting the growth of the Ethereum ecosystem through core protocol research, development, and education.',
+        'Supporting Ethereum through core protocol research, development, and education.',
     },
     {
       id: '2',
       name: 'Obol Collective',
       logo: '/obol-logo.png',
       description:
-        'Providing Distributed Validator Technology that enhances security and decentralization by enabling multiple operators to collaboratively run validators.',
+        'Providing distributed validator technology to enhance security and decentralization.',
     },
     // Add more backers here as needed
   ];
