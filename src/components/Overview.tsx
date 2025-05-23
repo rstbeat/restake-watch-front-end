@@ -1037,7 +1037,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           {/* TLDR Risk Summary */}
           <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden shadow-sm">
             <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-              <h3 className="font-bold text-gray-800">
+              <h3 className="text-lg font-semibold tracking-tight text-gray-800 relative after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:bg-gradient-to-r after:from-[#ab3bd2] after:to-[#06b6d4]">
                 TLDR: EigenLayer Risk Summary
               </h3>
             </div>
@@ -1342,7 +1342,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Left column - Risk Alert */}
             <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-              <h3 className="text-base font-bold text-red-800 mb-3 flex items-center">
+              <h3 className="text-lg font-semibold tracking-tight text-red-800 mb-3 flex items-center">
                 <SmallStyledIcon
                   icon={<AlertCircle className="h-3 w-3" />}
                   gradientColors={['#ef4444', '#f97316']}
@@ -1487,7 +1487,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
 
             {/* Right column - Visual Risk Dashboard */}
             <div className="bg-gray-50 border border-gray-200 p-4 rounded-md">
-              <h3 className="text-base font-bold text-gray-800 mb-3 flex items-center">
+              <h3 className="text-lg font-semibold tracking-tight text-gray-800 mb-3 flex items-center">
                 <SmallStyledIcon
                   icon={<Info className="h-3 w-3" />}
                   gradientColors={['#3b82f6', '#06b6d4']}
@@ -1705,7 +1705,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
 
           {/* Bottom section - Strategy breakdown */}
           <div className="bg-gray-50 border-l-4 border-l-red-500 border border-gray-200 rounded-md p-4">
-            <h3 className="text-base font-bold text-gray-800 mb-3 flex items-center">
+            <h3 className="text-lg font-semibold tracking-tight text-gray-800 mb-3 flex items-center">
               <SmallStyledIcon
                 icon={<DollarSign className="h-3 w-3" />}
                 gradientColors={['#ef4444', '#f97316']}
@@ -3810,7 +3810,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         </CardHeader>
         <CardContent>
           <div className="rounded-lg border border-gray-200 p-4 mb-4 bg-gray-50">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+            <h4 className="text-lg font-semibold tracking-tight text-gray-700 mb-2">
               Key Insights:
             </h4>
             <ul className="space-y-2 text-sm text-gray-600">
@@ -3903,7 +3903,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
           )}
 
           <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+            <h4 className="text-lg font-semibold tracking-tight text-gray-700 mb-2">
               How to interpret this visualization:
             </h4>
             <p className="text-sm text-gray-600">
@@ -3989,7 +3989,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         </CardHeader>
         <CardContent>
           <div className="rounded-lg border border-gray-200 p-4 mb-4 bg-gray-50">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2">
+            <h4 className="text-lg font-semibold tracking-tight text-gray-700 mb-2">
               Key Insights:
             </h4>
             <ul className="space-y-2 text-sm text-gray-600">
@@ -4161,7 +4161,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
 
               {/* Enhanced table showing top 6 whales with strategy info */}
               <div className="mt-6 overflow-x-auto">
-                <h4 className="text-sm font-bold text-gray-700 mb-2">
+                <h4 className="text-lg font-semibold tracking-tight text-gray-700 mb-2">
                   Details of Top 6 Whales
                 </h4>
                 <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden shadow-sm">
@@ -4291,7 +4291,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
               </div>
 
               <div className="mt-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                <h4 className="text-lg font-semibold tracking-tight text-gray-700 mb-2">
                   How to interpret this visualization:
                 </h4>
                 <p className="text-sm text-gray-600">
