@@ -369,10 +369,15 @@ const RestakeWatch: React.FC = () => {
             }`}
           >
             <div
-              className={`bg-[#e6e7ec]/90 backdrop-blur-md text-[#171717] py-4 border-b border-gray-200/50 transition-all duration-300 ${
+              className={`relative bg-gradient-to-br from-[#e6e7ec]/95 via-purple-50/30 to-blue-50/20 backdrop-blur-md text-[#171717] py-4 border-b border-gray-200/50 transition-all duration-300 ${
                 scrolled ? 'py-2' : 'py-4'
-              }`}
+              } overflow-hidden`}
             >
+              {/* Subtle animated background pattern */}
+              <div className="absolute inset-0 opacity-[0.02]">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#ab3bd2]/20 via-transparent to-[#3b82f6]/20 animate-pulse"></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,rgba(171,59,210,0.1)_2px,rgba(171,59,210,0.1)_4px)]"></div>
+              </div>
               <div className="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center w-full justify-between">
                   <div className="flex items-center">
@@ -384,7 +389,10 @@ const RestakeWatch: React.FC = () => {
                             : 'text-2xl sm:text-3xl md:text-4xl mb-1'
                         }`}
                       >
-                        RestakeWatch
+                        <span className="relative">
+                          RestakeWatch
+                          <span className="absolute inset-0 bg-gradient-to-r from-[#ab3bd2]/20 to-[#7928ca]/20 blur-lg animate-pulse -z-10"></span>
+                        </span>
                       </h1>
                       <p
                         className={`font-bold transition-all duration-300 ${
@@ -393,11 +401,20 @@ const RestakeWatch: React.FC = () => {
                             : 'text-sm sm:text-base sm:text-lg'
                         }`}
                       >
-                        The{' '}
-                        <span className="font-extrabold text-[#ab3bd2] underline decoration-2 underline-offset-2">
-                          L2Beat
-                        </span>{' '}
-                        of the Restaking Ecosystem
+                        <span className="relative">
+                          The{' '}
+                          <span className="relative font-extrabold text-[#ab3bd2] underline decoration-2 underline-offset-2 hover:decoration-4 transition-all duration-300 group">
+                            <span className="bg-gradient-to-r from-[#ab3bd2] to-[#3b82f6] bg-clip-text text-transparent">
+                              L2Beat
+                            </span>
+                            <span className="absolute inset-0 bg-gradient-to-r from-[#ab3bd2]/10 to-[#3b82f6]/10 blur-sm group-hover:blur-none transition-all duration-300 rounded-sm"></span>
+                          </span>{' '}
+                          of the{' '}
+                          <span className="relative font-semibold bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] bg-clip-text text-transparent group hover:scale-105 transition-transform duration-300">
+                            Restaking Ecosystem
+                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] group-hover:w-full transition-all duration-500"></span>
+                          </span>
+                        </span>
                       </p>
                     </div>
                   </div>
