@@ -389,10 +389,7 @@ const RestakeWatch: React.FC = () => {
                             : 'text-2xl sm:text-3xl md:text-4xl mb-1'
                         }`}
                       >
-                        <span className="relative">
-                          RestakeWatch
-                          <span className="absolute inset-0 bg-gradient-to-r from-[#ab3bd2]/20 to-[#7928ca]/20 blur-lg animate-pulse -z-10"></span>
-                        </span>
+                        RestakeWatch
                       </h1>
                       <p
                         className={`font-bold transition-all duration-300 ${
