@@ -234,31 +234,31 @@ const RestakeWatch: React.FC = () => {
         <TabsList className="bg-white rounded-lg shadow-md overflow-x-auto flex whitespace-nowrap w-full">
           <TabsTrigger
             value="overview"
-            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="group text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ab3bd2] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="operators"
-            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="group text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ab3bd2] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Operators
           </TabsTrigger>
           <TabsTrigger
             value="restakers"
-            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="group text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ab3bd2] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Restakers
           </TabsTrigger>
           <TabsTrigger
             value="strategies"
-            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="group text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ab3bd2] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             Strategies
           </TabsTrigger>
           <TabsTrigger
             value="avs"
-            className="text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="group text-[#171717] text-xs sm:text-sm md:text-base font-bold data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#ab3bd2] data-[state=active]:to-[#3b82f6] data-[state=active]:text-white transition-all duration-300 ease-in-out"
           >
             AVS
           </TabsTrigger>
@@ -452,19 +452,25 @@ const RestakeWatch: React.FC = () => {
                       </>
                     )}
 
-                    <a
-                      href="https://signal.me/#eu/espejelomar.01"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`inline-flex items-center bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-2px] ${
-                        scrolled ? 'px-3 py-1.5 text-xs' : 'px-4 py-2'
+                    <Button
+                      asChild
+                      size={scrolled ? 'sm' : 'default'}
+                      className={`bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-2px] ring-2 ring-inset ring-[#ab3bd2]/30 animate-pulse ${
+                        scrolled ? 'text-xs' : ''
                       }`}
                     >
-                      <DollarSign
-                        className={scrolled ? 'mr-1 h-3 w-3' : 'mr-1.5 h-4 w-4'}
-                      />
-                      {scrolled ? 'Funding' : 'Got Funding or Insights?'}
-                    </a>
+                      <a
+                        href="https://signal.me/#eu/espejelomar.01"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center"
+                      >
+                        <DollarSign
+                          className={scrolled ? 'mr-1 h-3 w-3' : 'mr-1.5 h-4 w-4'}
+                        />
+                        {scrolled ? 'Funding' : 'Got Funding or Insights?'}
+                      </a>
+                    </Button>
 
                     {!scrolled && (
                       <Button
@@ -490,14 +496,20 @@ const RestakeWatch: React.FC = () => {
                           <Search className="h-4 w-4" />
                         </button>
                       )}
-                      <a
-                        href="https://signal.me/#eu/espejelomar.01"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white text-xs rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-1px]"
+                      <Button
+                        asChild
+                        size="sm"
+                        className="bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-1px] ring-2 ring-inset ring-[#ab3bd2]/30 animate-pulse text-xs px-2 py-1"
                       >
-                        <DollarSign className="mr-1 h-3 w-3" /> Funding
-                      </a>
+                        <a
+                          href="https://signal.me/#eu/espejelomar.01"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center"
+                        >
+                          <DollarSign className="mr-1 h-3 w-3" /> Funding
+                        </a>
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"
@@ -549,7 +561,7 @@ const RestakeWatch: React.FC = () => {
                         onClick={() => handleTabChange('overview')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'overview'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2] bg-gradient-to-r from-[#ab3bd2]/10 to-[#3b82f6]/10'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
@@ -559,7 +571,7 @@ const RestakeWatch: React.FC = () => {
                         onClick={() => handleTabChange('operators')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'operators'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2] bg-gradient-to-r from-[#ab3bd2]/10 to-[#3b82f6]/10'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
@@ -569,7 +581,7 @@ const RestakeWatch: React.FC = () => {
                         onClick={() => handleTabChange('restakers')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'restakers'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2] bg-gradient-to-r from-[#ab3bd2]/10 to-[#3b82f6]/10'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
@@ -579,7 +591,7 @@ const RestakeWatch: React.FC = () => {
                         onClick={() => handleTabChange('strategies')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'strategies'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2] bg-gradient-to-r from-[#ab3bd2]/10 to-[#3b82f6]/10'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
@@ -589,7 +601,7 @@ const RestakeWatch: React.FC = () => {
                         onClick={() => handleTabChange('avs')}
                         className={`text-sm py-3 font-medium border-b-2 transition-all duration-200 ${
                           activeTab === 'avs'
-                            ? 'border-[#ab3bd2] text-[#ab3bd2]'
+                            ? 'border-[#ab3bd2] text-[#ab3bd2] bg-gradient-to-r from-[#ab3bd2]/10 to-[#3b82f6]/10'
                             : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
                         }`}
                       >
@@ -603,7 +615,7 @@ const RestakeWatch: React.FC = () => {
                           onClick={() => handleTabChange('overview')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'overview'
-                              ? 'bg-[#ab3bd2] text-white'
+                              ? 'bg-gradient-to-r from-[#ab3bd2] to-[#3b82f6] text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
@@ -613,7 +625,7 @@ const RestakeWatch: React.FC = () => {
                           onClick={() => handleTabChange('operators')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'operators'
-                              ? 'bg-[#ab3bd2] text-white'
+                              ? 'bg-gradient-to-r from-[#ab3bd2] to-[#3b82f6] text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
@@ -623,7 +635,7 @@ const RestakeWatch: React.FC = () => {
                           onClick={() => handleTabChange('restakers')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'restakers'
-                              ? 'bg-[#ab3bd2] text-white'
+                              ? 'bg-gradient-to-r from-[#ab3bd2] to-[#3b82f6] text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
@@ -633,7 +645,7 @@ const RestakeWatch: React.FC = () => {
                           onClick={() => handleTabChange('strategies')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'strategies'
-                              ? 'bg-[#ab3bd2] text-white'
+                              ? 'bg-gradient-to-r from-[#ab3bd2] to-[#3b82f6] text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
@@ -643,7 +655,7 @@ const RestakeWatch: React.FC = () => {
                           onClick={() => handleTabChange('avs')}
                           className={`px-3 py-1 text-xs rounded-full transition-all duration-200 whitespace-nowrap ${
                             activeTab === 'avs'
-                              ? 'bg-[#ab3bd2] text-white'
+                              ? 'bg-gradient-to-r from-[#ab3bd2] to-[#3b82f6] text-white'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                           }`}
                         >
