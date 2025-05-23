@@ -466,7 +466,9 @@ const RestakeWatch: React.FC = () => {
                         className="inline-flex items-center"
                       >
                         <DollarSign
-                          className={scrolled ? 'mr-1 h-3 w-3' : 'mr-1.5 h-4 w-4'}
+                          className={
+                            scrolled ? 'mr-1 h-3 w-3' : 'mr-1.5 h-4 w-4'
+                          }
                         />
                         {scrolled ? 'Funding' : 'Got Funding or Insights?'}
                       </a>
