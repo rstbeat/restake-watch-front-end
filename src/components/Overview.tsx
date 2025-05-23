@@ -720,7 +720,7 @@ const MetricSummaryCard: React.FC<{
   description?: string;
   usdValue?: string | React.ReactNode;
 }> = ({ title, value, icon, description, usdValue }) => (
-  <div className="rounded-lg border border-purple-100 p-5 shadow-md hover:shadow-lg transition-all duration-300 backdrop-blur-md bg-white/70">
+  <div className="rounded-lg border border-purple-100 p-5 shadow-lg/10 hover:shadow-lg/20 transition-all duration-300 hover:scale-[1.02] backdrop-blur-md bg-white/70">
     <div className="flex items-center mb-3">
       {icon}
       <h3 className="text-gray-700 font-medium ml-3">{title}</h3>
@@ -1098,7 +1098,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           </div>
 
           {/* Key Metrics Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             <MetricSummaryCard
               title="EigenLayer's $1.2 Billion Temptation"
               value={
@@ -1272,7 +1272,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
           </div>
 
           {/* Second row of metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             <MetricSummaryCard
               title="Whitelisting Centralization Index (WCI)"
               value={
@@ -3261,7 +3261,7 @@ const StrategiesOverview: React.FC<{
       </Card>
 
       {/* Top Strategies Detailed Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-6">
         {topStrategies.map((strategy, index) => {
           const riskLevel = getConcentrationRiskLevel(strategy.metrics);
           const riskBadge = getRiskBadge(riskLevel);
@@ -3274,10 +3274,18 @@ const StrategiesOverview: React.FC<{
                 ? 'border-yellow-400'
                 : 'border-green-400';
 
+          // Get background gradient based on risk level
+          const backgroundGradient =
+            riskLevel === 'critical'
+              ? 'bg-gradient-to-br from-red-50 to-red-100'
+              : riskLevel === 'warning'
+                ? 'bg-gradient-to-br from-yellow-50 to-yellow-100'
+                : 'bg-gradient-to-br from-green-50 to-green-100';
+
           return (
             <div
               key={index}
-              className={`bg-white rounded-lg shadow-sm border-l-4 ${borderColor} border border-gray-200 p-3 hover:shadow-md transition-all`}
+              className={`${backgroundGradient} rounded-lg shadow-lg/10 hover:shadow-lg/20 border-l-4 ${borderColor} border border-gray-200 p-4 hover:scale-[1.02] transition-all duration-300`}
             >
               <div className="mb-2 border-b border-gray-100 pb-2">
                 <div className="flex justify-between items-center">
@@ -3651,9 +3659,9 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   return (
     <div className="space-y-6">
       {/* Add dashboard-style metrics section at the top */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {/* Metric 1: Total Value Locked */}
-        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border border-purple-100 shadow-sm p-3 transition-all duration-300 hover:shadow-md">
+        <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border border-purple-100 shadow-lg/10 p-4 transition-all duration-300 hover:shadow-lg/20 hover:scale-[1.02]">
           <div className="flex items-center mb-1.5">
             <div className="p-1.5 bg-gradient-to-br from-purple-500 to-blue-600 rounded-md shadow-sm">
               <DollarSign className="h-4 w-4 text-white" />
@@ -3674,7 +3682,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         </div>
 
         {/* Metric 2: Active Operators */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100 shadow-sm p-3 transition-all duration-300 hover:shadow-md">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-100 shadow-lg/10 p-4 transition-all duration-300 hover:shadow-lg/20 hover:scale-[1.02]">
           <div className="flex items-center mb-1.5">
             <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md shadow-sm">
               <ServerCog className="h-4 w-4 text-white" />
@@ -3697,7 +3705,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         </div>
 
         {/* Metric 3: Active Restakers */}
-        <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg border border-green-100 shadow-sm p-3 transition-all duration-300 hover:shadow-md">
+        <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-lg border border-green-100 shadow-lg/10 p-4 transition-all duration-300 hover:shadow-lg/20 hover:scale-[1.02]">
           <div className="flex items-center mb-1.5">
             <div className="p-1.5 bg-gradient-to-br from-green-500 to-teal-600 rounded-md shadow-sm">
               <Users className="h-4 w-4 text-white" />
@@ -3720,7 +3728,7 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
         </div>
 
         {/* Metric 4: ETH Restaked vs. Total Supply */}
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg border border-blue-100 shadow-sm p-3 transition-all duration-300 hover:shadow-md">
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg border border-blue-100 shadow-lg/10 p-4 transition-all duration-300 hover:shadow-lg/20 hover:scale-[1.02]">
           <div className="flex items-center mb-1.5">
             <div className="p-1.5 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-md shadow-sm">
               <Network className="h-4 w-4 text-white" />
