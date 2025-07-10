@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { AlertTriangle, Share2, Copy } from 'lucide-react';
 
 // Types for the risk headline data
@@ -186,69 +185,66 @@ const RiskHeadlines: React.FC<RiskHeadlinesProps> = ({
     const styles = getSeverityStyles(data.severity);
 
     return (
-      <Card 
+      <div 
         key={key} 
-        className={`${styles.bg} ${styles.border} border-l-4 hover:shadow-lg transition-shadow duration-200`}
+        className={`${styles.bg} ${styles.border} border-l-4 rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:scale-[1.01]`}
       >
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-3">
-              <AlertTriangle className={`h-5 w-5 ${styles.icon} shrink-0 mt-0.5`} />
-              <div className="flex-1">
-                <h3 className={`text-lg font-bold ${styles.title} leading-tight`}>
-                  {data.title}
-                </h3>
-                <p className={`text-sm ${styles.subtitle} mt-1`}>
-                  {data.subtitle}
-                </p>
-                <div className="mt-3 bg-white/80 rounded-lg p-3 border border-gray-200">
-                  <div className="flex items-start space-x-2">
-                    <Share2 className={`h-4 w-4 ${styles.icon} shrink-0 mt-0.5`} />
-                    <p className="text-sm text-gray-700 font-mono">
-                      {data.tweet}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <button
-                onClick={() => copyToClipboard(data.tweet, key)}
-                className={`p-2 rounded-md ${styles.icon} hover:bg-white/50 transition-colors`}
-                title="Copy tweet"
-              >
-                {copiedTweet === key ? (
-                  <div className="h-4 w-4 text-green-600 font-bold">✓</div>
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </button>
-            </div>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className={`h-4 w-4 ${styles.icon} shrink-0`} />
+            <h3 className={`text-base font-bold ${styles.title} leading-tight`}>
+              {data.title}
+            </h3>
           </div>
-        </CardHeader>
-      </Card>
+          <button
+            onClick={() => copyToClipboard(data.tweet, key)}
+            className={`p-1.5 rounded-md ${styles.icon} hover:bg-white/50 transition-colors`}
+            title="Copy tweet"
+          >
+            {copiedTweet === key ? (
+              <div className="h-3.5 w-3.5 text-green-600 font-bold">✓</div>
+            ) : (
+              <Copy className="h-3.5 w-3.5" />
+            )}
+          </button>
+        </div>
+        
+        <p className={`text-xs ${styles.subtitle} mb-2`}>
+          {data.subtitle}
+        </p>
+        
+        <div className="bg-white/60 rounded-md p-2 border border-gray-200/50">
+          <div className="flex items-start space-x-1.5">
+            <Share2 className={`h-3 w-3 ${styles.icon} shrink-0 mt-0.5`} />
+            <p className="text-xs text-gray-700 font-mono leading-relaxed">
+              {data.tweet}
+            </p>
+          </div>
+        </div>
+      </div>
     );
   };
 
   return (
-    <div className="space-y-4">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          🚨 Risk Headlines That Demand Attention
+    <div className="space-y-3">
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center">
+          <span className="mr-2">🚨</span>
+          Risk Headlines That Demand Attention
         </h2>
         <p className="text-gray-600 text-sm">
-          Clear, shareable risk statements with real-time data. Copy the tweet text directly or click the copy button.
+          Critical risk metrics with shareable content
         </p>
       </div>
       
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {Object.entries(riskData).map(([key, data]) => 
           renderRiskCard(key, data)
         )}
       </div>
 
       {copiedTweet && (
-        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg">
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-3 py-2 rounded-md shadow-lg text-sm">
           Tweet copied to clipboard!
         </div>
       )}
