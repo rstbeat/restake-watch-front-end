@@ -51,6 +51,7 @@ import {
   fetchEthereumStats,
 } from '../app/api/restake/restake';
 import { Skeleton } from '../components/ui/skeleton';
+import RiskHeadlines from './RiskHeadlines';
 
 interface OverviewProps {
   restakeData: any | null;
@@ -3408,6 +3409,11 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     totalEthSupply: number;
     totalStEthSupply: number;
   } | null>(null);
+  const [avsPermissionStats, setAvsPermissionStats] = useState<{
+    permissionedPercentage: number;
+    permissionedCount: number;
+    totalCount: number;
+  } | null>(null);
 
   // Format USD value with appropriate suffix (B for billions, M for millions)
   const formatUSDValue = (value: number): string => {
@@ -3522,6 +3528,61 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
     };
 
     getEthStats();
+  }, []);
+
+  // Calculate AVS permission statistics
+  useEffect(() => {
+    const calculateAvsPermissionStats = async () => {
+      try {
+        // Fetch the AVS whitelisting data CSV
+        const response = await fetch('/data/AVS - whitelisting info.csv');
+        const csvText = await response.text();
+
+        // Parse CSV (simple parsing, skipping the header)
+        const rows = csvText
+          .split('\n')
+          .slice(1)
+          .filter((row) => row.trim() !== '');
+
+        let permissionedCount = 0;
+        const totalCount = rows.length;
+
+        rows.forEach((row) => {
+          const columns = row.split(',');
+          if (columns.length >= 3) {
+            const permissionModel = columns[2].trim();
+
+            // Check if this AVS is whitelisted/permissioned
+            if (
+              permissionModel === 'Permissioned' ||
+              permissionModel === 'Implicit-TeamRun'
+            ) {
+              permissionedCount++;
+            }
+          }
+        });
+
+        // Calculate the percentage
+        const permissionedPercentage = (permissionedCount / totalCount) * 100;
+
+        setAvsPermissionStats({
+          permissionedPercentage,
+          permissionedCount,
+          totalCount,
+        });
+
+        console.log('AVS Permission Stats calculated:', {
+          permissionedPercentage: permissionedPercentage.toFixed(1) + '%',
+          permissionedCount,
+          totalCount,
+          permissionlessCount: totalCount - permissionedCount,
+        });
+      } catch (error) {
+        console.error('Error calculating AVS permission stats:', error);
+      }
+    };
+
+    calculateAvsPermissionStats();
   }, []);
 
   // Find operator data helper function
@@ -3658,6 +3719,14 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
 
   return (
     <div className="space-y-6">
+      {/* Risk Headlines Section */}
+      <RiskHeadlines 
+        operatorData={operatorData}
+        restakeData={restakeData}
+        ethPrice={ethPrice}
+        avsPermissionStats={avsPermissionStats}
+      />
+      
       {/* Add dashboard-style metrics section at the top */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         {/* Metric 1: Total Value Locked */}
