@@ -40,6 +40,7 @@ import About from './About';
 import BackersCarousel from './BackersCarousel';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchStakerData, fetchOperatorData } from '../app/api/restake/restake';
+import { trackEvent } from '@/lib/analytics';
 
 // Color palette CSS variables (to be injected into :root in globals.css)
 // Primary: #ab3bd2 (Purple)
@@ -95,6 +96,14 @@ const RestakeWatch: React.FC = () => {
     },
     // Add more backers here as needed
   ];
+
+  const handlePlatformChange = (platform: PlatformType) => {
+    trackEvent('platform_change', {
+      from_platform: activePlatform,
+      to_platform: platform
+    });
+    setActivePlatform(platform);
+  };
 
   // Helper function to apply specific risk color classes that will override glassmorphism effects
   const getRiskColorClass = (risk: string) => {
@@ -204,6 +213,12 @@ const RestakeWatch: React.FC = () => {
   };
 
   const handleTabChange = (value: string) => {
+    trackEvent('tab_navigation', {
+      from_tab: activeTab,
+      to_tab: value,
+      platform: activePlatform
+    });
+  
     setTabChanged(true);
     setActiveTab(value);
   };
@@ -305,7 +320,7 @@ const RestakeWatch: React.FC = () => {
         >
           <Select
             value={activePlatform}
-            onValueChange={(value: PlatformType) => setActivePlatform(value)}
+            onValueChange={handlePlatformChange}
           >
             <SelectTrigger className="w-full border-gray-300 bg-white text-[#171717] focus:border-[#ab3bd2] transition-colors duration-200">
               <SelectValue placeholder="Select platform" />
@@ -330,6 +345,11 @@ const RestakeWatch: React.FC = () => {
                     New paper release:{' '}
                     <Link
                       href="/publications"
+                      onClick={() => trackEvent('research_paper_clicked', {
+                        paper_name: 'fortify_or_falter',
+                        source: 'banner',
+                        section: activeTab
+                      })}
                       className="relative inline-block font-semibold hover:text-[#ab3bd2] transition-colors duration-200 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-[#ab3bd2] after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left"
                     >
                       Fortify or Falter: A Comprehensive Restaking Risk
@@ -442,6 +462,11 @@ const RestakeWatch: React.FC = () => {
                       href="https://signal.me/#eu/espejelomar.01"
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => trackEvent('funding_cta_clicked', {
+                        source: 'header',
+                        section: activeTab,
+                        user_type: 'visitor'
+                      })}
                       className={`inline-flex items-center bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-2px] ${
                         scrolled ? 'px-3 py-1.5 text-xs' : 'px-4 py-2'
                       }`}
@@ -480,6 +505,11 @@ const RestakeWatch: React.FC = () => {
                         href="https://signal.me/#eu/espejelomar.01"
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => trackEvent('funding_cta_clicked', {
+                          source: 'header',
+                          section: activeTab,
+                          user_type: 'visitor'
+                        })}
                         className="inline-flex items-center px-2 py-1 bg-gradient-to-r from-[#ab3bd2] to-[#7928ca] text-white text-xs rounded-md hover:from-[#9933c7] hover:to-[#6820b0] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-1px]"
                       >
                         <DollarSign className="mr-1 h-3 w-3" /> Funding

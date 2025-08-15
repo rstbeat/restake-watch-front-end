@@ -20,6 +20,8 @@ import {
   Pie,
 } from 'recharts';
 
+import { trackEvent } from '@/lib/analytics';
+
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { InfoCircledIcon } from '@radix-ui/react-icons';
 import {
@@ -3249,6 +3251,42 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       fill: purpleColors[majorOperatorData.length % purpleColors.length],
     });
   }
+
+  // --- Critical risk analytics ---
+  useEffect(() => {
+    if (restakeData?.stakerData && restakeData.stakerData.length > 0) {
+      const top20Share = restakeData.stakerData
+        .slice(0, 20)
+        .reduce(
+          (sum: number, staker: any) =>
+            sum + parseFloat(staker['Market Share'] || 0) * 100,
+          0,
+        );
+
+      if (top20Share > 50) {
+        trackEvent('critical_risk_detected', {
+          risk_type: 'whale_concentration',
+          risk_level: 'critical',
+          concentration_percentage: top20Share.toFixed(1),
+          top_addresses_count: 20,
+        });
+      }
+    }
+  }, [restakeData?.stakerData]);
+
+  useEffect(() => {
+    if (
+      operatorData?.concentrationMetrics?.top33PercentCount !== undefined &&
+      operatorData.concentrationMetrics.top33PercentCount <= 5
+    ) {
+      trackEvent('critical_risk_detected', {
+        risk_type: 'operator_concentration',
+        risk_level: 'critical',
+        operators_controlling_33_percent:
+          operatorData.concentrationMetrics.top33PercentCount,
+      });
+    }
+  }, [operatorData?.concentrationMetrics?.top33PercentCount]);
 
   return (
     <div className="space-y-6">

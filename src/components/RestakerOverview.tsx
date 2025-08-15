@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { fetchStakerData } from '../app/api/restake/restake';
+import { trackEvent } from '@/lib/analytics';
 
 interface RestakerData {
   restakerAddress: string;
@@ -122,6 +123,14 @@ const RestakerOverview: React.FC = () => {
   }, [stakerData, fetchStakerDataCallback]);
 
   const toggleRowExpansion = (address: string) => {
+    const isExpanding = !expandedRows[address];
+    
+    trackEvent('whale_analysis', {
+      restaker_address: address,
+      action: isExpanding ? 'expand' : 'collapse',
+      section: 'restakers'
+    });
+    
     setExpandedRows((prev) => ({
       ...prev,
       [address]: !prev[address],
@@ -130,6 +139,12 @@ const RestakerOverview: React.FC = () => {
 
   const exportToCsv = () => {
     if (!stakerData) return;
+    
+    trackEvent('data_export', {
+      export_type: 'csv',
+      data_type: 'restakers',
+      record_count: stakerData.length
+    });
 
     const headers = [
       'Address',
@@ -259,7 +274,14 @@ const RestakerOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(5)}
+            onClick={() => {
+              trackEvent('filter_applied', {
+                filter_type: 'market_share',
+                filter_value: 'high_share_over_5',
+                section: 'restakers'
+              });
+              setFilteredMarketShare(5);
+            }}
             className={`text-xs ${filteredMarketShare === 5 ? 'bg-red-100 border-red-300 hover:bg-red-200' : ''}`}
           >
             High Share (&gt;5%)
@@ -267,7 +289,14 @@ const RestakerOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(1)}
+            onClick={() => {
+              trackEvent('filter_applied', {
+                filter_type: 'market_share',
+                filter_value: 'medium_share_1_5',
+                section: 'restakers'
+              });
+              setFilteredMarketShare(1);
+            }}
             className={`text-xs ${filteredMarketShare === 1 ? 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200' : ''}`}
           >
             Medium Share (1-5%)
@@ -275,7 +304,14 @@ const RestakerOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(0)}
+            onClick={() => {
+              trackEvent('filter_applied', {
+                filter_type: 'market_share',
+                filter_value: 'low_share_under_1',
+                section: 'restakers'
+              });
+              setFilteredMarketShare(0);
+            }}
             className={`text-xs ${filteredMarketShare === 0 ? 'bg-green-100 border-green-300 hover:bg-green-200' : ''}`}
           >
             Low Share (&lt;1%)
