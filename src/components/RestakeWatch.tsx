@@ -62,6 +62,12 @@ const RestakeWatch: React.FC = () => {
   const [showBanner, setShowBanner] = useState(true);
   const aboutRef = useRef<HTMLDivElement>(null);
 
+  // Keep latest values for safe usage in unload
+  const platformRef = useRef<PlatformType>(activePlatform);
+  const tabRef = useRef<string>(activeTab);
+  useEffect(() => { platformRef.current = activePlatform; }, [activePlatform]);
+  useEffect(() => { tabRef.current = activeTab; }, [activeTab]);
+
   // Track session duration
   useEffect(() => {
     const startTime = Date.now();
@@ -69,13 +75,19 @@ const RestakeWatch: React.FC = () => {
     const sendSession = () => {
       trackEvent('session_ended', {
         duration_ms: Date.now() - startTime,
-        platform: activePlatform,
-        last_tab: activeTab,
+        platform: platformRef.current,
+        last_tab: tabRef.current,
       });
     };
 
+    const handleBeforeUnload = () => {
+      sendSession();
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload, { capture: true } as any);
+
     // on unmount
     return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload as any, { capture: true } as any);
       sendSession();
     };
   }, []);
@@ -468,6 +480,11 @@ const RestakeWatch: React.FC = () => {
                           href="https://twitter.com/therestakewatch"
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => trackEvent('twitter_link_clicked', {
+                            source: 'header',
+                            section: activeTab,
+                            user_type: 'visitor'
+                          })}
                           className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-r from-[#3b82f6] to-[#06b6d4] text-white hover:shadow-md transition-all duration-200 transform hover:scale-105"
                           aria-label="Twitter"
                         >
@@ -505,6 +522,11 @@ const RestakeWatch: React.FC = () => {
                             aboutSection.scrollIntoView({ behavior: 'smooth' });
                           }
                         }}
+                        onClick={() => trackEvent('learn_more_cta_clicked', {
+                          source: 'header',
+                          section: activeTab,
+                          user_type: 'visitor'
+                        })}
                       >
                         Learn More
                         <ChevronRight className="ml-2 h-4 w-4" />
