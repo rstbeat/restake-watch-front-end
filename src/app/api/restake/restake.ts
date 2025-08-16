@@ -1,5 +1,6 @@
 // import axios, { AxiosResponse } from "axios";
 import axios from 'axios';
+import { trackEvent } from '@/lib/analytics';
 import { OperatorDataResponse } from '../../interface/operatorData.interface';
 
 /**
@@ -9,15 +10,30 @@ import { OperatorDataResponse } from '../../interface/operatorData.interface';
  */
 const fetchETHPrice = async (): Promise<number> => {
   try {
+    const startTime = Date.now();
     const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
       params: {
         ids: 'ethereum',
         vs_currencies: 'usd',
       },
     });
-    return response.data.ethereum.usd;
+    const price = response.data.ethereum.usd;
+
+    trackEvent('data_loaded', {
+      data_type: 'eth_price',
+      load_time_ms: Date.now() - startTime,
+      record_count: 1,
+      success: true,
+    });
+
+    return price;
   } catch (err: unknown) {
     console.error('Error fetching ETH price data');
+    trackEvent('data_error', {
+      data_type: 'eth_price',
+      error_message: err instanceof Error ? err.message : 'unknown_error',
+      timestamp: Date.now(),
+    });
     return 0;
   }
 };
@@ -30,6 +46,7 @@ const fetchETHPrice = async (): Promise<number> => {
  */
 const fetchOperatorData = async (): Promise<OperatorDataResponse | null> => {
   try {
+    const startTime = Date.now();
     const response = await axios.get('/restake/operator-data', {
       headers: {
         'Content-Type': 'application/json',
@@ -40,9 +57,24 @@ const fetchOperatorData = async (): Promise<OperatorDataResponse | null> => {
     });
     const data = response.data;
 
+    const recordCount = Array.isArray((data as any)?.operatorData)
+      ? (data as any).operatorData.length
+      : 0;
+    trackEvent('data_loaded', {
+      data_type: 'operators',
+      load_time_ms: Date.now() - startTime,
+      record_count: recordCount,
+      success: true,
+    });
+
     return data;
   } catch (err: unknown) {
     console.error('Error fetching operator data');
+    trackEvent('data_error', {
+      data_type: 'operators',
+      error_message: err instanceof Error ? err.message : 'unknown_error',
+      timestamp: Date.now(),
+    });
     return null;
   }
 };
@@ -55,6 +87,7 @@ const fetchOperatorData = async (): Promise<OperatorDataResponse | null> => {
  */
 const fetchStakerData = async () => {
   try {
+    const startTime = Date.now();
     const response = await axios.get('/restake/staker-data', {
       headers: {
         'Content-Type': 'application/json',
@@ -65,6 +98,16 @@ const fetchStakerData = async () => {
     });
     const data = response.data;
 
+    const recordCount = Array.isArray((data as any)?.stakerData)
+      ? (data as any).stakerData.length
+      : 0;
+    trackEvent('data_loaded', {
+      data_type: 'restakers',
+      load_time_ms: Date.now() - startTime,
+      record_count: recordCount,
+      success: true,
+    });
+
     return data;
   } catch (err: unknown) {
     // if (err instanceof Error) {
@@ -74,6 +117,11 @@ const fetchStakerData = async () => {
     //     console.error(err);
     // }
     console.error('Error staker data');
+    trackEvent('data_error', {
+      data_type: 'restakers',
+      error_message: err instanceof Error ? err.message : 'unknown_error',
+      timestamp: Date.now(),
+    });
     return {};
   }
 };

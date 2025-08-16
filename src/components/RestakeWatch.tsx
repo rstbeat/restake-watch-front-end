@@ -62,6 +62,24 @@ const RestakeWatch: React.FC = () => {
   const [showBanner, setShowBanner] = useState(true);
   const aboutRef = useRef<HTMLDivElement>(null);
 
+  // Track session duration
+  useEffect(() => {
+    const startTime = Date.now();
+
+    const sendSession = () => {
+      trackEvent('session_ended', {
+        duration_ms: Date.now() - startTime,
+        platform: activePlatform,
+        last_tab: activeTab,
+      });
+    };
+
+    // on unmount
+    return () => {
+      sendSession();
+    };
+  }, []);
+
   const [stakerData, setStakerData] = useState<any | null>(null);
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
     null,

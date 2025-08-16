@@ -3056,6 +3056,35 @@ const CopyToClipboardButton: React.FC<{ text: string }> = ({ text }) => {
   );
 };
 
+// Simple throttle to avoid event floods
+const throttle = (fn: (...args: any[]) => void, wait: number) => {
+  let lastTime = 0;
+  let timeout: any;
+  return (...args: any[]) => {
+    const now = Date.now();
+    const remaining = wait - (now - lastTime);
+    if (remaining <= 0) {
+      clearTimeout(timeout);
+      lastTime = now;
+      fn(...args);
+    } else if (!timeout) {
+      timeout = setTimeout(() => {
+        lastTime = Date.now();
+        timeout = null;
+        fn(...args);
+      }, remaining);
+    }
+  };
+};
+
+const trackMetricInteraction = throttle((metricName: string, value: any) => {
+  trackEvent('metric_viewed', {
+    metric_name: metricName,
+    metric_value: value,
+    section: 'overview',
+  });
+}, 3000);
+
 const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
   const [operatorData, setOperatorData] = useState<OperatorDataResponse | null>(
     null,
