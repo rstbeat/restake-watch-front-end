@@ -102,6 +102,11 @@ const RiskAssessment = () => {
         </div>
       </CardHeader>
       <CardContent>
+        {/* Track when key metrics first come into view */}
+        {(() => {
+          // IIFE to use hooks at top level not allowed; instead we use a nested component pattern below
+          return null;
+        })()}
         <p className="mb-2 font-medium">
           The current operator landscape presents significant centralization
           risks:
@@ -1406,6 +1411,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
+                    id="metric-operator-concentration"
                     className="bg-orange-500 h-2.5 rounded-full"
                     style={{
                       width: `${Math.min(operatorData?.concentrationMetrics?.herfindahlIndex ? operatorData.concentrationMetrics.herfindahlIndex * 100 * 3 : 0, 100)}%`,
@@ -1426,6 +1432,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
+                    id="metric-restaker-concentration"
                     className="bg-yellow-500 h-2.5 rounded-full"
                     style={{
                       width: `${Math.min(restakeData?.concentrationMetrics?.herfindahlIndex ? restakeData.concentrationMetrics.herfindahlIndex * 100 * 3 : 0, 100)}%`,
@@ -1446,6 +1453,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
+                    id="metric-strategy-concentration"
                     className="bg-red-500 h-2.5 rounded-full"
                     style={{ width: '85%' }}
                   ></div>
@@ -3316,6 +3324,41 @@ const Overview: React.FC<OverviewProps> = ({ restakeData }) => {
       });
     }
   }, [operatorData?.concentrationMetrics?.top33PercentCount]);
+
+  // Observe when key concentration indicators enter viewport
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ids = [
+      { id: 'metric-operator-concentration', name: 'operator_concentration_bar' },
+      { id: 'metric-restaker-concentration', name: 'restaker_concentration_bar' },
+      { id: 'metric-strategy-concentration', name: 'strategy_concentration_bar' },
+    ];
+
+    const seen = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.target instanceof HTMLElement) {
+            const id = entry.target.id;
+            if (!seen.has(id)) {
+              seen.add(id);
+              const config = ids.find((x) => x.id === id);
+              const width = entry.target.style.width || undefined;
+              trackMetricInteraction(config?.name || id, width);
+            }
+          }
+        });
+      },
+      { threshold: 0.4 },
+    );
+
+    ids.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="space-y-6">
