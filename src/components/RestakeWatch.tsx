@@ -108,6 +108,15 @@ const RestakeWatch: React.FC = () => {
   const [tabChanged, setTabChanged] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
 
+  // Track viewed section changes
+  const lastSectionRef = useRef<string>('overview');
+  useEffect(() => {
+    if (visibleSection && lastSectionRef.current !== visibleSection) {
+      trackEvent('section_viewed', { section: visibleSection });
+      lastSectionRef.current = visibleSection;
+    }
+  }, [visibleSection]);
+
   // Backers data for the carousel
   const backersData = [
     {
@@ -517,16 +526,16 @@ const RestakeWatch: React.FC = () => {
                         size="sm"
                         className="bg-[#06b6d4] text-white hover:bg-[#0891b2] shadow-sm hover:shadow-md transition-all duration-200 transform hover:translate-y-[-2px]"
                         onClick={() => {
+                          trackEvent('learn_more_cta_clicked', {
+                            source: 'header',
+                            section: activeTab,
+                            user_type: 'visitor'
+                          });
                           const aboutSection = document.getElementById('about');
                           if (aboutSection) {
                             aboutSection.scrollIntoView({ behavior: 'smooth' });
                           }
                         }}
-                        onClick={() => trackEvent('learn_more_cta_clicked', {
-                          source: 'header',
-                          section: activeTab,
-                          user_type: 'visitor'
-                        })}
                       >
                         Learn More
                         <ChevronRight className="ml-2 h-4 w-4" />
