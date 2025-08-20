@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import Script from 'next/script';
 import GAListener from '@/components/GAListener.client';
+import ScrollDepth from '@/components/ScrollDepth.client';
 import './globals.css';
 
 const poppins = Poppins({
@@ -30,6 +31,9 @@ export default function RootLayout({
       <body className={`${poppins.variable} antialiased`}>
         {children}
 
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
           strategy="afterInteractive"
@@ -44,6 +48,7 @@ export default function RootLayout({
         </Script>
 
         <GAListener />
+        <ScrollDepth />
       </body>
     </html>
   );
