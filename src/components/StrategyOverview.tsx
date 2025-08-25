@@ -167,17 +167,6 @@ const StrategyOverview: React.FC = () => {
   }, [strategiesData, fetchStrategyData]);
 
   useEffect(() => {
-    if (!firstRenderTrackedRef.current && strategiesWithData.length > 0) {
-      firstRenderTrackedRef.current = true;
-      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
-      trackEvent('first_data_render', {
-        section: 'strategies',
-        duration_ms: Math.round(now - mountAtRef.current),
-      });
-    }
-  }, [strategiesWithData]);
-
-  useEffect(() => {
     const getEthPrice = async () => {
       try {
         const price = await fetchETHPrice();
@@ -301,6 +290,18 @@ const StrategyOverview: React.FC = () => {
         metrics: strategiesData.strategyConcentrationMetrics[strategy] || null,
       }));
   }, [strategiesData]);
+
+  // Track first data render after strategiesWithData is available
+  useEffect(() => {
+    if (!firstRenderTrackedRef.current && strategiesWithData.length > 0) {
+      firstRenderTrackedRef.current = true;
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      trackEvent('first_data_render', {
+        section: 'strategies',
+        duration_ms: Math.round(now - mountAtRef.current),
+      });
+    }
+  }, [strategiesWithData]);
 
   const filteredAndSortedData = useMemo(() => {
     if (!strategiesWithData.length) return [];
