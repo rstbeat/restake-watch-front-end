@@ -51,4 +51,14 @@ export function trackSearch(category: string, searchTerm: string): void {
   });
 }
 
+export function debugAnalytics(enabled: boolean = true): void {
+  if (typeof window === 'undefined') return;
+  if (typeof window.gtag !== 'function') return;
+  window.gtag('set', { debug_mode: enabled });
+}
+
+export function isInitialized(): boolean {
+  return typeof window !== 'undefined' && typeof window.gtag === 'function';
+}
+
 
