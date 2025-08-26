@@ -40,7 +40,7 @@ import About from './About';
 import BackersCarousel from './BackersCarousel';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchStakerData, fetchOperatorData } from '../app/api/restake/restake';
-import { trackEvent } from 'lib/analytics';
+import { trackEvent, setUserProperties } from 'lib/analytics';
 
 // Color palette CSS variables (to be injected into :root in globals.css)
 // Primary: #ab3bd2 (Purple)
@@ -132,6 +132,7 @@ const RestakeWatch: React.FC = () => {
       from_platform: activePlatform,
       to_platform: platform
     });
+    setUserProperties({ platform });
     setActivePlatform(platform);
   };
 
@@ -248,6 +249,7 @@ const RestakeWatch: React.FC = () => {
       to_tab: value,
       platform: activePlatform
     });
+    setUserProperties({ current_tab: value });
   
     setTabChanged(true);
     setActiveTab(value);

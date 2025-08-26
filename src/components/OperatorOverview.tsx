@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
+import { trackEvent } from 'lib/analytics';
 import {
   ChevronUp,
   ChevronDown,
@@ -108,6 +109,10 @@ const OperatorOverview: React.FC = () => {
     null,
   );
 
+  // Track time to first data render
+  const mountAtRef = useRef(typeof performance !== 'undefined' ? performance.now() : Date.now());
+  const firstRenderTrackedRef = useRef(false);
+
   const fetchOperatorDataCallback = useCallback(async () => {
     try {
       setIsLoadingOperatorData(true);
@@ -142,6 +147,17 @@ const OperatorOverview: React.FC = () => {
       fetchOperatorDataCallback();
     }
   }, [operatorData, fetchOperatorDataCallback]);
+
+  useEffect(() => {
+    if (!firstRenderTrackedRef.current && operatorData && operatorData.length > 0) {
+      firstRenderTrackedRef.current = true;
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      trackEvent('first_data_render', {
+        section: 'operators',
+        duration_ms: Math.round(now - mountAtRef.current),
+      });
+    }
+  }, [operatorData]);
 
   const professionalOperators = useMemo(() => {
     if (!operatorData) return [];
@@ -179,6 +195,18 @@ const OperatorOverview: React.FC = () => {
   );
 
   const toggleRowExpansion = (address: string) => {
+    const willExpand = !(expandedRows[address]);
+    trackEvent('row_expanded', {
+      table: 'operators',
+      operator_address: address,
+      expanded: willExpand,
+    });
+    if (willExpand) {
+      trackEvent('view_item', {
+        item_category: 'operator',
+        item_id: address,
+      });
+    }
     setExpandedRows((prev) => ({
       ...prev,
       [address]: !prev[address],
@@ -218,6 +246,11 @@ const OperatorOverview: React.FC = () => {
     link.setAttribute('href', url);
     link.setAttribute('download', 'operator_data.csv');
     link.click();
+
+    trackEvent('export_csv', {
+      table: 'operators',
+      row_count: operatorData.length,
+    });
   };
 
   const filteredAndSortedData = useMemo(() => {
@@ -298,8 +331,15 @@ const OperatorOverview: React.FC = () => {
   }, [filteredAndSortedData, itemsPerPage]);
 
   const handleSort = (column: keyof OperatorDataFormated) => {
+    const nextDirection =
+      column === sortColumn ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'desc';
+    trackEvent('sort_changed', {
+      table: 'operators',
+      column,
+      direction: nextDirection,
+    });
     if (column === sortColumn) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(nextDirection);
     } else {
       setSortColumn(column);
       setSortDirection('desc');
@@ -320,6 +360,10 @@ const OperatorOverview: React.FC = () => {
       setCopiedAddress(text);
       setTimeout(() => setCopiedAddress(null), 2000);
     });
+    trackEvent('copy_to_clipboard', {
+      table: 'operators',
+      field: 'operator_address',
+    });
   };
 
   const truncateAddress = (address: string) => {
@@ -335,7 +379,17 @@ const OperatorOverview: React.FC = () => {
           type="text"
           placeholder="Search by Name, Address, or Professional Operator"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            // Debounced search tracking
+            const term = e.target.value;
+            window.clearTimeout((window as any).__op_search_to);
+            (window as any).__op_search_to = window.setTimeout(() => {
+              import('lib/analytics').then(({ trackSearch }) =>
+                trackSearch('operators', term)
+              );
+            }, 500);
+          }}
           className="pl-8"
         />
       </div>
@@ -346,7 +400,14 @@ const OperatorOverview: React.FC = () => {
           <Button
             variant={filteredMarketShare === null ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilteredMarketShare(null)}
+            onClick={() => {
+              setFilteredMarketShare(null);
+              trackEvent('filter_applied', {
+                table: 'operators',
+                filter_type: 'market_share',
+                filter_value: 'all',
+              });
+            }}
             className="text-xs"
           >
             All
@@ -354,7 +415,14 @@ const OperatorOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(5)}
+            onClick={() => {
+              setFilteredMarketShare(5);
+              trackEvent('filter_applied', {
+                table: 'operators',
+                filter_type: 'market_share',
+                filter_value: 'gt_5',
+              });
+            }}
             className={`text-xs ${filteredMarketShare === 5 ? 'bg-red-100 border-red-300 hover:bg-red-200' : ''}`}
           >
             High Share (&gt;5%)
@@ -362,7 +430,14 @@ const OperatorOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(1)}
+            onClick={() => {
+              setFilteredMarketShare(1);
+              trackEvent('filter_applied', {
+                table: 'operators',
+                filter_type: 'market_share',
+                filter_value: '1_to_5',
+              });
+            }}
             className={`text-xs ${filteredMarketShare === 1 ? 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200' : ''}`}
           >
             Medium Share (1-5%)
@@ -370,7 +445,14 @@ const OperatorOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(0)}
+            onClick={() => {
+              setFilteredMarketShare(0);
+              trackEvent('filter_applied', {
+                table: 'operators',
+                filter_type: 'market_share',
+                filter_value: 'lt_1',
+              });
+            }}
             className={`text-xs ${filteredMarketShare === 0 ? 'bg-green-100 border-green-300 hover:bg-green-200' : ''}`}
           >
             Low Share (&lt;1%)
@@ -381,7 +463,14 @@ const OperatorOverview: React.FC = () => {
           <Checkbox
             id="show-only-dvt"
             checked={showOnlyDVT}
-            onCheckedChange={(checked) => setShowOnlyDVT(checked as boolean)}
+            onCheckedChange={(checked) => {
+              setShowOnlyDVT(checked as boolean);
+              trackEvent('filter_applied', {
+                table: 'operators',
+                filter_type: 'dvt_only',
+                filter_value: Boolean(checked),
+              });
+            }}
           />
           <label
             htmlFor="show-only-dvt"
@@ -400,8 +489,18 @@ const OperatorOverview: React.FC = () => {
             onChange={(e) => {
               if (e.target.value) {
                 setSelectedProfessionalOperators([e.target.value]);
+                trackEvent('filter_applied', {
+                  table: 'operators',
+                  filter_type: 'professional_operator',
+                  filter_value: e.target.value,
+                });
               } else {
                 setSelectedProfessionalOperators([]);
+                trackEvent('filter_applied', {
+                  table: 'operators',
+                  filter_type: 'professional_operator',
+                  filter_value: 'all',
+                });
               }
             }}
             className="px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -417,7 +516,10 @@ const OperatorOverview: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setSelectedProfessionalOperators([])}
+              onClick={() => {
+                setSelectedProfessionalOperators([]);
+                trackEvent('filters_cleared', { table: 'operators', scope: 'professional_operator' });
+              }}
               className="text-xs"
             >
               Clear
@@ -796,7 +898,11 @@ const OperatorOverview: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => {
+                const next = Math.max(currentPage - 1, 1);
+                setCurrentPage(next);
+                trackEvent('pagination_changed', { table: 'operators', page: next });
+              }}
               disabled={currentPage === 1}
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
@@ -808,9 +914,11 @@ const OperatorOverview: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
+              onClick={() => {
+                const next = Math.min(currentPage + 1, totalPages);
+                setCurrentPage(next);
+                trackEvent('pagination_changed', { table: 'operators', page: next });
+              }}
               disabled={currentPage === totalPages}
             >
               Next
