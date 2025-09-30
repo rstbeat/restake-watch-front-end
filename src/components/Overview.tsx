@@ -2128,9 +2128,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                             .slice(0, 20)
                             .reduce(
                               (sum: number, staker: any) =>
-                                sum +
-                                (staker['ETH Equivalent Value'] || 0) *
-                                  ethPrice,
+                                sum + (staker['Market Share'] || 0),
                               0,
                             ) * 100
                         ).toFixed(1)}
@@ -2168,9 +2166,7 @@ const UnifiedRiskMetricsOverview: React.FC<UnifiedRiskMetricsOverviewProps> = ({
                             .slice(0, 5)
                             .reduce(
                               (sum: number, staker: any) =>
-                                sum +
-                                (staker['ETH Equivalent Value'] || 0) *
-                                  ethPrice,
+                                sum + (staker['Market Share'] || 0),
                               0,
                             ) * 100
                         ).toFixed(1)}
