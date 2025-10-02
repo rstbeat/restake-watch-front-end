@@ -209,10 +209,34 @@ const RestakerOverview: React.FC = () => {
         return matchesSearchTerm && matchesMarketShare;
       })
       .sort((a, b) => {
-        const aValue = a[sortColumn];
-        const bValue = b[sortColumn];
+        let aValue = a[sortColumn];
+        let bValue = b[sortColumn];
 
         if (aValue === undefined || bValue === undefined) return 0;
+
+        // Convert to number for amountRestaked to fix sorting
+        if (sortColumn === 'amountRestaked') {
+          aValue = parseFloat(aValue as string);
+          bValue = parseFloat(bValue as string);
+        }
+
+        // Convert compact ETH notation to number for proper sorting
+        if (sortColumn === 'ethRestaked') {
+          const parseETH = (value: string): number => {
+            const match = value.match(/^([\d.]+)([KMB]?)/);
+            if (!match) return 0;
+            const num = parseFloat(match[1]);
+            const suffix = match[2];
+            const multipliers: { [key: string]: number } = {
+              K: 1_000,
+              M: 1_000_000,
+              B: 1_000_000_000,
+            };
+            return num * (multipliers[suffix] || 1);
+          };
+          aValue = parseETH(aValue as string);
+          bValue = parseETH(bValue as string);
+        }
 
         if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
