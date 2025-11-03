@@ -2,25 +2,16 @@
 import axios from 'axios';
 import { OperatorDataResponse } from '../../interface/operatorData.interface';
 
-/**
- * Fetches the current ETH price in USD from CoinGecko API
- * 
- * @return A Promise that resolves to the current ETH price in USD
- */
-const fetchETHPrice = async (): Promise<number> => {
-  try {
-    const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
-      params: {
-        ids: 'ethereum',
-        vs_currencies: 'usd',
-      },
-    });
-    return response.data.ethereum.usd;
-  } catch (err: unknown) {
-    console.error('Error fetching ETH price data');
-    return 0;
-  }
+type PlatformType = 'eigenlayer' | 'symbiotic' | 'karak';
+
+let currentPlatform: PlatformType = 'eigenlayer';
+
+export const setPlatform = (platform: PlatformType) => {
+  currentPlatform = platform;
 };
+
+const getBasePath = (platform: PlatformType = currentPlatform) =>
+  platform === 'symbiotic' ? '/smetrics' : '/restake';
 
 /**
  * Fetches operator data from the "/restake/operator-data" endpoint.
@@ -28,9 +19,9 @@ const fetchETHPrice = async (): Promise<number> => {
  * @param params - The parameters for the fetch request.
  * @return A Promise that resolves to the fetched data as an object. If an error occurs, an empty object is returned.
  */
-const fetchOperatorData = async (): Promise<OperatorDataResponse | null> => {
+const fetchOperatorData = async (platform: PlatformType = currentPlatform): Promise<OperatorDataResponse | null> => {
   try {
-    const response = await axios.get('/restake/operator-data', {
+    const response = await axios.get(`${getBasePath(platform)}/operator-data`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -53,9 +44,9 @@ const fetchOperatorData = async (): Promise<OperatorDataResponse | null> => {
  * @param params - The parameters for the fetch request.
  * @return  A Promise that resolves to the fetched data as an object. If an error occurs, an empty object is returned.
  */
-const fetchStakerData = async () => {
+const fetchStakerData = async (platform: PlatformType = currentPlatform) => {
   try {
-    const response = await axios.get('/restake/staker-data', {
+    const response = await axios.get(`${getBasePath(platform)}/staker-data`, {
       headers: {
         'Content-Type': 'application/json',
       },
@@ -95,4 +86,24 @@ export async function fetchEthereumStats(): Promise<{
   }
 }
 
-export { fetchOperatorData, fetchStakerData, fetchETHPrice };
+export async function fetchDailyMetrics(platform: PlatformType = currentPlatform) {
+  try {
+    const response = await axios.get(`${getBasePath(platform)}/daily-metrics`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching daily metrics');
+    return null;
+  }
+}
+
+export async function fetchStrategyData(platform: PlatformType = currentPlatform) {
+  try {
+    const response = await axios.get(`${getBasePath(platform)}/vault-data`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching strategy data');
+    return null;
+  }
+}
+
+export { fetchOperatorData, fetchStakerData, fetchETHPrice, fetchDailyMetrics, fetchStrategyData };

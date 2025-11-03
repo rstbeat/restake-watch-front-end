@@ -39,7 +39,7 @@ import Roadmap from './Roadmap';
 import About from './About';
 import BackersCarousel from './BackersCarousel';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
-import { fetchStakerData, fetchOperatorData } from '../app/api/restake/restake';
+import { fetchStakerData, fetchOperatorData, setPlatform } from '../app/api/restake/restake';
 import { trackEvent } from 'lib/analytics';
 
 // Color palette CSS variables (to be injected into :root in globals.css)
@@ -128,6 +128,8 @@ const RestakeWatch: React.FC = () => {
   ];
 
   const handlePlatformChange = (platform: PlatformType) => {
+    // Actualiza la plataforma global para que los fetch utilicen el prefijo correcto
+    setPlatform(platform);
     trackEvent('platform_change', {
       from_platform: activePlatform,
       to_platform: platform
