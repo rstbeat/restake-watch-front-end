@@ -254,7 +254,8 @@ const RestakeWatch: React.FC = () => {
   };
 
   const renderContent = () => {
-    if (activePlatform !== 'eigenlayer') {
+    // Solo mostramos "Coming Soon" si la plataforma seleccionada es Karak; las demás usan el diseño completo
+    if (activePlatform === 'karak') {
       return (
         <div className="text-center py-8">
           <h2 className="text-2xl font-bold mb-4 text-[#ab3bd2]">
@@ -567,7 +568,7 @@ const RestakeWatch: React.FC = () => {
               </div>
             </div>
 
-            {activePlatform === 'eigenlayer' && (
+            {activePlatform !== 'karak' && (
               <div className="bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm overflow-x-auto">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex items-center justify-between min-w-max">
@@ -575,7 +576,7 @@ const RestakeWatch: React.FC = () => {
                       <span className="text-gray-600 whitespace-nowrap">
                         Platform:{' '}
                         <span className="font-medium text-[#ab3bd2]">
-                          EigenLayer
+                          {activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)}
                         </span>
                       </span>
                       <span className="text-gray-400">|</span>
