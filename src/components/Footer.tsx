@@ -3,7 +3,7 @@ import { Twitter, Coffee, Heart, Signal } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#e6e7ec] text-gray-600 py-8 border-t border-gray-200">
+    <footer className="bg-white/80 backdrop-blur-sm text-gray-600 py-8 border-t border-gray-200 md:ml-48">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col space-y-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
