@@ -19,7 +19,7 @@ const getBasePath = (platform: PlatformType = currentPlatform) =>
  * @param params - The parameters for the fetch request.
  * @return A Promise that resolves to the fetched data as an object. If an error occurs, an empty object is returned.
  */
-const fetchOperatorData = async (platform: PlatformType = currentPlatform): Promise<OperatorDataResponse | null> => {
+export const fetchOperatorData = async (platform: PlatformType = currentPlatform): Promise<OperatorDataResponse | null> => {
   try {
     const response = await axios.get(`${getBasePath(platform)}/operator-data`, {
       headers: {
@@ -44,7 +44,7 @@ const fetchOperatorData = async (platform: PlatformType = currentPlatform): Prom
  * @param params - The parameters for the fetch request.
  * @return  A Promise that resolves to the fetched data as an object. If an error occurs, an empty object is returned.
  */
-const fetchStakerData = async (platform: PlatformType = currentPlatform) => {
+export const fetchStakerData = async (platform: PlatformType = currentPlatform) => {
   try {
     const response = await axios.get(`${getBasePath(platform)}/staker-data`, {
       headers: {
@@ -66,6 +66,19 @@ const fetchStakerData = async (platform: PlatformType = currentPlatform) => {
     // }
     console.error('Error staker data');
     return {};
+  }
+};
+
+// Devuelve el precio actual de ETH en USD
+const fetchETHPrice = async (): Promise<number> => {
+  try {
+    const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
+      params: { ids: 'ethereum', vs_currencies: 'usd' },
+    });
+    return response.data?.ethereum?.usd ?? 0;
+  } catch (error) {
+    console.error('Error fetching ETH price data');
+    return 0;
   }
 };
 
@@ -105,5 +118,3 @@ export async function fetchStrategyData(platform: PlatformType = currentPlatform
     return null;
   }
 }
-
-export { fetchOperatorData, fetchStakerData, fetchETHPrice, fetchDailyMetrics, fetchStrategyData };
