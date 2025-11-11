@@ -70,7 +70,7 @@ export const fetchStakerData = async (platform: PlatformType = currentPlatform) 
 };
 
 // Devuelve el precio actual de ETH en USD
-const fetchETHPrice = async (): Promise<number> => {
+export const fetchETHPrice = async (): Promise<number> => {
   try {
     const response = await axios.get('https://api.coingecko.com/api/v3/simple/price', {
       params: { ids: 'ethereum', vs_currencies: 'usd' },
