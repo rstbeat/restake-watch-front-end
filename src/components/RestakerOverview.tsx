@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import {
   ChevronUp,
@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { fetchStakerData } from '../app/api/restake/restake';
+import { trackEvent } from 'lib/analytics';
 
 interface RestakerData {
   restakerAddress: string;
@@ -89,6 +90,10 @@ const RestakerOverview: React.FC = () => {
     null,
   );
 
+  // Track time to first data render
+  const mountAtRef = useRef(typeof performance !== 'undefined' ? performance.now() : Date.now());
+  const firstRenderTrackedRef = useRef(false);
+
   const fetchStakerDataCallback = useCallback(async () => {
     try {
       setIsLoadingStakerData(true);
@@ -121,7 +126,24 @@ const RestakerOverview: React.FC = () => {
     }
   }, [stakerData, fetchStakerDataCallback]);
 
+  useEffect(() => {
+    if (!firstRenderTrackedRef.current && stakerData && stakerData.length > 0) {
+      firstRenderTrackedRef.current = true;
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      trackEvent('first_data_render', {
+        section: 'restakers',
+        duration_ms: Math.round(now - mountAtRef.current),
+      });
+    }
+  }, [stakerData]);
+
   const toggleRowExpansion = (address: string) => {
+    const willExpand = !(expandedRows[address]);
+    trackEvent('row_expanded', {
+      table: 'restakers',
+      restaker_address: address,
+      expanded: willExpand,
+    });
     setExpandedRows((prev) => ({
       ...prev,
       [address]: !prev[address],
@@ -157,6 +179,7 @@ const RestakerOverview: React.FC = () => {
     link.setAttribute('href', url);
     link.setAttribute('download', 'restaker_data.csv');
     link.click();
+    trackEvent('export_csv', { table: 'restakers', row_count: stakerData.length });
   };
 
   const filteredAndSortedData = useMemo(() => {
@@ -179,8 +202,35 @@ const RestakerOverview: React.FC = () => {
         return matchesSearchTerm && matchesMarketShare;
       })
       .sort((a, b) => {
-        const aValue = a[sortColumn];
-        const bValue = b[sortColumn];
+        let aValue = a[sortColumn];
+        let bValue = b[sortColumn];
+
+        if (aValue === undefined || bValue === undefined) return 0;
+
+        // Convert to number for amountRestaked to fix sorting
+        if (sortColumn === 'amountRestaked') {
+          aValue = parseFloat(aValue as string);
+          bValue = parseFloat(bValue as string);
+        }
+
+        // Convert compact ETH notation to number for proper sorting
+        if (sortColumn === 'ethRestaked') {
+          const parseETH = (value: string): number => {
+            const match = value.match(/^([\d.]+)([KMB]?)/);
+            if (!match) return 0;
+            const num = parseFloat(match[1]);
+            const suffix = match[2];
+            const multipliers: { [key: string]: number } = {
+              K: 1_000,
+              M: 1_000_000,
+              B: 1_000_000_000,
+            };
+            return num * (multipliers[suffix] || 1);
+          };
+          aValue = parseETH(aValue as string);
+          bValue = parseETH(bValue as string);
+        }
+
         if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
         if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
         return 0;
@@ -225,6 +275,10 @@ const RestakerOverview: React.FC = () => {
       setCopiedAddress(text);
       setTimeout(() => setCopiedAddress(null), 2000);
     });
+    trackEvent('copy_to_clipboard', {
+      table: 'restakers',
+      field: 'restaker_address',
+    });
   };
 
   const truncateAddress = (address: string) => {
@@ -240,7 +294,14 @@ const RestakerOverview: React.FC = () => {
           type="text"
           placeholder="Search by Restaker Address"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            trackEvent('filter_applied', {
+              table: 'restakers',
+              filter_type: 'search',
+              filter_value: e.target.value,
+            });
+          }}
           className="pl-8"
         />
       </div>
@@ -251,7 +312,14 @@ const RestakerOverview: React.FC = () => {
           <Button
             variant={filteredMarketShare === null ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilteredMarketShare(null)}
+            onClick={() => {
+              setFilteredMarketShare(null);
+              trackEvent('filter_applied', {
+                table: 'restakers',
+                filter_type: 'market_share',
+                filter_value: 'all',
+              });
+            }}
             className="text-xs"
           >
             All
@@ -259,7 +327,14 @@ const RestakerOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(5)}
+            onClick={() => {
+              setFilteredMarketShare(5);
+              trackEvent('filter_applied', {
+                table: 'restakers',
+                filter_type: 'market_share',
+                filter_value: 'gt_5',
+              });
+            }}
             className={`text-xs ${filteredMarketShare === 5 ? 'bg-red-100 border-red-300 hover:bg-red-200' : ''}`}
           >
             High Share (&gt;5%)
@@ -267,7 +342,14 @@ const RestakerOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(1)}
+            onClick={() => {
+              setFilteredMarketShare(1);
+              trackEvent('filter_applied', {
+                table: 'restakers',
+                filter_type: 'market_share',
+                filter_value: '1_to_5',
+              });
+            }}
             className={`text-xs ${filteredMarketShare === 1 ? 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200' : ''}`}
           >
             Medium Share (1-5%)
@@ -275,7 +357,14 @@ const RestakerOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredMarketShare(0)}
+            onClick={() => {
+              setFilteredMarketShare(0);
+              trackEvent('filter_applied', {
+                table: 'restakers',
+                filter_type: 'market_share',
+                filter_value: 'lt_1',
+              });
+            }}
             className={`text-xs ${filteredMarketShare === 0 ? 'bg-green-100 border-green-300 hover:bg-green-200' : ''}`}
           >
             Low Share (&lt;1%)
@@ -606,7 +695,11 @@ const RestakerOverview: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => {
+                const next = Math.max(currentPage - 1, 1);
+                setCurrentPage(next);
+                trackEvent('pagination_changed', { table: 'restakers', page: next });
+              }}
               disabled={currentPage === 1}
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
@@ -618,9 +711,11 @@ const RestakerOverview: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
+              onClick={() => {
+                const next = Math.min(currentPage + 1, totalPages);
+                setCurrentPage(next);
+                trackEvent('pagination_changed', { table: 'restakers', page: next });
+              }}
               disabled={currentPage === totalPages}
             >
               Next

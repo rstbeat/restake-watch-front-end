@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import {
   ChevronUp,
   ChevronDown,
@@ -23,6 +23,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { fetchOperatorData, fetchETHPrice } from '../app/api/restake/restake';
+import { trackEvent } from 'lib/analytics';
 import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface StrategyMetrics {
@@ -124,6 +125,10 @@ const StrategyOverview: React.FC = () => {
     null,
   );
 
+  // Track time to first data render
+  const mountAtRef = useRef(typeof performance !== 'undefined' ? performance.now() : Date.now());
+  const firstRenderTrackedRef = useRef(false);
+
   const fetchStrategyData = useCallback(async () => {
     try {
       setIsLoadingStrategyData(true);
@@ -180,6 +185,11 @@ const StrategyOverview: React.FC = () => {
 
   // Toggle expansion function
   const toggleRowExpansion = (name: string) => {
+    const willExpand = !(expandedRows[name]);
+    trackEvent('row_expanded', { table: 'strategies', strategy: name, expanded: willExpand });
+    if (willExpand) {
+      trackEvent('view_item', { item_category: 'strategy', item_id: name });
+    }
     setExpandedRows((prev) => ({
       ...prev,
       [name]: !prev[name],
@@ -230,6 +240,7 @@ const StrategyOverview: React.FC = () => {
     link.setAttribute('href', url);
     link.setAttribute('download', 'strategy_data.csv');
     link.click();
+    trackEvent('export_csv', { table: 'strategies', row_count: strategiesWithData.length });
   };
 
   // Function to determine risk level based on concentration metrics
@@ -279,6 +290,18 @@ const StrategyOverview: React.FC = () => {
         metrics: strategiesData.strategyConcentrationMetrics[strategy] || null,
       }));
   }, [strategiesData]);
+
+  // Track first data render after strategiesWithData is available
+  useEffect(() => {
+    if (!firstRenderTrackedRef.current && strategiesWithData.length > 0) {
+      firstRenderTrackedRef.current = true;
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      trackEvent('first_data_render', {
+        section: 'strategies',
+        duration_ms: Math.round(now - mountAtRef.current),
+      });
+    }
+  }, [strategiesWithData]);
 
   const filteredAndSortedData = useMemo(() => {
     if (!strategiesWithData.length) return [];
@@ -338,8 +361,11 @@ const StrategyOverview: React.FC = () => {
   }, [searchTerm, filteredRiskLevel]);
 
   const handleSort = (column: keyof StrategyData) => {
+    const nextDirection =
+      column === sortColumn ? (sortDirection === 'asc' ? 'desc' : 'asc') : 'desc';
+    trackEvent('sort_changed', { table: 'strategies', column, direction: nextDirection });
     if (column === sortColumn) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(nextDirection);
     } else {
       setSortColumn(column);
       setSortDirection('desc');
@@ -393,7 +419,10 @@ const StrategyOverview: React.FC = () => {
           type="text"
           placeholder="Search by Strategy Name"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            trackEvent('filter_applied', { table: 'strategies', filter_type: 'search', filter_value: e.target.value });
+          }}
           className="pl-8"
         />
       </div>
@@ -404,7 +433,10 @@ const StrategyOverview: React.FC = () => {
           <Button
             variant={filteredRiskLevel === null ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilteredRiskLevel(null)}
+            onClick={() => {
+              setFilteredRiskLevel(null);
+              trackEvent('filter_applied', { table: 'strategies', filter_type: 'risk', filter_value: 'all' });
+            }}
             className="text-xs"
           >
             All
@@ -412,7 +444,10 @@ const StrategyOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredRiskLevel('critical')}
+            onClick={() => {
+              setFilteredRiskLevel('critical');
+              trackEvent('filter_applied', { table: 'strategies', filter_type: 'risk', filter_value: 'critical' });
+            }}
             className={`text-xs ${filteredRiskLevel === 'critical' ? 'bg-red-100 border-red-300 hover:bg-red-200' : ''}`}
           >
             High Risk
@@ -420,7 +455,10 @@ const StrategyOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredRiskLevel('warning')}
+            onClick={() => {
+              setFilteredRiskLevel('warning');
+              trackEvent('filter_applied', { table: 'strategies', filter_type: 'risk', filter_value: 'warning' });
+            }}
             className={`text-xs ${filteredRiskLevel === 'warning' ? 'bg-yellow-100 border-yellow-300 hover:bg-yellow-200' : ''}`}
           >
             Medium Risk
@@ -428,7 +466,10 @@ const StrategyOverview: React.FC = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setFilteredRiskLevel('positive')}
+            onClick={() => {
+              setFilteredRiskLevel('positive');
+              trackEvent('filter_applied', { table: 'strategies', filter_type: 'risk', filter_value: 'positive' });
+            }}
             className={`text-xs ${filteredRiskLevel === 'positive' ? 'bg-green-100 border-green-300 hover:bg-green-200' : ''}`}
           >
             Low Risk
@@ -847,7 +888,11 @@ const StrategyOverview: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              onClick={() => {
+                const next = Math.max(currentPage - 1, 1);
+                setCurrentPage(next);
+                trackEvent('pagination_changed', { table: 'strategies', page: next });
+              }}
               disabled={currentPage === 1}
             >
               <ChevronLeft className="h-4 w-4 mr-1" />
@@ -859,9 +904,11 @@ const StrategyOverview: React.FC = () => {
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
+              onClick={() => {
+                const next = Math.min(currentPage + 1, totalPages);
+                setCurrentPage(next);
+                trackEvent('pagination_changed', { table: 'strategies', page: next });
+              }}
               disabled={currentPage === totalPages}
             >
               Next

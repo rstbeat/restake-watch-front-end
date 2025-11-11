@@ -36,4 +36,29 @@ export function trackPageView(path: string): void {
   });
 }
 
+export function setUserProperties(properties: Record<string, unknown>): void {
+  if (typeof window === 'undefined') return;
+  if (typeof window.gtag !== 'function') return;
+  window.gtag('set', 'user_properties', properties);
+}
+
+export function trackSearch(category: string, searchTerm: string): void {
+  if (!searchTerm) return;
+  trackEvent('search', {
+    category,
+    search_term: searchTerm,
+    search_term_length: searchTerm.length,
+  });
+}
+
+export function debugAnalytics(enabled: boolean = true): void {
+  if (typeof window === 'undefined') return;
+  if (typeof window.gtag !== 'function') return;
+  window.gtag('set', { debug_mode: enabled });
+}
+
+export function isInitialized(): boolean {
+  return typeof window !== 'undefined' && typeof window.gtag === 'function';
+}
+
 

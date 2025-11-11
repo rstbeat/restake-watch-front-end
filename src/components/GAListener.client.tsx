@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { trackPageView } from '@/lib/analytics';
+import { trackPageView, setUserProperties } from '@/lib/analytics';
 
 type GoogleTagFunction = (...args: unknown[]) => void;
 
@@ -24,6 +24,7 @@ export default function GAListener() {
     const pagePath = queryString ? `${pathname}?${queryString}` : pathname;
 
     trackPageView(pagePath);
+    setUserProperties({ last_page_path: pagePath });
   }, [pathname, searchParams]);
 
   return null;

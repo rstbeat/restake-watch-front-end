@@ -35,7 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   children,
 }) => {
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-[#e6e7ec] text-[#000000] font-bold relative pb-14">
+    <div className="flex flex-col h-full bg-white/80 backdrop-blur-sm text-[#000000] font-bold relative pb-14">
       <div className="p-4">
         <Image
           src="/restake-watch-logo.png"
@@ -107,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden md:flex fixed h-screen w-48 bg-[#e6e7ec] text-[#000000] font-bold">
+      <div className="hidden md:flex fixed h-screen w-48 bg-white/80 backdrop-blur-sm text-[#000000] font-bold border-r border-gray-200 z-10">
         <SidebarContent />
       </div>
 

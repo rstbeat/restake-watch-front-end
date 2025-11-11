@@ -38,9 +38,10 @@ import Footer from './Footer';
 import Roadmap from './Roadmap';
 import About from './About';
 import BackersCarousel from './BackersCarousel';
+import AnimatedBackground from './AnimatedBackground';
 import { OperatorDataResponse } from '../app/interface/operatorData.interface';
 import { fetchStakerData, fetchOperatorData, setPlatform } from '../app/api/restake/restake';
-import { trackEvent } from 'lib/analytics';
+import { trackEvent, setUserProperties } from 'lib/analytics';
 
 // Color palette CSS variables (to be injected into :root in globals.css)
 // Primary: #ab3bd2 (Purple)
@@ -134,6 +135,7 @@ const RestakeWatch: React.FC = () => {
       from_platform: activePlatform,
       to_platform: platform
     });
+    setUserProperties({ platform });
     setActivePlatform(platform);
   };
 
@@ -250,6 +252,7 @@ const RestakeWatch: React.FC = () => {
       to_tab: value,
       platform: activePlatform
     });
+    setUserProperties({ current_tab: value });
   
     setTabChanged(true);
     setActiveTab(value);
@@ -278,28 +281,28 @@ const RestakeWatch: React.FC = () => {
         onValueChange={handleTabChange}
         className="space-y-6"
       >
-        <TabsList className="bg-white rounded-lg shadow-md">
+        <TabsList className="bg-white rounded-lg shadow-md w-full justify-start flex-wrap gap-1">
           <TabsTrigger
             value="overview"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out flex-1 min-w-[80px] sm:min-w-[100px]"
           >
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="operators"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out flex-1 min-w-[80px] sm:min-w-[100px]"
           >
             Operators
           </TabsTrigger>
           <TabsTrigger
             value="restakers"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out flex-1 min-w-[80px] sm:min-w-[100px]"
           >
             Restakers
           </TabsTrigger>
           <TabsTrigger
             value="strategies"
-            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out"
+            className="text-[#171717] font-bold data-[state=active]:bg-[#ab3bd2] data-[state=active]:text-white transition-all duration-300 ease-in-out flex-1 min-w-[80px] sm:min-w-[100px]"
           >
             Strategies
           </TabsTrigger>
@@ -345,8 +348,9 @@ const RestakeWatch: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#e6e7ec] text-[#171717] font-bold">
-      <div className="flex flex-1">
+    <div className="flex flex-col min-h-screen text-[#171717] font-bold relative">
+      <AnimatedBackground />
+      <div className="flex flex-1 relative">
         <Sidebar
           isMobileOpen={isMobileSidebarOpen}
           setIsMobileOpen={setIsMobileSidebarOpen}
@@ -366,7 +370,7 @@ const RestakeWatch: React.FC = () => {
           </Select>
         </Sidebar>
 
-        <div className="flex-1 flex flex-col md:ml-48 w-full">
+        <div className="flex-1 flex flex-col md:ml-48 min-w-0">
           {showBanner && (
             <div className="bg-gradient-to-r from-purple-50/90 via-purple-100/90 to-indigo-50/90 backdrop-blur-lg text-gray-700 py-3 border-b border-purple-200/50 shadow-sm transition-all duration-300 ease-in-out z-20">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -408,7 +412,7 @@ const RestakeWatch: React.FC = () => {
             }`}
           >
             <div
-              className={`bg-[#e6e7ec]/90 backdrop-blur-md text-[#171717] py-4 border-b border-gray-200/50 transition-all duration-300 ${
+              className={`bg-white/80 backdrop-blur-md text-[#171717] py-4 border-b border-gray-200/50 transition-all duration-300 ${
                 scrolled ? 'py-2' : 'py-4'
               }`}
             >
@@ -695,8 +699,8 @@ const RestakeWatch: React.FC = () => {
             )}
           </header>
 
-          <main className="flex-1 bg-[#e6e7ec] text-[#171717]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <main className="flex-1 text-[#171717] overflow-x-hidden">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
               {/* Backers Carousel */}
               <div className="mb-6">
                 <h3 className="text-xl font-bold text-[#171717] mb-2">
